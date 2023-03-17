@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
 
     vector2 playerPos = vector2(2, 3);
     vector2 direction = vector2(1, 0);
-    double rotation = 0;
+    vector2 plane = rotate(direction, M_PI/2);
     
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -59,30 +59,34 @@ int main(int argc, char const *argv[])
         }
         circleColor(renderer, playerPos.x*25, playerPos.y*25, 5, 0xFF0000FF);
         
-        //plane = direction rotated by 90
-        for (int i = 0; i < 800; i+=20)
+
+
+
+
+
+        
+
+        for (int i = 0; i < 800; i+=1)
         {
             //raycast
             // 1 tile = 1 unit, might increase to 16 later
 
-            
-            vector2 ray = vector2(playerPos.x + direction.x, playerPos.y + 2*i/800-1 + direction.y);
+            double camx = 2*double(i)/800-1;
+            vector2 raydir = direction + plane * camx;
 
+            vector2 ray = playerPos;
             double distance = 0;
             double precision = .01;
             for (distance = 0; distance < 10; distance += precision)
             {
-                ray = vector2(ray.x + precision * ray.y/ray.x, ray.y + precision * ray.x/ray.y);
+                ray += raydir * precision;
+                
+                
+                
                 //cellcheck
-                int cellx = ray.x;
-                int celly = ray.y;
-                if (levelGrid[cellx][celly])
-                {            
-                    //abs(distance *= cos(radAngle));
+                if (levelGrid[int(ray.x)][int(ray.y)])
                     break;
-                }
-                
-                
+
             }
 
             lineColor(renderer, playerPos.x*25, playerPos.y*25, ray.x*25, ray.y*25, 0x00FF00FF);
@@ -93,9 +97,14 @@ int main(int argc, char const *argv[])
 
         SDL_RenderPresent(renderer);
 
-        rotation += .01;
+        direction.rotate(.01);
+        vector2 plane = rotate(direction, M_PI/2);
         
         
+
+
+
+
         if (SDL_PollEvent(&mainEvent))
         {
             if (mainEvent.type == SDL_QUIT)
@@ -112,6 +121,5 @@ int main(int argc, char const *argv[])
     SDL_DestroyWindow(window);
     SDL_Quit();
 
-    std::cout << "Hello" << std::endl;
     return EXIT_SUCCESS;
 }

@@ -7,16 +7,37 @@ private:
     /* data */
 public:
     double x, y;
-    vector2(double x, double y);
-    vector2 operator+(const vector2 v);
-    vector2 operator+=(const vector2& v);
-    vector2 operator*(const double lambda);
-    vector2 rotate(double rad);
+    vector2(double setx, double sety){
+        x = setx;
+        y = sety;
+    }
+
+    vector2 operator+(const vector2& v){
+        return vector2(x + v.x, y + v.y);
+    }
+
+    vector2& operator+=(const vector2& v){
+        *this = this->operator+(v);
+        return *this;
+    }
+
+    vector2 operator*(const double lambda)
+    {
+        return vector2(x*lambda, y*lambda);
+    }
+
+    void rotate(const double rad){
+        *this = vector2(
+            x * cos(rad) - y * sin(rad),
+            x * sin(rad) + y * cos(rad)
+        );
+    }
+
 };
 
+vector2 rotate(vector2 v, const double rad){
+    v.rotate(rad);
+    return v;
+}
 
-
-
-
-
-#endif VECTOR2_H
+#endif
