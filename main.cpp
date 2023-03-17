@@ -4,20 +4,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL2_gfxPrimitives.h"
 
-class vector2
-{
-public:
-    double x, y;
-    vector2(double x, double y);
-};
-
-vector2::vector2(double x, double y)
-{
-    this->x = x;
-    this->y = y;
-}
-
-
+#include "vector2.h"
 
 int main(int argc, char const *argv[])
 {
@@ -41,6 +28,7 @@ int main(int argc, char const *argv[])
     };
 
     vector2 playerPos = vector2(2, 3);
+    vector2 direction = vector2(1, 0);
     double rotation = 0;
     
 
@@ -57,14 +45,13 @@ int main(int argc, char const *argv[])
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
         
-        // render level
+        // render minimap
         for (int i = 0; i < 6; i++)
         {
             for (int j = 0; j < 6; j++)
             {
                 if (levelGrid[i][j])
                 {
-                    SDL_Rect box = {};
                     rectangleColor(renderer, i*25, j*25, (i+1)*25, (j+1)*25, 0xFFFFFFFF);
                 }
             }
@@ -72,21 +59,20 @@ int main(int argc, char const *argv[])
         }
         circleColor(renderer, playerPos.x*25, playerPos.y*25, 5, 0xFF0000FF);
         
-        for (int i = 0; i < 800; i++)
+        //plane = direction rotated by 90
+        for (int i = 0; i < 800; i+=20)
         {
             //raycast
             // 1 tile = 1 unit, might increase to 16 later
 
             
-            vector2 ray = playerPos;
+            vector2 ray = vector2(playerPos.x + direction.x, playerPos.y + 2*i/800-1 + direction.y);
 
             double distance = 0;
             double precision = .01;
             for (distance = 0; distance < 10; distance += precision)
             {
-                double radAngle = (double(i)-400)/400 * (M_PI/4) + rotation;
-                ray.x += sin(radAngle)*precision; //todo
-                ray.y += cos(radAngle)*precision;
+                ray = vector2(ray.x + precision * ray.y/ray.x, ray.y + precision * ray.x/ray.y);
                 //cellcheck
                 int cellx = ray.x;
                 int celly = ray.y;
