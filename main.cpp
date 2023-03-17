@@ -27,24 +27,21 @@ int main(int argc, char const *argv[])
         {1,1,1,1,1,1}
     };
 
-    vector2 playerPos = vector2(2, 3);
-    vector2 direction = vector2(1, 0);
-    vector2 plane = rotate(direction, M_PI/2);
-    
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+
+
+
+    vector2 pPos = vector2(2, 3);
+    vector2 pDir = vector2(-1, 0);
+    vector2 pPlane = rotate(pDir, -M_PI/2);
 
     SDL_Event mainEvent;
-
     while (true)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-        
         // render minimap
         for (int i = 0; i < 6; i++)
         {
@@ -57,7 +54,7 @@ int main(int argc, char const *argv[])
             }
             
         }
-        circleColor(renderer, playerPos.x*25, playerPos.y*25, 5, 0xFF0000FF);
+        circleColor(renderer, pPos.x*25, pPos.y*25, 5, 0xFF0000FF);
         
 
 
@@ -68,43 +65,18 @@ int main(int argc, char const *argv[])
 
         for (int i = 0; i < 800; i+=1)
         {
-            //raycast
-            // 1 tile = 1 unit, might increase to 16 later
-
-            double camx = 2*double(i)/800-1;
-            vector2 raydir = direction + plane * camx;
-
-            vector2 ray = playerPos;
-            double distance = 0;
-            double precision = .01;
-            for (distance = 0; distance < 10; distance += precision)
-            {
-                ray += raydir * precision;
-                
-                
-                
-                //cellcheck
-                if (levelGrid[int(ray.x)][int(ray.y)])
-                    break;
-
-            }
-
-            lineColor(renderer, playerPos.x*25, playerPos.y*25, ray.x*25, ray.y*25, 0x00FF00FF);
-            SDL_RenderDrawLine(renderer, i, 300-1/distance*100, i, 300+1/distance*100);
-
+            pair<int> mapCell = pair<int>(pPos.x, pPos.y);
+            
             
         }
 
+
+
+
+
+
+
         SDL_RenderPresent(renderer);
-
-        direction.rotate(.01);
-        vector2 plane = rotate(direction, M_PI/2);
-        
-        
-
-
-
-
         if (SDL_PollEvent(&mainEvent))
         {
             if (mainEvent.type == SDL_QUIT)

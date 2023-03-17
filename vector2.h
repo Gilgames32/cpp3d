@@ -7,7 +7,7 @@ private:
     /* data */
 public:
     double x, y;
-    vector2(double setx, double sety){
+    vector2(double setx = 0, double sety = 0){
         x = setx;
         y = sety;
     }
@@ -39,5 +39,22 @@ vector2 rotate(vector2 v, const double rad){
     v.rotate(rad);
     return v;
 }
+
+
+template <typename T>
+class pair
+{
+private:
+    /* data */
+public:
+    T x, y;
+    pair(T x0 = 0, T y0 = 0){
+        x = x0;
+        y = y0;
+    }
+};
+
+
+
 
 #endif
