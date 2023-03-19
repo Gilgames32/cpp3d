@@ -6,6 +6,10 @@
 
 #include "vector2.h"
 
+
+#define w 800
+#define h 600
+
 int main(int argc, char const *argv[])
 {
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -18,13 +22,23 @@ int main(int argc, char const *argv[])
 
 
 
-    bool levelGrid [6][6] = {
-        {1,1,1,1,1,1},
-        {1,0,0,0,0,1},
-        {1,0,0,0,0,1},
-        {1,0,0,1,1,1},
-        {1,0,0,0,0,1},
-        {1,1,1,1,1,1}
+    bool levelGrid [16][16] = {
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1},
+        {1,0,0,0,0,0,1,1,0,0,1,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
     };
 
 
@@ -37,24 +51,25 @@ int main(int argc, char const *argv[])
     vector2 pPlane = rotate(pDir, -M_PI/2);
 
     SDL_Event mainEvent;
-    while (true)
+    bool quit = false;
+    while (!quit)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         // render minimap
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 16; i++)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < 16; j++)
             {
                 if (levelGrid[i][j])
                 {
-                    rectangleColor(renderer, i*25, j*25, (i+1)*25, (j+1)*25, 0xFFFFFFFF);
+                    rectangleColor(renderer, i*10, j*10, (i+1)*10, (j+1)*10, 0xFFFFFFFF);
                 }
             }
             
         }
-        circleColor(renderer, pPos.x*25, pPos.y*25, 5, 0xFF0000FF);
+        circleColor(renderer, pPos.x*10, pPos.y*10, 2, 0xFF0000FF);
         
 
 
@@ -63,15 +78,82 @@ int main(int argc, char const *argv[])
 
         
 
-        for (int i = 0; i < 800; i+=1)
+        for (int i = 0; i < w; i+=1)
         {
-            pair<int> mapCell = pair<int>(pPos.x, pPos.y);
+            //kiindulási cella cella
+            pair<int> rayCell = pair<int>(pPos.x, pPos.y);
+
+            //jelenlegi csík kamerához relatív aránya -1...1
+            double camX = 2*double(i)/w - 1;
+
+            //sugár irányvektora
+            vector2 rayDir = pDir + pPlane * camX;
+
+            //rácsvonalanként léptetett pont
+            vector2 sideDist;
+
+            //egyik x vagy y oldalról a legközelebbi átellenes oldalig a távolság
+            //1 helyett átfogó kéne
+            vector2 deltaDist = vector2(abs(1/rayDir.x), abs(1/rayDir.y));
+
+            //lépegeté irányának előjele, -1 vagy 1
+            pair<int> stepDir;
+            stepDir.x = rayDir.x < 0 ? -1 : 1;
+            stepDir.y = rayDir.y < 0 ? -1 : 1;
+
+            //kamera síkja és a fal közti távolság
+            double wallDist;
+
+            //vízszintes / függőleges oldalt talált el
+            bool side;
+
+
+            //legközelebbi falig távolság
+            if(rayDir.x < 0)
+                sideDist.x = (pPos.x - rayCell.x) * deltaDist.x;
+            else
+                sideDist.x = (rayCell.x + 1.0 - pPos.x) * deltaDist.x;
+
+            if(rayDir.y < 0)
+                sideDist.y = (pPos.y - rayCell.y) * deltaDist.y;
+            else
+                sideDist.y = (rayCell.y + 1.0 - pPos.y) * deltaDist.y;
+
+            while (levelGrid[rayCell.x][rayCell.y] == 0)
+            {
+                if(sideDist.x < sideDist.y)
+                {
+                    sideDist.x += deltaDist.x;
+                    rayCell.x += stepDir.x;
+                    side = false;
+                }
+                else
+                {
+                    sideDist.y += deltaDist.y;
+                    rayCell.y += stepDir.y;
+                    side = true;
+                }
+            }
+
+            if(side == 0) wallDist = (sideDist.x - deltaDist.x);
+            else          wallDist = (sideDist.y - deltaDist.y);
             
-            
+            int lineHeight = (int)(h*.5 / wallDist);
+            int drawStart = -lineHeight / 2 + h / 2;
+            if(drawStart < 0) drawStart = 0;
+            int drawEnd = lineHeight / 2 + h / 2;
+            if(drawEnd >= h) drawEnd = h - 1;
+
+            lineColor(renderer, i, drawStart, i, drawEnd, side ? 0x888888FF : 0xFFFFFFFF);
+            vector2 hit = pPos + rayDir * wallDist;
+            lineColor(renderer, hit.x * 10, hit.y * 10, pPos.x * 10, pPos.y * 10, 0x0000FFFF);
         }
 
 
 
+
+        pDir.rotate(.01);
+        pPlane = rotate(pDir, -M_PI/2);
 
 
 
@@ -79,10 +161,17 @@ int main(int argc, char const *argv[])
         SDL_RenderPresent(renderer);
         if (SDL_PollEvent(&mainEvent))
         {
-            if (mainEvent.type == SDL_QUIT)
+            switch (mainEvent.type)
             {
+            case SDL_QUIT:
+                quit = true;
+                break;
+            
+            default:
                 break;
             }
+
+            
             
         }
         
