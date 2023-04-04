@@ -1,5 +1,11 @@
 #include "gamelogic.h"
 
+Vector2 Player::plane() const{
+    return Vector2(-pos.y, pos.x);
+}
+
+Player::Player(Vector2 position, Vector2 direction): pos(position), dir(direction) {}
+
 Level::Level(const char* fileName){
     std::ifstream levelFile(fileName);
 

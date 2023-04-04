@@ -11,7 +11,7 @@ public:
     Vector2(const Vector2 &v);
 
     Vector2& operator=(const Vector2 &v);
-    Vector2 operator+(const Vector2 &v);
+    Vector2 operator+(const Vector2 &v) const;
     Vector2& operator+=(const Vector2 &v);
     Vector2 operator*(const double lambda);
 

@@ -9,7 +9,7 @@ Vector2& Vector2::operator=(const Vector2 &v){
     return *this;
 }
 
-Vector2 Vector2::operator+(const Vector2 &v){
+Vector2 Vector2::operator+(const Vector2 &v) const{
     return Vector2(x + v.x, y + v.y);
 }
 

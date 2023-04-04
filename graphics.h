@@ -21,7 +21,7 @@ public:
     void Clear();
     void Render();
     void DrawMinimap(const Level& griddy);
-    void DrawPerspective();
+    void DrawPerspective(const Level& lev, const Player& pla);
 
 };
 
