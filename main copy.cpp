@@ -3,7 +3,7 @@
 #define SDL_MAIN_HANDLED 
 
 #include "graphics.h"
-#include "gamelogic.h"
+//#include "gamelogic.h"
 
 // todo: put em in classes bit by bit
 // trust me :clueless:
@@ -31,15 +31,16 @@ int main(int argc, char const *argv[])
 
 
 
+    Window win;
+    Input inp;
 
-
-    vector2 pPlane = rotate(pDir, -M_PI/2);
+    // vector2 pPlane = rotate(pDir, -M_PI/2);
 
     SDL_Event mainEvent;
     bool quit = false;
     while (!quit)
     {
-
+        /*
         for (int i = 0; i < 16; i++)
         {
             for (int j = 0; j < 16; j++)
@@ -63,14 +64,14 @@ int main(int argc, char const *argv[])
             double camX = 2*double(i)/w - 1;
 
             //sugár irányvektora
-            vector2 rayDir = pDir + pPlane * camX;
+            Vector2 rayDir = pDir + pPlane * camX;
 
             //rácsvonalanként léptetett pont
-            vector2 sideDist;
+            Vector2 sideDist;
 
             //egyik x vagy y oldalról a legközelebbi átellenes oldalig a távolság
             //1 helyett átfogó kéne
-            vector2 deltaDist = vector2(abs(1/rayDir.x), abs(1/rayDir.y));
+            Vector2 deltaDist = Vector2(abs(1/rayDir.x), abs(1/rayDir.y));
 
             //lépegeté irányának előjele, -1 vagy 1
             pair<int> stepDir;
@@ -121,7 +122,7 @@ int main(int argc, char const *argv[])
             if(drawEnd >= h) drawEnd = h - 1;
 
             lineColor(renderer, i, drawStart, i, drawEnd, side ? 0x888888FF : 0xFFFFFFFF);
-            vector2 hit = pPos + rayDir * wallDist;
+            Vector2 hit = pPos + rayDir * wallDist;
             lineColor(renderer, hit.x * 10, hit.y * 10, pPos.x * 10, pPos.y * 10, 0x0000FFFF);
         }
 
@@ -135,6 +136,8 @@ int main(int argc, char const *argv[])
 
 
         SDL_RenderPresent(renderer);
+        */
+
         if (SDL_PollEvent(&mainEvent))
         {
             switch (mainEvent.type)
@@ -142,17 +145,23 @@ int main(int argc, char const *argv[])
             case SDL_QUIT:
                 quit = true;
                 break;
+
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                // filter repeating signals
+                if (!mainEvent.key.repeat)
+                    inp.UpdateKeys(mainEvent.key);
+
+                break;
             
+            case SDL_MOUSEMOTION:
+                inp.UpdateMouse(mainEvent.motion);
             default:
                 break;
             }
-
-            
-            
         }
-        
+
     }
-    
 
 
 

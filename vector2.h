@@ -7,7 +7,7 @@ class Vector2
 {
 public:
     double x, y;
-    Vector2(double x, double y);
+    Vector2(double x = 0, double y = 0);
     Vector2(const Vector2 &v);
 
     Vector2& operator=(const Vector2 &v);
@@ -17,7 +17,7 @@ public:
 
     Vector2& rotate(const double rad);
 
-    ~Vector2();
+    //~Vector2();
 };
 
 

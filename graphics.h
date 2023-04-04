@@ -14,7 +14,7 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
 public:
-    Window(int w, int h);
+    Window(int w = 800, int h = 600);
     ~Window();
     void Clear();
     void Render();
@@ -27,9 +27,13 @@ public:
 class Input
 {
     Vector2 dir;
+    double turn;
+    bool w = 0, a = 0, s = 0, d = 0;
 public:
-    Input(/* args */);
-    ~Input();
+    Input(Vector2 dir = Vector2());
+    //~Input();
+    void UpdateKeys(SDL_KeyboardEvent keyEvent);
+    void UpdateMouse(SDL_MouseMotionEvent mouseEvent);
 };
 
 

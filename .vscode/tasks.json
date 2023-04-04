@@ -11,9 +11,11 @@
                 "-L",
                 "src/lib",
                 "-g",
-                "${file}",
+                "${fileDirname}\\**.h",
+                //"${fileDirname}\\**.hpp",
+                "${fileDirname}\\**.cpp",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "${fileDirname}\\build\\owo.exe",
 
                 "-lmingw32",
                 "-lSDL2main",
