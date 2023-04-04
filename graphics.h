@@ -8,7 +8,8 @@
 class Window
 {
 private:
-    /* data */
+    SDL_Window *window;
+    SDL_Renderer *renderer;
 public:
     Window(/* args */);
     ~Window();

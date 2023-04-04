@@ -5,7 +5,6 @@
 #include "SDL2/SDL2_gfxPrimitives.h"
 
 #include "vector2.h"
-#include "graphics.h"
 
 
 #define w 800
