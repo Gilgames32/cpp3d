@@ -3,36 +3,16 @@
 #define SDL_MAIN_HANDLED 
 
 #include "graphics.h"
-//#include "gamelogic.h"
+#include "gamelogic.h"
 
 // todo: put em in classes bit by bit
 // trust me :clueless:
 
 int main(int argc, char const *argv[])
 {
-    bool levelGrid [16][16] = {
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1},
-        {1,0,0,0,0,0,1,1,0,0,1,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-    };
-
-
-
     Window win;
     Input inp;
+    Level lev("palya.txt");
 
     // vector2 pPlane = rotate(pDir, -M_PI/2);
 
@@ -41,19 +21,6 @@ int main(int argc, char const *argv[])
     while (!quit)
     {
         /*
-        for (int i = 0; i < 16; i++)
-        {
-            for (int j = 0; j < 16; j++)
-            {
-                if (levelGrid[i][j])
-                {
-                    rectangleColor(renderer, i*10, j*10, (i+1)*10, (j+1)*10, 0xFFFFFFFF);
-                }
-            }
-            
-        }
-        circleColor(renderer, pPos.x*10, pPos.y*10, 2, 0xFF0000FF);
-        
 
         for (int i = 0; i < w; i+=1)
         {
@@ -133,9 +100,6 @@ int main(int argc, char const *argv[])
         pPlane = rotate(pDir, -M_PI/2);
 
 
-
-
-        SDL_RenderPresent(renderer);
         */
 
         if (SDL_PollEvent(&mainEvent))
@@ -151,7 +115,9 @@ int main(int argc, char const *argv[])
                 // filter repeating signals
                 if (!mainEvent.key.repeat)
                     inp.UpdateKeys(mainEvent.key);
-
+                    win.Clear();
+                    win.DrawMinimap(lev);
+                    win.Render();
                 break;
             
             case SDL_MOUSEMOTION:
