@@ -1,11 +1,13 @@
 #if !defined(GRAPHICS_H)
 #define GRAPHICS_H
 
-
+#include "iostream"
 #include "SDL2/SDL.h"
 #include "SDL2/SDL2_gfxPrimitives.h"
 
 #include "vector2.h"
+#include "gamelogic.h"
+
 
 class Window
 {
@@ -18,7 +20,7 @@ public:
     ~Window();
     void Clear();
     void Render();
-    void DrawMinimap();
+    void DrawMinimap(const Level& griddy);
     void DrawPerspective();
 
 };
@@ -26,6 +28,7 @@ public:
 
 class Input
 {
+private:
     Vector2 dir;
     double turn;
     bool w = 0, a = 0, s = 0, d = 0;

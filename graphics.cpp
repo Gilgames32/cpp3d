@@ -1,13 +1,12 @@
 #include "graphics.h"
-#include "iostream"
 
 Window::Window(int w, int h)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
 
 
-    SDL_Window *window = SDL_CreateWindow("UWU", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    window = SDL_CreateWindow("UWU", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 
     // SDL_SetWindowGrab(window, SDL_TRUE);
@@ -30,6 +29,28 @@ void Window::Clear(){
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
+
+void Window::Render(){
+    SDL_RenderPresent(renderer);
+}
+
+void Window::DrawMinimap(const Level& griddy){
+
+    for (int i = 0; i < griddy.sizex; i++)
+    {
+        for (int j = 0; j < griddy.sizey; j++)
+        {
+            if (griddy.grid[i][j] != 0)
+            {
+                rectangleColor(renderer, i*10, j*10, (i+1)*10, (j+1)*10, 0xFFFFFFFF);
+            }
+        }
+        
+    }
+
+    //circleColor(renderer, pPos.x*10, pPos.y*10, 2, 0xFF0000FF);
+}
+
 
 Input::Input(Vector2 dir) : dir(dir) {}
 

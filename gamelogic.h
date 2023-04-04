@@ -2,23 +2,26 @@
 #define GAMELOGIC_H
 
 #include "vector2.h"
+#include <iostream>
+#include <fstream>
 
 class Player
 {
     Vector2 pos;
     Vector2 dir;
-public:
-    Player(/* args */);
-    ~Player();
 };
 
 class Level
 {
-private:
-    int **grid;
 public:
-    Level(/* args */);
+    int sizex, sizey;
+    int **grid;
+    
+    Level(const char* fileName);
+    //Level(const Level &l);
     ~Level();
+
+    //int* operator[](size_t index);
 };
 
 
