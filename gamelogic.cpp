@@ -20,7 +20,7 @@ Level::Level(const char* fileName){
             levelFile >> grid[s][o];
         }
     }
-    
+
     levelFile.close();
 }
 
@@ -29,4 +29,8 @@ Level::~Level(){
         delete[] grid[i];
         
     delete[] grid;
+}
+
+int* Level::operator[](size_t index) const{
+    return grid[index];
 }

@@ -7,6 +7,7 @@
 
 class Player
 {
+public:
     Vector2 pos;
     Vector2 dir;
 };
@@ -21,7 +22,7 @@ public:
     //Level(const Level &l);
     ~Level();
 
-    //int* operator[](size_t index);
+    int* operator[](size_t index) const;
 };
 
 
