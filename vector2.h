@@ -1,44 +1,24 @@
 #ifndef VECTOR2_H
 #define VECTOR2_H
 
-class vector2
+#include "math.h"
+
+class Vector2
 {
-private:
-    /* data */
 public:
     double x, y;
-    vector2(double setx = 0, double sety = 0){
-        x = setx;
-        y = sety;
-    }
+    Vector2(double x, double y);
+    Vector2(const Vector2 &v);
 
-    vector2 operator+(const vector2& v){
-        return vector2(x + v.x, y + v.y);
-    }
+    Vector2& operator=(const Vector2 &v);
+    Vector2 operator+(const Vector2 &v);
+    Vector2& operator+=(const Vector2 &v);
+    Vector2 operator*(const double lambda);
 
-    vector2& operator+=(const vector2& v){
-        *this = this->operator+(v);
-        return *this;
-    }
+    Vector2& rotate(const double rad);
 
-    vector2 operator*(const double lambda)
-    {
-        return vector2(x*lambda, y*lambda);
-    }
-
-    void rotate(const double rad){
-        *this = vector2(
-            x * cos(rad) - y * sin(rad),
-            x * sin(rad) + y * cos(rad)
-        );
-    }
-
+    ~Vector2();
 };
-
-vector2 rotate(vector2 v, const double rad){
-    v.rotate(rad);
-    return v;
-}
 
 
 template <typename T>
