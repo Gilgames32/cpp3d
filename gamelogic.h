@@ -12,6 +12,15 @@ public:
     ~Player();
 };
 
+class Level
+{
+private:
+    int **grid;
+public:
+    Level(/* args */);
+    ~Level();
+};
+
 
 
 

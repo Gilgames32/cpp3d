@@ -18,6 +18,7 @@ public:
     ~Window();
     void Clear();
     void Render();
+    void DrawMinimap();
     void DrawPerspective();
 
 };
