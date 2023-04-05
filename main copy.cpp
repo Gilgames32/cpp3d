@@ -11,18 +11,22 @@
 int main(int argc, char const *argv[])
 {
     Window win;
-    Input inp;
-    Level lev("palya.txt");
-    Player pla(Vector2(2, 3));
+    Game mainGame;
+    WindowInput inp;
 
 
     SDL_Event mainEvent;
     bool quit = false;
+    Uint32 prev = SDL_GetTicks(), curr = SDL_GetTicks(), deltaTime = 0;
     while (!quit)
     {
-        win.DrawPerspective(lev, pla);
-        win.Render();
-        std::cout << "drawn" << std::endl;
+        // deltatime kiszámítása
+        curr = SDL_GetTicks();
+        deltaTime = curr - prev;
+        prev = curr;
+
+        //mainGame.SimulateGame(inp, deltaTime);
+        
         while (SDL_PollEvent(&mainEvent))
         {
             switch (mainEvent.type)
@@ -37,7 +41,8 @@ int main(int argc, char const *argv[])
                 if (!mainEvent.key.repeat)
                     inp.UpdateKeys(mainEvent.key);
                     win.Clear();
-                    win.DrawMinimap(lev);
+                    win.DrawPerspective(mainGame);
+                    win.DrawMinimap(mainGame);
                     win.Render();
                 break;
             
@@ -48,9 +53,8 @@ int main(int argc, char const *argv[])
             }
         }
 
+
     }
-
-
 
     return EXIT_SUCCESS;
 }

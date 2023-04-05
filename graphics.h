@@ -16,24 +16,20 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
 public:
-    Window(int w = 800, int h = 600);
+    Window(int = 800, int = 600);
     ~Window();
     void Clear();
     void Render();
-    void DrawMinimap(const Level& griddy);
-    void DrawPerspective(const Level& lev, const Player& pla);
+    void DrawMinimap(const Game&);
+    void DrawPerspective(const Game&);
 
 };
 
 
-class Input
+class WindowInput : private Input
 {
-private:
-    Vector2 dir;
-    double turn;
-    bool w = 0, a = 0, s = 0, d = 0;
 public:
-    Input(Vector2 dir = Vector2());
+    WindowInput();
     //~Input();
     void UpdateKeys(SDL_KeyboardEvent keyEvent);
     void UpdateMouse(SDL_MouseMotionEvent mouseEvent);

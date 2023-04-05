@@ -34,36 +34,35 @@ void Window::Render(){
     SDL_RenderPresent(renderer);
 }
 
-void Window::DrawMinimap(const Level& lev){
+void Window::DrawMinimap(const Game& game){
 
-    for (int i = 0; i < lev.sizex; i++)
+    for (int i = 0; i < game.gLevel.sizex; i++)
     {
-        for (int j = 0; j < lev.sizey; j++)
+        for (int j = 0; j < game.gLevel.sizey; j++)
         {
-            if (lev[i][j] != 0)
+            if (game.gLevel[i][j] != 0)
             {
                 rectangleColor(renderer, i*10, j*10, (i+1)*10, (j+1)*10, 0xFFFFFFFF);
             }
         }
         
     }
-
-    //circleColor(renderer, pPos.x*10, pPos.y*10, 2, 0xFF0000FF);
+    circleColor(renderer, game.gPlayer.pos.x*10, game.gPlayer.pos.y*10, 2, 0xFF0000FF);
 }
 
-void Window::DrawPerspective(const Level& lev, const Player& pla){
+void Window::DrawPerspective(const Game& game){
     
-    Vector2 plane = pla.plane();
+    Vector2 plane = game.gPlayer.plane();
     for (int i = 0; i < width; i+=1)
     {
         //kiindulási cella cella
-        pair<int> rayCell = pair<int>(pla.pos.x, pla.pos.y);
+        pair<int> rayCell = pair<int>(game.gPlayer.pos.x, game.gPlayer.pos.y);
 
         //jelenlegi csík kamerához relatív aránya -1...1
         double camX = 2*double(i)/width - 1;
 
         //sugár irányvektora
-        Vector2 rayDir = pla.dir + plane * camX;
+        Vector2 rayDir = game.gPlayer.dir + plane * camX;
 
         //rácsvonalanként léptetett pont
         Vector2 sideDist;
@@ -86,16 +85,16 @@ void Window::DrawPerspective(const Level& lev, const Player& pla){
 
         //legközelebbi falig távolság
         if(rayDir.x < 0)
-            sideDist.x = (pla.pos.x - rayCell.x) * deltaDist.x;
+            sideDist.x = (game.gPlayer.pos.x - rayCell.x) * deltaDist.x;
         else
-            sideDist.x = (rayCell.x + 1.0 - pla.pos.x) * deltaDist.x;
+            sideDist.x = (rayCell.x + 1.0 - game.gPlayer.pos.x) * deltaDist.x;
 
         if(rayDir.y < 0)
-            sideDist.y = (pla.pos.y - rayCell.y) * deltaDist.y;
+            sideDist.y = (game.gPlayer.pos.y - rayCell.y) * deltaDist.y;
         else
-            sideDist.y = (rayCell.y + 1.0 - pla.pos.y) * deltaDist.y;
+            sideDist.y = (rayCell.y + 1.0 - game.gPlayer.pos.y) * deltaDist.y;
 
-        while (lev[rayCell.x][rayCell.y] == 0)
+        while (game.gLevel[rayCell.x][rayCell.y] == 0)
         {
             if(sideDist.x < sideDist.y)
             {
@@ -121,15 +120,16 @@ void Window::DrawPerspective(const Level& lev, const Player& pla){
         if(drawEnd >= heigth) drawEnd = heigth - 1;
 
         lineColor(renderer, i, drawStart, i, drawEnd, side ? 0x888888FF : 0xFFFFFFFF);
-        Vector2 hit = pla.pos + rayDir * wallDist;
-        lineColor(renderer, hit.x * 10, hit.y * 10, pla.pos.x * 10, pla.pos.y * 10, 0x0000FFFF);
+        Vector2 hit = game.gPlayer.pos + rayDir * wallDist;
+        lineColor(renderer, hit.x * 10, hit.y * 10, game.gPlayer.pos.x * 10, game.gPlayer.pos.y * 10, 0x0000FFFF);
     }
 }
 
 
-Input::Input(Vector2 dir) : dir(dir) {}
+WindowInput::WindowInput() : Input() {}
 
-void Input::UpdateKeys(SDL_KeyboardEvent keyEvent){
+void WindowInput::UpdateKeys(SDL_KeyboardEvent keyEvent){
+    bool w = 0, a = 0, s = 0, d = 0;
     switch (keyEvent.keysym.sym)
     {
     case SDLK_ESCAPE:
@@ -156,6 +156,6 @@ void Input::UpdateKeys(SDL_KeyboardEvent keyEvent){
     dir = Vector2(d-a, w-s);
 }
 
-void Input::UpdateMouse(SDL_MouseMotionEvent mouseEvent){
+void WindowInput::UpdateMouse(SDL_MouseMotionEvent mouseEvent){
     turn += mouseEvent.xrel; // multiply by sensitivity latur
 }
