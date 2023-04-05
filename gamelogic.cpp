@@ -57,4 +57,14 @@ int* Level::operator[](size_t index) const{
 
 Input::Input(Vector2 dir, double turn) : dir(dir) , turn(turn) {}
 
+double Input::GetTurn() {
+    double re = turn;
+    turn = 0;
+    return re;
+}
+
 Game::Game(Level gl, Player gp) : gLevel(gl), gPlayer(gp) {}
+
+void Game::SimulateGame(const Input& inp, const double deltaTime) {
+    gPlayer.dir.rotate(inp.turn / 180);
+}

@@ -17,15 +17,22 @@ int main(int argc, char const *argv[])
 
     SDL_Event mainEvent;
     bool quit = false;
-    Uint32 prev = SDL_GetTicks(), curr = SDL_GetTicks(), deltaTime = 0;
+    Uint64 prev = SDL_GetPerformanceCounter(), curr = SDL_GetPerformanceCounter();
+    double deltaTime = 0;
     while (!quit)
     {
-        // deltatime kiszámítása
-        curr = SDL_GetTicks();
-        deltaTime = curr - prev;
         prev = curr;
+        curr = SDL_GetPerformanceCounter();
 
-        //mainGame.SimulateGame(inp, deltaTime);
+        deltaTime = double((curr - prev)*1000 / double(SDL_GetPerformanceFrequency()) );
+        std::cout << (1000 / deltaTime) << std::endl;
+
+        mainGame.SimulateGame(inp, deltaTime);
+
+        win.Clear();
+        win.DrawPerspective(mainGame);
+        win.DrawMinimap(mainGame);
+        win.Render();
         
         while (SDL_PollEvent(&mainEvent))
         {
@@ -40,10 +47,6 @@ int main(int argc, char const *argv[])
                 // filter repeating signals
                 if (!mainEvent.key.repeat)
                     inp.UpdateKeys(mainEvent.key);
-                    win.Clear();
-                    win.DrawPerspective(mainGame);
-                    win.DrawMinimap(mainGame);
-                    win.Render();
                 break;
             
             case SDL_MOUSEMOTION:

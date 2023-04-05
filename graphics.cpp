@@ -157,5 +157,5 @@ void WindowInput::UpdateKeys(SDL_KeyboardEvent keyEvent){
 }
 
 void WindowInput::UpdateMouse(SDL_MouseMotionEvent mouseEvent){
-    turn += mouseEvent.xrel; // multiply by sensitivity latur
+    turn = mouseEvent.xrel; // multiply by sensitivity latur // ide +=
 }

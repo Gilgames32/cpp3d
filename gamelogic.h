@@ -31,11 +31,13 @@ public:
 class Input
 {
 protected:
+    //
+public:
     Vector2 dir;
     double turn;
-public:
     Input(Vector2 = Vector2(), double turn = 0);
     //~Input();
+    double GetTurn();
 };
 
 class Game

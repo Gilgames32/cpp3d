@@ -26,7 +26,7 @@ public:
 };
 
 
-class WindowInput : private Input
+class WindowInput : public Input
 {
 public:
     WindowInput();
