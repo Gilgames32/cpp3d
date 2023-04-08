@@ -2,16 +2,17 @@
 #define RAYCAST_H
 
 #include "vector2.h"
-#include "gamelogic.h"
+#include "matrix.h"
 
 class Ray
 {
 public:
     // kiindulási és végkoordináta
-    Vector2 start, end;
+    const Vector2 start;
+    Vector2 end;
 
     // a sugár irányvektora
-    Vector2 dir;
+    const Vector2 dir;
 
     // rácsvonalanként léptetett pont
     // starthoz relatív
@@ -24,8 +25,11 @@ public:
     // a becsapódási oldal
     bool side;
 
-    Ray(const Level& sapce, const Vector2& startVector, const Vector2& dirVector);
+    const Level& space;
+
+    Ray(const Level& sapceGrid, const Vector2& startVector, const Vector2& dirVector);
     Ray(const Ray& ray);
+
     //~Ray();
 };
 

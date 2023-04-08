@@ -1,7 +1,7 @@
 #include "raycast.h"
 
-Ray::Ray(const Level& space, const Vector2& startVector, const Vector2& dirVector) 
-    : start(startVector), dir(dirVector)
+Ray::Ray(const Level& spaceGrid, const Vector2& startVector, const Vector2& dirVector) 
+    : space(spaceGrid), start(startVector), dir(dirVector)
 {
     // kiindulási cella
     pair<int> cell(start.x, start.y);
@@ -52,4 +52,5 @@ Ray::Ray(const Ray& ray) :
     dir(ray.dir),
     sideDist(ray.sideDist),
     wallDist(ray.wallDist),
-    side(ray.side) {}
+    side(ray.side),
+    space(ray.space) {}

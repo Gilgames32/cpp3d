@@ -2,8 +2,7 @@
 #define GAMELOGIC_H
 
 #include "vector2.h"
-#include <iostream>
-#include <fstream>
+#include "matrix.h"
 
 class Player
 {
@@ -13,19 +12,6 @@ public:
     Vector2 plane() const;
     Player(Vector2 position = Vector2(), Vector2 direction = Vector2(1, 0));
     Player(const Player&);
-};
-
-class Level
-{
-public:
-    int sizex, sizey;
-    int **grid;
-    
-    Level(const char* fileName);
-    Level(const Level &);
-    ~Level();
-
-    int* operator[](size_t index) const;
 };
 
 class Input
