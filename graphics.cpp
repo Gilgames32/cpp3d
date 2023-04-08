@@ -114,9 +114,9 @@ void Window::DrawPerspective(const Game& game){
         else          wallDist = (sideDist.y - deltaDist.y);
         
         int lineHeight = (int)(heigth*.5 / wallDist);
-        int drawStart = -lineHeight / 2 + heigth / 2;
+        int drawStart = -lineHeight / 1 + heigth / 2;
         if(drawStart < 0) drawStart = 0;
-        int drawEnd = lineHeight / 2 + heigth / 2;
+        int drawEnd = lineHeight / 1  + heigth / 2;
         if(drawEnd >= heigth) drawEnd = heigth - 1;
 
         lineColor(renderer, i, drawStart, i, drawEnd, side ? 0x888888FF : 0xFFFFFFFF);
@@ -129,12 +129,12 @@ void Window::DrawPerspective(const Game& game){
 WindowInput::WindowInput() : Input() {}
 
 void WindowInput::UpdateKeys(SDL_KeyboardEvent keyEvent){
-    bool w = 0, a = 0, s = 0, d = 0;
     switch (keyEvent.keysym.sym)
     {
     case SDLK_ESCAPE:
         // unlock mouse
         SDL_SetRelativeMouseMode(SDL_FALSE);
+        break;
 
     case SDLK_w:
         w = keyEvent.state;
@@ -157,5 +157,5 @@ void WindowInput::UpdateKeys(SDL_KeyboardEvent keyEvent){
 }
 
 void WindowInput::UpdateMouse(SDL_MouseMotionEvent mouseEvent){
-    turn = mouseEvent.xrel; // multiply by sensitivity latur // ide +=
+    turn += mouseEvent.xrel; // multiply by sensitivity latur
 }

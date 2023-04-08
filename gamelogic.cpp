@@ -65,6 +65,9 @@ double Input::GetTurn() {
 
 Game::Game(Level gl, Player gp) : gLevel(gl), gPlayer(gp) {}
 
-void Game::SimulateGame(const Input& inp, const double deltaTime) {
+void Game::SimulateGame(Input& inp, const double deltaTime) {
     gPlayer.dir.rotate(inp.turn / 180);
+    inp.turn = 0;
+
+    gPlayer.pos += (gPlayer.dir * inp.dir.y + gPlayer.plane() * inp.dir.x) * (deltaTime / 500);
 }

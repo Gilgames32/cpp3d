@@ -48,7 +48,7 @@ public:
 
     Game(Level gl = Level("palya.txt"), Player gp = Player(Vector2(2, 3)));
     //~Game();
-    void SimulateGame(const Input& inp, const double deltaTime);
+    void SimulateGame(Input& inp, const double deltaTime);
 };
 
 
