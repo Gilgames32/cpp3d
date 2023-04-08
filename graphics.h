@@ -7,6 +7,7 @@
 
 #include "vector2.h"
 #include "gamelogic.h"
+#include "raycast.h"
 
 
 class Window
