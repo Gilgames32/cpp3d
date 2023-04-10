@@ -17,6 +17,13 @@ Uint32 Color::ToPixel()
     return (r << 24) | (g << 16) | (b << 8) | a;
 }
 
+Color& Color::Exposure(double e){
+    r *= e;
+    g *= e;
+    b *= e;
+    return *this;
+}
+
 Texture::Texture(const char *fileName)
 {
     texture = IMG_Load(fileName);

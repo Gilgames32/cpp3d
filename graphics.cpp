@@ -1,11 +1,11 @@
 #include "graphics.h"
 
-Window::Window(int w, int h) : width(w), heigth(h), pattern("bleh.png")
+Window::Window(int w, int h) : width(w), heigth(h), pattern("grass_side.png")
 {
     SDL_Init(SDL_INIT_EVERYTHING);
 
 
-    window = SDL_CreateWindow("UWU", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
+    window = SDL_CreateWindow("NHZ", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 
@@ -92,8 +92,10 @@ void Window::DrawPerspective(const Game& game){
             Uint32 pixel = pattern.GetPixel(textureX, textureY);
             
             // igény szerint sötétítés
-            // if(cast.side) pixel = (pixel >> 1) & 0x7F7F7F;
+            if(cast.side) pixel = (pixel >> 1) & 0x7F7F7F;
             pixelColor(renderer, x, y, pixel);
+
+            // !! https://gamedev.stackexchange.com/questions/102490/fastest-way-to-render-image-data-from-buffer
         }
 
         // fal

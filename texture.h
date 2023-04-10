@@ -19,6 +19,8 @@ public:
     // színből pixel
     Uint32 ToPixel();
 
+    Color& Exposure(double e);
+
     //~Color();
 };
 
