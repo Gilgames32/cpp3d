@@ -1,7 +1,7 @@
 #include "gamelogic.h"
 
 Vector2 Player::plane() const{
-    return Vector2(-dir.y, dir.x);
+    return Vector2(-dir.y, dir.x)*0.66;
 }
 
 Player::Player(Vector2 position, Vector2 direction): pos(position), dir(direction) {}
@@ -9,11 +9,17 @@ Player::Player(Vector2 position, Vector2 direction): pos(position), dir(directio
 Player::Player(const Player& p) : pos(p.pos), dir(p.dir) {}
 
 void Player::Move(const Level& grid, Vector2 moveDir, double deltaTime){
+    moveDir.normalize();
     Vector2 nextPos = pos + moveDir * (deltaTime * .005);
-    if (grid[int(nextPos.x)][int(nextPos.y)] == 0)
-    {
+    
+    Ray path(grid, pos, moveDir);
+
+    const double snapRange = .05;
+
+    if ((path.end - pos).abs() - snapRange < (nextPos - pos).abs())
+        pos += moveDir * (path.wallDist - snapRange);
+    else
         pos = nextPos;
-    }
     
     
     

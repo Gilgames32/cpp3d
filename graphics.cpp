@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-Window::Window(int w, int h) : width(w), heigth(h)
+Window::Window(int w, int h) : width(w), heigth(h), pattern("bleh.png")
 {
     SDL_Init(SDL_INIT_EVERYTHING);
 
@@ -53,26 +53,53 @@ void Window::DrawMinimap(const Game& game){
 void Window::DrawPerspective(const Game& game){
     
     Vector2 plane = game.gPlayer.plane();
-    for (int i = 0; i < width; i+=1)
+    for (int x = 0; x < width; x++)
     {
-        //jelenlegi csík kamerához relatív aránya -1...1
-        double camX = 2*double(i)/width - 1;
+        // jelenlegi csík kamerához relatív aránya -1...1
+        double camX = 2*double(x)/width - 1;
 
-        //sugár irányvektora
+        // sugár irányvektora
         Vector2 rayDir = game.gPlayer.dir + plane * camX;
         
+        // a sugár
         Ray cast = Ray(game.gLevel, game.gPlayer.pos, rayDir);
 
-
-        int lineHeight = (int)(heigth*.5 / cast.wallDist);
-        int drawStart = -lineHeight / 1 + heigth / 2;
+        // a fal magassága:
+        int lineHeight = heigth / cast.wallDist;
+        int drawStart = -lineHeight / 2 + heigth / 2;
         if(drawStart < 0) drawStart = 0;
-        int drawEnd = lineHeight / 1  + heigth / 2;
+        int drawEnd = lineHeight / 2  + heigth / 2;
         if(drawEnd >= heigth) drawEnd = heigth - 1;
 
-        lineColor(renderer, i, drawStart, i, drawEnd, cast.side ? 0x888888FF : 0xFFFFFFFF);
-        Vector2 hit = game.gPlayer.pos + rayDir * cast.wallDist;
-        lineColor(renderer, hit.x * 10, hit.y * 10, game.gPlayer.pos.x * 10, game.gPlayer.pos.y * 10, 0x0000FFFF);
+        
+        // textúra X oszlopa
+        int textureX = cast.WallX() * double(pattern.width);
+        if(cast.side == 0 && cast.dir.x > 0) textureX = pattern.width - textureX - 1;
+        if(cast.side == 1 && cast.dir.y < 0) textureX = pattern.width - textureX - 1;
+
+        // nyújtás mértéke
+        double scale = double(pattern.height) / lineHeight;
+
+        // ha a textúra lelógna, nem a tetején kezdjük kirajzolni
+        double texturePos = (drawStart - heigth / 2 + lineHeight / 2) * scale;
+
+
+        for(int y = drawStart; y<drawEnd; y++)
+        {
+            // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
+            int textureY = texturePos;
+            texturePos += scale;
+            Uint32 pixel = pattern.GetPixel(textureX, textureY);
+            
+            // igény szerint sötétítés
+            // if(cast.side) pixel = (pixel >> 1) & 0x7F7F7F;
+            pixelColor(renderer, x, y, pixel);
+        }
+
+        // fal
+        // lineColor(renderer, x, drawStart, x, drawEnd, cast.side ? 0x888888FF : 0xFFFFFFFF);
+        // minimap debug
+        lineColor(renderer, cast.end.x * 10, cast.end.y * 10, cast.start.x * 10, cast.start.y * 10, 0x0000FFFF);
     }
 }
 

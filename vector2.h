@@ -13,13 +13,17 @@ public:
     Vector2& operator=(const Vector2 &v);
     Vector2 operator+(const Vector2 &v) const;
     Vector2& operator+=(const Vector2 &v);
-    Vector2 operator*(const double lambda);
+    Vector2 operator*(const double lambda) const;
 
-    Vector2 operator-(const Vector2 &v);
+    Vector2 operator-(const Vector2 &v) const;
 
+    // rotates SELF
     Vector2& rotate(const double rad);
 
-    double abs();
+    double abs() const;
+
+    // returns the same vector but 1 unit long
+    Vector2& normalize();
     //~Vector2();
 };
 

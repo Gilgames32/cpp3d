@@ -43,7 +43,7 @@ Ray::Ray(const Level& spaceGrid, const Vector2& startVector, const Vector2& dirV
     // egy kis matek
     wallDist = side == 0 ? sideDist.x - deltaDist.x : sideDist.y - deltaDist.y;
 
-    end = start + sideDist;
+    end = start + dir * wallDist;
 }
 
 Ray::Ray(const Ray& ray) :
@@ -54,3 +54,11 @@ Ray::Ray(const Ray& ray) :
     wallDist(ray.wallDist),
     side(ray.side),
     space(ray.space) {}
+
+double Ray::WallX(){
+    double wallX; 
+    if (side == 0) wallX = start.y + wallDist * dir.y;// posY + perpWallDist * rayDirY;
+    else           wallX = start.x + wallDist * dir.x;
+    wallX -= floor(wallX);
+    return wallX;
+}

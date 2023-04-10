@@ -8,6 +8,7 @@
 #include "vector2.h"
 #include "gamelogic.h"
 #include "raycast.h"
+#include "texture.h"
 
 
 class Window
@@ -16,6 +17,8 @@ private:
     int width, heigth;
     SDL_Window *window;
     SDL_Renderer *renderer;
+
+    Texture pattern;
 public:
     Window(int = 800, int = 600);
     ~Window();

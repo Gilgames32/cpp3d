@@ -21,6 +21,7 @@
                 "-lSDL2main",
                 "-lSDL2",
                 "-lSDL2_gfx",
+                "-lSDL2_image",
                 ""
             ],
             "options": {

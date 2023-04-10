@@ -25,7 +25,8 @@ int main(int argc, char const *argv[])
         curr = SDL_GetPerformanceCounter();
 
         deltaTime = double((curr - prev)*1000 / double(SDL_GetPerformanceFrequency()) );
-        std::cout << (1000 / deltaTime) << std::endl;
+        // FPS
+        //std::cout << (1000 / deltaTime) << std::endl;
 
         mainGame.SimulateGame(inp, deltaTime);
 
@@ -51,6 +52,12 @@ int main(int argc, char const *argv[])
             
             case SDL_MOUSEMOTION:
                 inp.UpdateMouse(mainEvent.motion);
+                break;
+
+            case SDL_MOUSEBUTTONDOWN:
+                SDL_SetRelativeMouseMode(SDL_TRUE);
+                break;
+                
             default:
                 break;
             }
