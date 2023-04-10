@@ -8,6 +8,18 @@ Player::Player(Vector2 position, Vector2 direction): pos(position), dir(directio
 
 Player::Player(const Player& p) : pos(p.pos), dir(p.dir) {}
 
+void Player::Move(const Level& grid, Vector2 moveDir, double deltaTime){
+    Vector2 nextPos = pos + moveDir * (deltaTime * .005);
+    if (grid[int(nextPos.x)][int(nextPos.y)] == 0)
+    {
+        pos = nextPos;
+    }
+    
+    
+    
+     
+}
+
 Input::Input(Vector2 dir, double turn) : dir(dir) , turn(turn) {}
 
 double Input::GetTurn() {
@@ -22,5 +34,7 @@ void Game::SimulateGame(Input& inp, const double deltaTime) {
     gPlayer.dir.rotate(inp.turn / 180);
     inp.turn = 0;
 
-    gPlayer.pos += (gPlayer.dir * inp.dir.y + gPlayer.plane() * inp.dir.x) * (deltaTime / 500);
+    Vector2 moveDir(gPlayer.dir * inp.dir.y + gPlayer.plane() * inp.dir.x);
+
+    gPlayer.Move(gLevel, moveDir, deltaTime);
 }

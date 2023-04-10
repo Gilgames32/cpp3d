@@ -3,6 +3,7 @@
 
 #include "vector2.h"
 #include "matrix.h"
+#include "raycast.h"
 
 class Player
 {
@@ -12,6 +13,8 @@ public:
     Vector2 plane() const;
     Player(Vector2 position = Vector2(), Vector2 direction = Vector2(1, 0));
     Player(const Player&);
+
+    void Move(const Level& grid, Vector2 moveDir, double deltaTime);
 };
 
 class Input

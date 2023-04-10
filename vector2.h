@@ -15,8 +15,11 @@ public:
     Vector2& operator+=(const Vector2 &v);
     Vector2 operator*(const double lambda);
 
+    Vector2 operator-(const Vector2 &v);
+
     Vector2& rotate(const double rad);
 
+    double abs();
     //~Vector2();
 };
 

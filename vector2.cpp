@@ -22,10 +22,18 @@ Vector2 Vector2::operator*(const double lambda){
     return Vector2(lambda * x, lambda * y);
 }
 
+Vector2 Vector2::operator-(const Vector2 &v){
+    return Vector2(x - v.x, y - v.y);
+}
+
 Vector2& Vector2::rotate(const double rad){
     *this = Vector2(
         x * cos(rad) - y * sin(rad),
         x * sin(rad) + y * cos(rad)
     );
     return *this;
+}
+
+double Vector2::abs(){
+    return sqrt(x*x + y*y);
 }
