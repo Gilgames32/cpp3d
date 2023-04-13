@@ -1,13 +1,18 @@
 #include "graphics.h"
 
-Window::Window(int w, int h) : width(w), heigth(h), pattern("grass_side.png")
+Window::Window(int w, int h) : width(w), heigth(h), pattern("grass_side.png"), frameBuffer(w, h, SDL_PIXELFORMAT_ABGR8888)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
 
 
     window = SDL_CreateWindow("NHZ", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_SHOWN);
+    
+    
+    Texture::windowPixelFormat = frameBuffer.texture->format;
+    std::cout << SDL_GetPixelFormatName(frameBuffer.texture->format->format)<< std::endl;
+    std::cout << SDL_GetPixelFormatName(pattern.texture->format->format)<< std::endl;
+    //pattern.Convert();
 
     // SDL_SetWindowGrab(window, SDL_TRUE);
     
@@ -23,15 +28,20 @@ Window::~Window()
 }
 
 void Window::Clear(){
+    /*
     Uint8 r, g, b, a;
     SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    */
 }
 
 void Window::Render(){
+    SDL_Texture *temp = SDL_CreateTextureFromSurface(renderer, frameBuffer.texture);
+    SDL_RenderCopy(renderer, temp, NULL, NULL);
     SDL_RenderPresent(renderer);
+    SDL_DestroyTexture(temp);
 }
 
 void Window::DrawMinimap(const Game& game){
@@ -51,7 +61,8 @@ void Window::DrawMinimap(const Game& game){
 }
 
 void Window::DrawPerspective(const Game& game){
-    
+    frameBuffer.Lock();
+
     Vector2 plane = game.gPlayer.plane();
     for (int x = 0; x < width; x++)
     {
@@ -90,10 +101,11 @@ void Window::DrawPerspective(const Game& game){
             int textureY = texturePos;
             texturePos += scale;
             Uint32 pixel = pattern.GetPixel(textureX, textureY);
+            Color c(pixel);
             
             // igény szerint sötétítés
-            if(cast.side) pixel = (pixel >> 1) & 0x7F7F7F;
-            pixelColor(renderer, x, y, pixel);
+            //if(cast.side) pixel = (pixel >> 1) & 0x7F7F7F;
+            frameBuffer.SetPixel(x, y, pixel);
 
             // !! https://gamedev.stackexchange.com/questions/102490/fastest-way-to-render-image-data-from-buffer
         }
@@ -103,6 +115,8 @@ void Window::DrawPerspective(const Game& game){
         // minimap debug
         lineColor(renderer, cast.end.x * 10, cast.end.y * 10, cast.start.x * 10, cast.start.y * 10, 0x0000FFFF);
     }
+
+    frameBuffer.UnLock();
 }
 
 
