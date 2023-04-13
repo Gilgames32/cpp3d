@@ -6,39 +6,31 @@
 #include "SDL2/SDL_image.h"
 
 
-class Color
-{
-public:
-    Uint8 r, g, b, a;
-
-    Color();
-    Color(const Color& c);
-
-    // pixelből szín
-    Color(Uint32);
-    // színből pixel
-    Uint32 ToPixel();
-
-    Color& Exposure(double e);
-
-    //~Color();
-};
-
-
 class Texture
 {
 private:
-    SDL_Surface *texture;
     
 public:
-    int width, height;
+    static SDL_Renderer *windowRenderer;
+    static Uint32 windowFormat;
 
+    SDL_Texture *texture;
+    int width, height;
+    Uint32 format;
+    Uint32* pixels;
+    int pitch;
+
+    Texture();
     Texture(const char* fileName);
     Texture(const Texture& t);
+    Texture(const int w, const int h, Uint32 format);
     ~Texture();
 
     Uint32 GetPixel(int x, int y);
-    Color GetColor(int x, int y);
+    void SetPixel(int x, int y, Uint32 pixel);
+
+    void Lock();
+    void UnLock();
 };
 
 

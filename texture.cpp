@@ -1,44 +1,32 @@
 #include "texture.h"
 
-Color::Color() : r(0), g(0), b(0), a(0) {}
+Uint32 Texture::windowFormat = SDL_PIXELFORMAT_ABGR8888;
+SDL_Renderer *windowRenderer = nullptr;
 
-Color::Color(const Color &c) : r(c.r), g(c.g), b(c.b), a(c.a) {}
+SDL_Renderer* Texture::windowRenderer = nullptr;
 
-Color::Color(Uint32 pixel)
+Texture::Texture() : texture(nullptr), width(0), height(0), format(0), pixels(nullptr), pitch(0) {}
+
+Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
 {
-    r = pixel & 0xff;
-    g = (pixel >> 8) & 0xff;
-    b = (pixel >> 16) & 0xff;
-    a = (pixel >> 24) & 0xff;
-}
-
-Uint32 Color::ToPixel()
-{
-    return (r << 24) | (g << 16) | (b << 8) | a;
-}
-
-Color& Color::Exposure(double e){
-    r *= e;
-    g *= e;
-    b *= e;
-    return *this;
-}
-
-Texture::Texture(const char *fileName)
-{
-    texture = IMG_Load(fileName);
+    texture = IMG_LoadTexture(windowRenderer, fileName);
+    // do this better ok?
     if (texture == nullptr)
     {
         throw "WPO0HL";
     }
-    width = texture->w;
-    height = texture->h;
+    SDL_QueryTexture(texture, &format, nullptr, &width, &height);
 }
 
 Texture::Texture(const Texture &t) : width(t.width), height(t.height)
 {
+    // SDL_BlitSurface !!!
     // nem másolódik csak a pointere;
     texture = t.texture;
+}
+
+Texture::Texture(const int w, const int h, Uint32 format){
+    texture = SDL_CreateTexture(windowRenderer, format, SDL_TEXTUREACCESS_STATIC, w, h);
 }
 
 Texture::~Texture()
@@ -48,20 +36,19 @@ Texture::~Texture()
 
 Uint32 Texture::GetPixel(int x, int y)
 {
-    // bitmélység
-    const Uint8 bSize = texture->format->BytesPerPixel;
-    // addot pixel színe
-    Uint8 *pixel = (Uint8 *)texture->pixels + y * texture->pitch + x * bSize;
-    Uint32 pixelColor = *(Uint32 *)pixel;
-    Color c;
-
-    // this is a terrible way of doing this
-    SDL_GetRGBA(pixelColor, texture->format, &c.r, &c.g, &c.b, &c.a);
-
-    return c.ToPixel();
+    Uint32 pixelPosition = y * (pitch / sizeof(Uint32)) + x;
+    return pixels[pixelPosition];
 }
 
-Color Texture::GetColor(int x, int y)
+void Texture::SetPixel(int x, int y, Uint32 set)
 {
-    return Color(GetPixel(x, y));
+    Uint32 pixelPosition = y * (pitch / sizeof(Uint32)) + x;
+    pixels[pixelPosition] = set;
+}
+
+void Texture::Lock(){
+    SDL_LockTexture(texture, nullptr, (void**)&pixels, &pitch);
+}
+void Texture::UnLock(){
+    SDL_UnlockTexture(texture);
 }
