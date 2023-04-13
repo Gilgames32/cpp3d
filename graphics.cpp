@@ -39,23 +39,18 @@ void Window::Clear(){
     frameBuffer->UnLock();
     
     
-    /*
+
     Uint8 r, g, b, a;
     SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
-    */
+
 }
 
 void Window::Render(){
-    frameBuffer->Lock();
-    Uint64 start = SDL_GetPerformanceCounter();
     SDL_RenderCopy(renderer, frameBuffer->texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
-    Uint64 end = SDL_GetPerformanceCounter();
-    std::cout << end - start << std::endl;
-    frameBuffer->UnLock();
 }
 
 void Window::DrawMinimap(const Game& game){
