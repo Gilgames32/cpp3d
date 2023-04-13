@@ -18,9 +18,8 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
 
-    Texture frameBuffer;
-
-    Texture pattern;
+    Texture *frameBuffer;
+    Texture *pattern;
 public:
     Window(int = 800, int = 600);
     ~Window();

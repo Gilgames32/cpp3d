@@ -9,29 +9,27 @@ Texture::Texture() : texture(nullptr), width(0), height(0), format(0), pixels(nu
 
 Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
 {
-    texture = IMG_LoadTexture(windowRenderer, fileName);
-    // do this better ok?
-    if (texture == nullptr)
+    SDL_Surface *image = IMG_Load(fileName);
+    if (image == nullptr)
     {
         throw "WPO0HL";
     }
-    SDL_QueryTexture(texture, &format, nullptr, &width, &height);
+    width = image->w;
+    height = image->h;
+    format = windowFormat;
+    texture = SDL_CreateTexture(windowRenderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
+    Lock();
+    SDL_ConvertPixels(width, height, image->format->format, image->pixels, image->pitch, windowFormat, pixels, pitch);
+    UnLock();
 }
 
-Texture::Texture(const Texture &t) : width(t.width), height(t.height)
-{
-    // SDL_BlitSurface !!!
-    // nem másolódik csak a pointere;
-    texture = t.texture;
-}
-
-Texture::Texture(const int w, const int h, Uint32 format){
-    texture = SDL_CreateTexture(windowRenderer, format, SDL_TEXTUREACCESS_STATIC, w, h);
+Texture::Texture(const int w, const int h, Uint32 textureFormat) : width(w), height(h), format(textureFormat), pixels(nullptr), pitch(0){
+    texture = SDL_CreateTexture(windowRenderer, textureFormat, SDL_TEXTUREACCESS_STREAMING, w, h);
 }
 
 Texture::~Texture()
 {
-    // SDL_FreeSurface(texture);
+    SDL_DestroyTexture(texture);
 }
 
 Uint32 Texture::GetPixel(int x, int y)
@@ -51,4 +49,14 @@ void Texture::Lock(){
 }
 void Texture::UnLock(){
     SDL_UnlockTexture(texture);
+}
+
+void Texture::Clear(){
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            pixels[y * (pitch / sizeof(Uint32)) + x] = 0;
+        }
+    }
 }

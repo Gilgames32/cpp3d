@@ -4,6 +4,7 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL2_gfxPrimitives.h"
 #include "SDL2/SDL_image.h"
+#include <iostream>
 
 
 class Texture
@@ -22,12 +23,12 @@ public:
 
     Texture();
     Texture(const char* fileName);
-    Texture(const Texture& t);
     Texture(const int w, const int h, Uint32 format);
     ~Texture();
 
     Uint32 GetPixel(int x, int y);
     void SetPixel(int x, int y, Uint32 pixel);
+    void Clear();
 
     void Lock();
     void UnLock();

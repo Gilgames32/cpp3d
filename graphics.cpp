@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-Window::Window(int w, int h) : width(w), heigth(h), pattern("grass_side.png"), frameBuffer(w, h, SDL_PIXELFORMAT_ABGR8888)
+Window::Window(int w, int h) : width(w), heigth(h) //pattern("grass_side.png"), frameBuffer(w, h, SDL_PIXELFORMAT_ABGR8888)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
     // textures initialize first but theyd need a renderer, retard
@@ -8,12 +8,15 @@ Window::Window(int w, int h) : width(w), heigth(h), pattern("grass_side.png"), f
     window = SDL_CreateWindow("NHZ", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_SHOWN);
     
+    Texture::windowRenderer = renderer;
+    pattern = new Texture("grass_side.png");
+    frameBuffer = new Texture(w, h, SDL_PIXELFORMAT_ABGR8888);
+
     Uint32 wpf;
-    SDL_QueryTexture(frameBuffer.texture, &wpf, nullptr, nullptr, nullptr);
+    SDL_QueryTexture(frameBuffer->texture, &wpf, nullptr, nullptr, nullptr);
     Texture::windowFormat = wpf;
-    std::cout << SDL_GetPixelFormatName(frameBuffer.format)<< std::endl;
-    std::cout << SDL_GetPixelFormatName(pattern.format)<< std::endl;
-    //pattern.Convert();
+    std::cout << SDL_GetPixelFormatName(frameBuffer->format)<< std::endl;
+    std::cout << SDL_GetPixelFormatName(pattern->format)<< std::endl;
 
     // SDL_SetWindowGrab(window, SDL_TRUE);
     
@@ -23,12 +26,19 @@ Window::Window(int w, int h) : width(w), heigth(h), pattern("grass_side.png"), f
 
 Window::~Window()
 {
+    delete pattern;
+    delete frameBuffer;
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
 
 void Window::Clear(){
+    frameBuffer->Lock();
+    frameBuffer->Clear();
+    frameBuffer->UnLock();
+    
+    
     /*
     Uint8 r, g, b, a;
     SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
@@ -39,7 +49,7 @@ void Window::Clear(){
 }
 
 void Window::Render(){
-    SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
+    SDL_RenderCopy(renderer, frameBuffer->texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
 }
 
@@ -60,7 +70,7 @@ void Window::DrawMinimap(const Game& game){
 }
 
 void Window::DrawPerspective(const Game& game){
-    frameBuffer.Lock();
+    frameBuffer->Lock();
 
     Vector2 plane = game.gPlayer.plane();
     for (int x = 0; x < width; x++)
@@ -83,12 +93,12 @@ void Window::DrawPerspective(const Game& game){
 
         
         // textúra X oszlopa
-        int textureX = cast.WallX() * double(pattern.width);
-        if(cast.side == 0 && cast.dir.x > 0) textureX = pattern.width - textureX - 1;
-        if(cast.side == 1 && cast.dir.y < 0) textureX = pattern.width - textureX - 1;
+        int textureX = cast.WallX() * double(pattern->width);
+        if(cast.side == 0 && cast.dir.x > 0) textureX = pattern->width - textureX - 1;
+        if(cast.side == 1 && cast.dir.y < 0) textureX = pattern->width - textureX - 1;
 
         // nyújtás mértéke
-        double scale = double(pattern.height) / lineHeight;
+        double scale = double(pattern->height) / lineHeight;
 
         // ha a textúra lelógna, nem a tetején kezdjük kirajzolni
         double texturePos = (drawStart - heigth / 2 + lineHeight / 2) * scale;
@@ -99,11 +109,11 @@ void Window::DrawPerspective(const Game& game){
             // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
             int textureY = texturePos;
             texturePos += scale;
-            Uint32 pixel = pattern.GetPixel(textureX, textureY);
+            Uint32 pixel = pattern->GetPixel(textureX, textureY);
             
             // igény szerint sötétítés
             //if(cast.side) pixel = (pixel >> 1) & 0x7F7F7F;
-            frameBuffer.SetPixel(x, y, pixel);
+            frameBuffer->SetPixel(x, y, pixel);
 
             // !! https://gamedev.stackexchange.com/questions/102490/fastest-way-to-render-image-data-from-buffer
         }
@@ -114,7 +124,7 @@ void Window::DrawPerspective(const Game& game){
         lineColor(renderer, cast.end.x * 10, cast.end.y * 10, cast.start.x * 10, cast.start.y * 10, 0x0000FFFF);
     }
 
-    frameBuffer.UnLock();
+    frameBuffer->UnLock();
 }
 
 
