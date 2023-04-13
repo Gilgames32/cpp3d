@@ -49,8 +49,13 @@ void Window::Clear(){
 }
 
 void Window::Render(){
+    frameBuffer->Lock();
+    Uint64 start = SDL_GetPerformanceCounter();
     SDL_RenderCopy(renderer, frameBuffer->texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
+    Uint64 end = SDL_GetPerformanceCounter();
+    std::cout << end - start << std::endl;
+    frameBuffer->UnLock();
 }
 
 void Window::DrawMinimap(const Game& game){
