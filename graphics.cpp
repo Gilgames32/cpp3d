@@ -3,15 +3,16 @@
 Window::Window(int w, int h) : width(w), heigth(h), pattern("grass_side.png"), frameBuffer(w, h, SDL_PIXELFORMAT_ABGR8888)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
-
+    // textures initialize first but theyd need a renderer, retard
 
     window = SDL_CreateWindow("NHZ", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_SHOWN);
     
-    
-    Texture::windowPixelFormat = frameBuffer.texture->format;
-    std::cout << SDL_GetPixelFormatName(frameBuffer.texture->format->format)<< std::endl;
-    std::cout << SDL_GetPixelFormatName(pattern.texture->format->format)<< std::endl;
+    Uint32 wpf;
+    SDL_QueryTexture(frameBuffer.texture, &wpf, nullptr, nullptr, nullptr);
+    Texture::windowFormat = wpf;
+    std::cout << SDL_GetPixelFormatName(frameBuffer.format)<< std::endl;
+    std::cout << SDL_GetPixelFormatName(pattern.format)<< std::endl;
     //pattern.Convert();
 
     // SDL_SetWindowGrab(window, SDL_TRUE);
@@ -38,10 +39,8 @@ void Window::Clear(){
 }
 
 void Window::Render(){
-    SDL_Texture *temp = SDL_CreateTextureFromSurface(renderer, frameBuffer.texture);
-    SDL_RenderCopy(renderer, temp, NULL, NULL);
+    SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
-    SDL_DestroyTexture(temp);
 }
 
 void Window::DrawMinimap(const Game& game){
@@ -101,7 +100,6 @@ void Window::DrawPerspective(const Game& game){
             int textureY = texturePos;
             texturePos += scale;
             Uint32 pixel = pattern.GetPixel(textureX, textureY);
-            Color c(pixel);
             
             // igény szerint sötétítés
             //if(cast.side) pixel = (pixel >> 1) & 0x7F7F7F;
