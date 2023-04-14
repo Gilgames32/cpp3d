@@ -9,7 +9,7 @@ Window::Window(int w, int h) : width(w), heigth(h) //pattern("grass_side.png"), 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_SHOWN);
     
     Texture::windowRenderer = renderer;
-    pattern = new Texture("grass_side.png");
+    pattern = new Texture("rolopipi.png");
     frameBuffer = new Texture(w, h, SDL_PIXELFORMAT_ABGR8888);
 
     Uint32 wpf;
@@ -112,7 +112,7 @@ void Window::DrawPerspective(const Game& game){
             Uint32 pixel = pattern->GetPixel(textureX, textureY);
             
             // igény szerint sötétítés
-            //if(cast.side) pixel = (pixel >> 1) & 0x7F7F7F;
+            if(cast.side) pixel = (pixel >> 1) & 0xFF7F7F7F;
             frameBuffer->SetPixel(x, y, pixel);
 
             // !! https://gamedev.stackexchange.com/questions/102490/fastest-way-to-render-image-data-from-buffer
