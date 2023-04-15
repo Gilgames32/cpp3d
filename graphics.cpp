@@ -1,24 +1,27 @@
 #include "graphics.h"
 
-Window::Window(int w, int h) : width(w), heigth(h) //pattern("grass_side.png"), frameBuffer(w, h, SDL_PIXELFORMAT_ABGR8888)
+Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8888)
 {
+    // initialize sdl
     SDL_Init(SDL_INIT_EVERYTHING);
-    // textures initialize first but theyd need a renderer, retard
 
+    // create window and renderer
+    // todo: game name
     window = SDL_CreateWindow("NHZ", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_SHOWN);
     
+    // set default renderer of textures
     Texture::windowRenderer = renderer;
+
+    // set color format
+    Texture::windowFormat = format;
+
+    // load textures
     pattern = new Texture("rolopipi.png");
-    frameBuffer = new Texture(w, h, SDL_PIXELFORMAT_ABGR8888);
-
-    Uint32 wpf;
-    SDL_QueryTexture(frameBuffer->texture, &wpf, nullptr, nullptr, nullptr);
-    Texture::windowFormat = wpf;
-    std::cout << SDL_GetPixelFormatName(frameBuffer->format)<< std::endl;
-    std::cout << SDL_GetPixelFormatName(pattern->format)<< std::endl;
-
-    // SDL_SetWindowGrab(window, SDL_TRUE);
+    
+    // create a framebuffer
+    frameBuffer = new Texture(w, h, format);
+    SDL_SetTextureBlendMode(frameBuffer->texture, SDL_BLENDMODE_BLEND);
     
     // trap mouse uwu
     SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -34,48 +37,47 @@ Window::~Window()
 }
 
 void Window::Clear(){
+    // empty the framebuffer
     frameBuffer->Lock();
     frameBuffer->Clear();
     frameBuffer->UnLock();
     
-    
-
+    // clear the SDL renderer
     Uint8 r, g, b, a;
     SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
-
 }
 
 void Window::Render(){
+    // copy the buffer onto the screen
     SDL_RenderCopy(renderer, frameBuffer->texture, nullptr, nullptr);
+    
+    // put the contents of the renderer to the screen
     SDL_RenderPresent(renderer);
 }
 
 void Window::DrawMinimap(const Game& game){
-
+    // draw tiles
     for (int i = 0; i < game.gLevel.sizex; i++)
-    {
         for (int j = 0; j < game.gLevel.sizey; j++)
-        {
             if (game.gLevel[i][j] != 0)
-            {
                 rectangleColor(renderer, i*10, j*10, (i+1)*10, (j+1)*10, 0xFFFFFFFF);
-            }
-        }
-        
-    }
+
+    // draw player
     circleColor(renderer, game.gPlayer.pos.x*10, game.gPlayer.pos.y*10, 2, 0xFF0000FF);
 }
 
 void Window::DrawPerspective(const Game& game){
+    // lock buffer so we can write it
     frameBuffer->Lock();
 
+    // irányra merőleges vektor, azaz a kamera síkjával párhuzamos
     Vector2 plane = game.gPlayer.plane();
     for (int x = 0; x < width; x++)
     {
-        // jelenlegi csík kamerához relatív aránya -1...1
+        // jelenlegi képernyőoszlop kamerához relatív aránya -1...1
         double camX = 2*double(x)/width - 1;
 
         // sugár irányvektora
@@ -100,30 +102,28 @@ void Window::DrawPerspective(const Game& game){
         // nyújtás mértéke
         double scale = double(pattern->height) / lineHeight;
 
-        // ha a textúra lelógna, nem a tetején kezdjük kirajzolni
-        double texturePos = (drawStart - heigth / 2 + lineHeight / 2) * scale;
+        // ha nem látszódik az egész textúra, a tetejét elhagyjuk
+        double textureY = (drawStart - heigth / 2 + lineHeight / 2) * scale;
 
-
+        // méretre nyújtjuk/zsugorítjuk a textúrát
         for(int y = drawStart; y<drawEnd; y++)
         {
-            // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
-            int textureY = texturePos;
-            texturePos += scale;
+            // textúra adott pixele
             Uint32 pixel = pattern->GetPixel(textureX, textureY);
+            textureY += scale;
             
             // igény szerint sötétítés
             if(cast.side) pixel = (pixel >> 1) & 0xFF7F7F7F;
-            frameBuffer->SetPixel(x, y, pixel);
 
-            // !! https://gamedev.stackexchange.com/questions/102490/fastest-way-to-render-image-data-from-buffer
+            // bufferbe írjuk
+            frameBuffer->SetPixel(x, y, pixel);
         }
 
-        // fal
-        // lineColor(renderer, x, drawStart, x, drawEnd, cast.side ? 0x888888FF : 0xFFFFFFFF);
-        // minimap debug
+        // minimap for debug
         lineColor(renderer, cast.end.x * 10, cast.end.y * 10, cast.start.x * 10, cast.start.y * 10, 0x0000FFFF);
     }
 
+    // unluck framebuffer
     frameBuffer->UnLock();
 }
 

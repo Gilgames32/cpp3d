@@ -17,7 +17,9 @@ private:
     int width, heigth;
     SDL_Window *window;
     SDL_Renderer *renderer;
+    Uint32 format;
 
+    // must be pointer otherwise would need to exist before the renderer
     Texture *frameBuffer;
     Texture *pattern;
 public:
