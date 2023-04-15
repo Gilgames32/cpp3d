@@ -10,7 +10,6 @@
 #include "raycast.h"
 #include "texture.h"
 
-
 class Window
 {
 private:
@@ -22,20 +21,20 @@ private:
     // must be pointer otherwise would need to exist before the renderer
     Texture *frameBuffer;
     Texture *pattern;
+
 public:
     Window(int = 800, int = 600);
     ~Window();
     void Clear();
     void Render();
-    void DrawMinimap(const Game&);
-    void DrawPerspective(const Game&);
-
+    void DrawMinimap(const Game &);
+    void DrawPerspective(const Game &);
 };
-
 
 class WindowInput : public Input
 {
     bool w = 0, a = 0, s = 0, d = 0;
+
 public:
     WindowInput();
     //~Input();
@@ -43,9 +42,4 @@ public:
     void UpdateMouse(SDL_MouseMotionEvent mouseEvent);
 };
 
-
 #endif // GRAPHICS_H
-
-
-
-
