@@ -3,7 +3,7 @@
 Uint32 Texture::windowFormat = SDL_PIXELFORMAT_ABGR8888;
 SDL_Renderer *windowRenderer = nullptr;
 
-SDL_Renderer* Texture::windowRenderer = nullptr;
+SDL_Renderer *Texture::windowRenderer = nullptr;
 
 Texture::Texture() : texture(nullptr), width(0), height(0), pixels(nullptr), pitch(0) {}
 
@@ -22,7 +22,8 @@ Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
     UnLock();
 }
 
-Texture::Texture(const int w, const int h) : width(w), height(h), pixels(nullptr), pitch(0){
+Texture::Texture(const int w, const int h) : width(w), height(h), pixels(nullptr), pitch(0)
+{
     texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, w, h);
     // FONTOS!! Lock hívás minden konstrukciónál a pixel és pitch beállításhoz
     Lock();
@@ -30,7 +31,7 @@ Texture::Texture(const int w, const int h) : width(w), height(h), pixels(nullptr
     UnLock();
 }
 
-Texture& Texture::operator=(const Texture& t)
+Texture &Texture::operator=(const Texture &t)
 {
     width = t.width;
     height = t.height;
@@ -41,7 +42,8 @@ Texture& Texture::operator=(const Texture& t)
     return *this;
 }
 
-Texture::Texture(const Texture& t) : width(t.width), height(t.height) {
+Texture::Texture(const Texture &t) : width(t.width), height(t.height)
+{
     std::cout << "ennek nem kéne meghívódni" << std::endl;
     texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, width, height);
     Lock();
@@ -66,14 +68,17 @@ void Texture::SetPixel(int x, int y, Uint32 set)
     pixels[pixelPosition] = set;
 }
 
-void Texture::Lock(){
-    SDL_LockTexture(texture, nullptr, (void**)&pixels, &pitch);
+void Texture::Lock()
+{
+    SDL_LockTexture(texture, nullptr, (void **)&pixels, &pitch);
 }
-void Texture::UnLock(){
+void Texture::UnLock()
+{
     SDL_UnlockTexture(texture);
 }
 
-void Texture::Clear(){
+void Texture::Clear()
+{
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)

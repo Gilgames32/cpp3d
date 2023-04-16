@@ -2,18 +2,20 @@
 
 Entity::Entity(Vector2 position) : pos(position) {}
 
-Vector2 Player::plane() const{
-    return Vector2(-dir.y, dir.x)*0.66;
+Vector2 Player::plane() const
+{
+    return Vector2(-dir.y, dir.x) * 0.66;
 }
 
-Player::Player(Vector2 position, Vector2 direction): Entity(position), dir(direction) {}
+Player::Player(Vector2 position, Vector2 direction) : Entity(position), dir(direction) {}
 
-Player::Player(const Player& p) : Entity(p.pos), dir(p.dir) {}
+Player::Player(const Player &p) : Entity(p.pos), dir(p.dir) {}
 
-void Entity::Move(const Level& grid, Vector2 moveDir, double deltaTime){
+void Entity::Move(const Level &grid, Vector2 moveDir, double deltaTime)
+{
     moveDir.normalize();
     Vector2 nextPos = pos + moveDir * (deltaTime * .005);
-    
+
     Ray path(grid, pos, moveDir);
 
     const double snapRange = .05;
@@ -24,9 +26,10 @@ void Entity::Move(const Level& grid, Vector2 moveDir, double deltaTime){
         pos = nextPos;
 }
 
-Input::Input(Vector2 dir, double turn) : dir(dir) , turn(turn) {}
+Input::Input(Vector2 dir, double turn) : dir(dir), turn(turn) {}
 
-double Input::GetTurn() {
+double Input::GetTurn()
+{
     double re = turn;
     turn = 0;
     return re;
@@ -34,7 +37,8 @@ double Input::GetTurn() {
 
 Game::Game(Level gl, Player gp) : gLevel(gl), gPlayer(gp) {}
 
-void Game::SimulateGame(Input& inp, const double deltaTime) {
+void Game::SimulateGame(Input &inp, const double deltaTime)
+{
     gPlayer.dir.rotate(inp.turn / 180);
     inp.turn = 0;
 

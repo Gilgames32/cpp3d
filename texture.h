@@ -6,26 +6,24 @@
 #include "SDL2/SDL_image.h"
 #include <iostream>
 
-
 class Texture
 {
 private:
-    
 public:
     static SDL_Renderer *windowRenderer;
     static Uint32 windowFormat;
 
     SDL_Texture *texture;
     int width, height;
-    Uint32* pixels;
+    Uint32 *pixels;
     int pitch;
 
     Texture();
-    Texture(const char* fileName);
+    Texture(const char *fileName);
     Texture(const int w, const int h);
-    Texture(const Texture&);
+    Texture(const Texture &);
 
-    Texture& operator=(const Texture&);
+    Texture &operator=(const Texture &);
 
     ~Texture();
 
@@ -36,10 +34,5 @@ public:
     void Lock();
     void UnLock();
 };
-
-
-
-
-
 
 #endif // TEXTURE_H

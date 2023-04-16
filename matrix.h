@@ -9,12 +9,12 @@ class Level
 public:
     int sizex, sizey;
     int **grid;
-    
-    Level(const char* fileName);
+
+    Level(const char *fileName);
     Level(const Level &);
     ~Level();
 
-    int* operator[](size_t index) const;
+    int *operator[](size_t index) const;
 };
 
 #endif // MATRIX_H

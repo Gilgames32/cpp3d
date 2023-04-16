@@ -10,10 +10,10 @@ class Entity
 public:
     Vector2 pos;
     Entity(Vector2 position = Vector2());
-    //Entity(const Entity&);
+    // Entity(const Entity&);
     //~Entity();
 
-    void Move(const Level& grid, Vector2 moveDir, double deltaTime);
+    void Move(const Level &grid, Vector2 moveDir, double deltaTime);
 };
 
 class Player : public Entity
@@ -23,7 +23,7 @@ public:
     Vector2 plane() const;
 
     Player(Vector2 position = Vector2(), Vector2 direction = Vector2(1, 0));
-    Player(const Player&);
+    Player(const Player &);
 };
 
 class Input
@@ -47,12 +47,7 @@ public:
 
     Game(Level gl = Level("palya.txt"), Player gp = Player(Vector2(2, 3)));
     //~Game();
-    void SimulateGame(Input& inp, const double deltaTime);
+    void SimulateGame(Input &inp, const double deltaTime);
 };
-
-
-
-
-
 
 #endif // GAMELOGIC_H
