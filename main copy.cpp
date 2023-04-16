@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
 
         deltaTime = double((curr - prev) * 1000 / double(SDL_GetPerformanceFrequency()));
         // FPS
-        std::cout << (1000 / deltaTime) << std::endl;
+        // std::cout << (1000 / deltaTime) << std::endl;
 
         mainGame.SimulateGame(inp, deltaTime);
 

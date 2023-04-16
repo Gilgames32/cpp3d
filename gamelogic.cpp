@@ -1,14 +1,16 @@
 #include "gamelogic.h"
 
+Entity::Entity(Vector2 position) : pos(position) {}
+
 Vector2 Player::plane() const{
     return Vector2(-dir.y, dir.x)*0.66;
 }
 
-Player::Player(Vector2 position, Vector2 direction): pos(position), dir(direction) {}
+Player::Player(Vector2 position, Vector2 direction): Entity(position), dir(direction) {}
 
-Player::Player(const Player& p) : pos(p.pos), dir(p.dir) {}
+Player::Player(const Player& p) : Entity(p.pos), dir(p.dir) {}
 
-void Player::Move(const Level& grid, Vector2 moveDir, double deltaTime){
+void Entity::Move(const Level& grid, Vector2 moveDir, double deltaTime){
     moveDir.normalize();
     Vector2 nextPos = pos + moveDir * (deltaTime * .005);
     
@@ -20,10 +22,6 @@ void Player::Move(const Level& grid, Vector2 moveDir, double deltaTime){
         pos += moveDir * (path.wallDist - snapRange);
     else
         pos = nextPos;
-    
-    
-    
-     
 }
 
 Input::Input(Vector2 dir, double turn) : dir(dir) , turn(turn) {}

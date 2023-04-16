@@ -24,6 +24,7 @@ public:
     Texture();
     Texture(const char* fileName);
     Texture(const int w, const int h, Uint32 format);
+    Texture(const Texture&);
     ~Texture();
 
     Uint32 GetPixel(int x, int y);

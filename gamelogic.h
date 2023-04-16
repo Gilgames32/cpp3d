@@ -5,16 +5,25 @@
 #include "matrix.h"
 #include "raycast.h"
 
-class Player
+class Entity
 {
 public:
     Vector2 pos;
-    Vector2 dir;
-    Vector2 plane() const;
-    Player(Vector2 position = Vector2(), Vector2 direction = Vector2(1, 0));
-    Player(const Player&);
+    Entity(Vector2 position = Vector2());
+    //Entity(const Entity&);
+    //~Entity();
 
     void Move(const Level& grid, Vector2 moveDir, double deltaTime);
+};
+
+class Player : public Entity
+{
+public:
+    Vector2 dir;
+    Vector2 plane() const;
+
+    Player(Vector2 position = Vector2(), Vector2 direction = Vector2(1, 0));
+    Player(const Player&);
 };
 
 class Input
@@ -34,6 +43,7 @@ class Game
 public:
     Level gLevel;
     Player gPlayer;
+    Entity *gEnemy;
 
     Game(Level gl = Level("palya.txt"), Player gp = Player(Vector2(2, 3)));
     //~Game();

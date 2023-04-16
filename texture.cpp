@@ -19,12 +19,19 @@ Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
     format = windowFormat;
     texture = SDL_CreateTexture(windowRenderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
     Lock();
-    SDL_ConvertPixels(width, height, image->format->format, image->pixels, image->pitch, windowFormat, pixels, pitch);
+    SDL_ConvertPixels(width, height, image->format->format, image->pixels, image->pitch, format, pixels, pitch);
     UnLock();
 }
 
 Texture::Texture(const int w, const int h, Uint32 textureFormat) : width(w), height(h), format(textureFormat), pixels(nullptr), pitch(0){
     texture = SDL_CreateTexture(windowRenderer, textureFormat, SDL_TEXTUREACCESS_STREAMING, w, h);
+}
+
+Texture::Texture(const Texture& t) : width(t.width), height(t.height), format(t.format) {
+    texture = SDL_CreateTexture(windowRenderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
+    Lock();
+    SDL_ConvertPixels(width, height, t.format, t.pixels, t.pitch, format, pixels, pitch);
+    UnLock();
 }
 
 Texture::~Texture()

@@ -10,6 +10,14 @@
 #include "raycast.h"
 #include "texture.h"
 
+class Sprite : public Entity
+{
+public:
+    Texture image;
+    Sprite(/* args */);
+    ~Sprite();
+};
+
 class Window
 {
 private:
