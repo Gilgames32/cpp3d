@@ -5,7 +5,7 @@ SDL_Renderer *windowRenderer = nullptr;
 
 SDL_Renderer* Texture::windowRenderer = nullptr;
 
-Texture::Texture() : texture(nullptr), width(0), height(0), format(0), pixels(nullptr), pitch(0) {}
+Texture::Texture() : texture(nullptr), width(0), height(0), pixels(nullptr), pitch(0) {}
 
 Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
 {
@@ -16,21 +16,36 @@ Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
     }
     width = image->w;
     height = image->h;
-    format = windowFormat;
-    texture = SDL_CreateTexture(windowRenderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
+    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, width, height);
     Lock();
-    SDL_ConvertPixels(width, height, image->format->format, image->pixels, image->pitch, format, pixels, pitch);
+    SDL_ConvertPixels(width, height, image->format->format, image->pixels, image->pitch, windowFormat, pixels, pitch);
     UnLock();
 }
 
-Texture::Texture(const int w, const int h, Uint32 textureFormat) : width(w), height(h), format(textureFormat), pixels(nullptr), pitch(0){
-    texture = SDL_CreateTexture(windowRenderer, textureFormat, SDL_TEXTUREACCESS_STREAMING, w, h);
+Texture::Texture(const int w, const int h) : width(w), height(h), pixels(nullptr), pitch(0){
+    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, w, h);
+    // FONTOS!! Lock hívás minden konstrukciónál a pixel és pitch beállításhoz
+    Lock();
+    Clear();
+    UnLock();
 }
 
-Texture::Texture(const Texture& t) : width(t.width), height(t.height), format(t.format) {
-    texture = SDL_CreateTexture(windowRenderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
+Texture& Texture::operator=(const Texture& t)
+{
+    width = t.width;
+    height = t.height;
+    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, width, height);
     Lock();
-    SDL_ConvertPixels(width, height, t.format, t.pixels, t.pitch, format, pixels, pitch);
+    SDL_ConvertPixels(width, height, windowFormat, t.pixels, t.pitch, windowFormat, pixels, pitch);
+    UnLock();
+    return *this;
+}
+
+Texture::Texture(const Texture& t) : width(t.width), height(t.height) {
+    std::cout << "ennek nem kéne meghívódni" << std::endl;
+    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, width, height);
+    Lock();
+    SDL_ConvertPixels(width, height, windowFormat, t.pixels, t.pitch, windowFormat, pixels, pitch);
     UnLock();
 }
 

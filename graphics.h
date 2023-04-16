@@ -26,9 +26,8 @@ private:
     SDL_Renderer *renderer;
     Uint32 format;
 
-    // must be pointer otherwise would need to exist before the renderer
-    Texture *frameBuffer;
-    Texture *pattern;
+    Texture frameBuffer;
+    Texture pattern;
 
 public:
     Window(int = 800, int = 600);

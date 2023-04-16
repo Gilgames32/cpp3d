@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8888)
+Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8888), pattern(), frameBuffer()
 {
     // initialize sdl
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -17,11 +17,11 @@ Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8
     Texture::windowFormat = format;
 
     // load textures
-    pattern = new Texture("rolopipi.png");
+    pattern = Texture("rolopipi.png");
 
     // create a framebuffer
-    frameBuffer = new Texture(w, h, format);
-    SDL_SetTextureBlendMode(frameBuffer->texture, SDL_BLENDMODE_BLEND);
+    frameBuffer = Texture(w, h);
+    SDL_SetTextureBlendMode(frameBuffer.texture, SDL_BLENDMODE_BLEND);
 
     // trap mouse uwu
     SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -29,8 +29,6 @@ Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8
 
 Window::~Window()
 {
-    delete pattern;
-    delete frameBuffer;
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -39,9 +37,9 @@ Window::~Window()
 void Window::Clear()
 {
     // empty the framebuffer
-    frameBuffer->Lock();
-    frameBuffer->Clear();
-    frameBuffer->UnLock();
+    frameBuffer.Lock();
+    frameBuffer.Clear();
+    frameBuffer.UnLock();
 
     // clear the SDL renderer
     Uint8 r, g, b, a;
@@ -54,7 +52,7 @@ void Window::Clear()
 void Window::Render()
 {
     // copy the buffer onto the screen
-    SDL_RenderCopy(renderer, frameBuffer->texture, nullptr, nullptr);
+    SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
 
     // put the contents of the renderer to the screen
     SDL_RenderPresent(renderer);
@@ -75,7 +73,7 @@ void Window::DrawMinimap(const Game &game)
 void Window::DrawPerspective(const Game &game)
 {
     // lock buffer so we can write it
-    frameBuffer->Lock();
+    frameBuffer.Lock();
 
     // irányra merőleges vektor, azaz a kamera síkjával párhuzamos
     Vector2 plane = game.gPlayer.plane();
@@ -102,14 +100,14 @@ void Window::DrawPerspective(const Game &game)
             drawEnd = heigth - 1;
 
         // textúra X oszlopa
-        int textureX = cast.WallX() * double(pattern->width);
+        int textureX = cast.WallX() * double(pattern.width);
         if (cast.side == 0 && cast.dir.x > 0)
-            textureX = pattern->width - textureX - 1;
+            textureX = pattern.width - textureX - 1;
         if (cast.side == 1 && cast.dir.y < 0)
-            textureX = pattern->width - textureX - 1;
+            textureX = pattern.width - textureX - 1;
 
         // nyújtás mértéke
-        double scale = double(pattern->height) / lineHeight;
+        double scale = double(pattern.height) / lineHeight;
 
         // ha nem látszódik az egész textúra, a tetejét elhagyjuk
         double textureY = (drawStart - heigth / 2 + lineHeight / 2) * scale;
@@ -118,7 +116,7 @@ void Window::DrawPerspective(const Game &game)
         for (int y = drawStart; y < drawEnd; y++)
         {
             // textúra adott pixele
-            Uint32 pixel = pattern->GetPixel(textureX, textureY);
+            Uint32 pixel = pattern.GetPixel(textureX, textureY);
             textureY += scale;
 
             // igény szerint sötétítés
@@ -126,7 +124,7 @@ void Window::DrawPerspective(const Game &game)
                 pixel = (pixel >> 1) & 0xFF7F7F7F;
 
             // bufferbe írjuk
-            frameBuffer->SetPixel(x, y, pixel);
+            frameBuffer.SetPixel(x, y, pixel);
         }
 
         // minimap for debug
@@ -134,7 +132,7 @@ void Window::DrawPerspective(const Game &game)
     }
 
     // unluck framebuffer
-    frameBuffer->UnLock();
+    frameBuffer.UnLock();
 }
 
 WindowInput::WindowInput() : Input() {}
