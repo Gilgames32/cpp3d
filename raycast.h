@@ -25,9 +25,9 @@ public:
     // a becsapódási oldal
     bool side;
 
-    const Level &space;
+    const Matrix &space;
 
-    Ray(const Level &sapceGrid, const Vector2 &startVector, const Vector2 &dirVector);
+    Ray(const Matrix &sapceGrid, const Vector2 &startVector, const Vector2 &dirVector);
     Ray(const Ray &ray);
 
     double WallX();

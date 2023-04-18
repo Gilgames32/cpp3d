@@ -1,17 +1,17 @@
 #include "gamelogic.h"
 
-Entity::Entity(Vector2 position) : pos(position) {}
+Entity::Entity(int id, const Vector2& pos) : id(id), pos(pos) {}
 
 Vector2 Player::plane() const
 {
     return Vector2(-dir.y, dir.x) * 0.66;
 }
 
-Player::Player(Vector2 position, Vector2 direction) : Entity(position), dir(direction) {}
+Player::Player(Vector2 position, Vector2 direction) : Entity(-1, position), dir(direction) {}
 
-Player::Player(const Player &p) : Entity(p.pos), dir(p.dir) {}
+Player::Player(const Player &p) : Entity(-1, p.pos), dir(p.dir) {}
 
-void Entity::Move(const Level &grid, Vector2 moveDir, double deltaTime)
+void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime)
 {
     moveDir.normalize();
     Vector2 nextPos = pos + moveDir * (deltaTime * .005);
@@ -35,14 +35,52 @@ double Input::GetTurn()
     return re;
 }
 
-Game::Game(Level gl, Player gp) : gLevel(gl), gPlayer(gp) {}
+Game::Game(const char* saveName) {
+    // open
+    std::ifstream levelFile(saveName);
+    if (!levelFile.is_open())
+    {
+        throw "WPO0HL";
+    }
+
+    // LOAD LEVEL GRID
+    // x sor
+    // y oszlop
+    // grid [x][y]
+    int sizex = 0, sizey = 0;
+    levelFile >> sizex >> sizey;
+    int **grid = new int*[sizex];
+    for (int s = 0; s < sizex; s++)
+    {
+        grid[s] = new int[sizey];
+        for (int o = 0; o < sizey; o++)
+        {
+            levelFile >> grid[s][o];
+        }
+    }
+    level = Matrix(sizex, sizey, grid);
+
+    // LOAD ENTITIES
+    levelFile >> entSize;
+    for (int i = 0; i < entSize; i++)
+    {
+        int tempid, posx, posy;
+        levelFile >> tempid >> posx >> posy;
+        entities[entSize] = Entity(tempid, Vector2(posx, posy));
+    }
+    
+
+
+    // close
+    levelFile.close();
+}
 
 void Game::SimulateGame(Input &inp, const double deltaTime)
 {
-    gPlayer.dir.rotate(inp.turn / 180);
+    player.dir.rotate(inp.turn / 180);
     inp.turn = 0;
 
-    Vector2 moveDir(gPlayer.dir * inp.dir.y + gPlayer.plane() * inp.dir.x);
+    Vector2 moveDir(player.dir * inp.dir.y + player.plane() * inp.dir.x);
 
-    gPlayer.Move(gLevel, moveDir, deltaTime);
+    player.Move(level, moveDir, deltaTime);
 }

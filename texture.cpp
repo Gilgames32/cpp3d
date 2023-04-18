@@ -87,3 +87,40 @@ void Texture::Clear()
         }
     }
 }
+
+Palette::Palette() : size(0), textures(nullptr) {}
+Palette::~Palette()
+{
+    for (int i = 0; i < size; i++)
+    {
+        delete textures[i];
+    }
+    delete[] textures;
+}
+
+void Palette::AddTexture(Texture *t)
+{
+    Texture **temp = new Texture*[size+1];
+    for (int i = 0; i < size; i++)
+    {
+        temp[i] = textures[i];
+    }
+    temp[size] = t;
+    size++;
+    delete[] textures;
+    textures = temp;
+}
+
+Texture& Palette::operator[](int index) const
+{
+    return *(textures[index]);
+}
+
+Palette Sprite::lookUpTable = Palette();
+
+Sprite::Sprite(int id, const Vector2& pos) : Entity(id, pos) {}
+
+Texture& Sprite::getTexture()
+{
+    return lookUpTable[id];
+}

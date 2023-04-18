@@ -4,15 +4,16 @@
 #include <iostream>
 #include <fstream>
 
-class Level
+class Matrix
 {
 public:
     int sizex, sizey;
     int **grid;
 
-    Level(const char *fileName);
-    Level(const Level &);
-    ~Level();
+    Matrix(int sizex = 0, int sizey = 0, int**grid = nullptr);
+    Matrix(const Matrix &);
+    void operator=(const Matrix &);
+    ~Matrix();
 
     int *operator[](size_t index) const;
 };

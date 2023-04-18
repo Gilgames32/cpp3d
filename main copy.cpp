@@ -11,7 +11,7 @@
 int main(int argc, char const *argv[])
 {
     Window win;
-    Game mainGame;
+    Game mainGame("palya.txt");
     WindowInput inp;
 
     SDL_Event mainEvent;

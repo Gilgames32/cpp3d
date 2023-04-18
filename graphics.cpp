@@ -17,11 +17,14 @@ Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8
     Texture::windowFormat = format;
 
     // load textures
-    pattern = Texture("rolopipi.png");
+    pattern = Texture("grass_side.png");
 
     // create a framebuffer
     frameBuffer = Texture(w, h);
     SDL_SetTextureBlendMode(frameBuffer.texture, SDL_BLENDMODE_BLEND);
+
+    // create zbuffer
+    zBuffer = new double[width];
 
     // trap mouse uwu
     SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -61,13 +64,13 @@ void Window::Render()
 void Window::DrawMinimap(const Game &game)
 {
     // draw tiles
-    for (int i = 0; i < game.gLevel.sizex; i++)
-        for (int j = 0; j < game.gLevel.sizey; j++)
-            if (game.gLevel[i][j] != 0)
+    for (int i = 0; i < game.level.sizex; i++)
+        for (int j = 0; j < game.level.sizey; j++)
+            if (game.level[i][j] != 0)
                 rectangleColor(renderer, i * 10, j * 10, (i + 1) * 10, (j + 1) * 10, 0xFFFFFFFF);
 
     // draw player
-    circleColor(renderer, game.gPlayer.pos.x * 10, game.gPlayer.pos.y * 10, 2, 0xFF0000FF);
+    circleColor(renderer, game.player.pos.x * 10, game.player.pos.y * 10, 2, 0xFF0000FF);
 }
 
 void Window::DrawPerspective(const Game &game)
@@ -76,17 +79,17 @@ void Window::DrawPerspective(const Game &game)
     frameBuffer.Lock();
 
     // irányra merőleges vektor, azaz a kamera síkjával párhuzamos
-    Vector2 plane = game.gPlayer.plane();
+    Vector2 plane = game.player.plane();
     for (int x = 0; x < width; x++)
     {
         // jelenlegi képernyőoszlop kamerához relatív aránya -1...1
         double camX = 2 * double(x) / width - 1;
 
         // sugár irányvektora
-        Vector2 rayDir = game.gPlayer.dir + plane * camX;
+        Vector2 rayDir = game.player.dir + plane * camX;
 
         // a sugár
-        Ray cast = Ray(game.gLevel, game.gPlayer.pos, rayDir);
+        Ray cast = Ray(game.level, game.player.pos, rayDir);
 
         // a fal magassága:
         int lineHeight = heigth / cast.wallDist;

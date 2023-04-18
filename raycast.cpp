@@ -1,6 +1,6 @@
 #include "raycast.h"
 
-Ray::Ray(const Level &spaceGrid, const Vector2 &startVector, const Vector2 &dirVector)
+Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dirVector)
     : space(spaceGrid), start(startVector), dir(dirVector)
 {
     // kiindulási cella

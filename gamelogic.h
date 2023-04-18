@@ -8,12 +8,13 @@
 class Entity
 {
 public:
+    int id;
     Vector2 pos;
-    Entity(Vector2 position = Vector2());
+    Entity(int id = 0, const Vector2& pos = Vector2());
     // Entity(const Entity&);
     //~Entity();
 
-    void Move(const Level &grid, Vector2 moveDir, double deltaTime);
+    void Move(const Matrix &grid, Vector2 moveDir, double deltaTime);
 };
 
 class Player : public Entity
@@ -41,11 +42,12 @@ public:
 class Game
 {
 public:
-    Level gLevel;
-    Player gPlayer;
-    Entity *gEnemy;
+    Matrix level;
+    Player player;
+    int entSize;
+    Entity *entities;
 
-    Game(Level gl = Level("palya.txt"), Player gp = Player(Vector2(2, 3)));
+    Game(const char* saveName);
     //~Game();
     void SimulateGame(Input &inp, const double deltaTime);
 };
