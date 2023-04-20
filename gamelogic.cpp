@@ -66,16 +66,17 @@ Game::Game(const char* saveName) {
     level.grid = grid;
     
     
-    /*
+
     // LOAD ENTITIES
     levelFile >> entSize;
+    entities = new Entity[entSize];
     for (int i = 0; i < entSize; i++)
     {
         int tempid, posx, posy;
         levelFile >> tempid >> posx >> posy;
         entities[i] = Entity(tempid, Vector2(posx, posy));
     }
-    */
+
 
 
     // close
