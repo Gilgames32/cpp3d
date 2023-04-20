@@ -43,6 +43,11 @@ Game::Game(const char* saveName) {
         throw "WPO0HL";
     }
 
+    // LOAD PLAYER
+    int pposx = 0, pposy = 0;
+    levelFile >> pposx >> pposy;
+    player = Player(Vector2(pposx, pposy), Vector2(1, 0));
+
     // LOAD LEVEL GRID
     // x sor
     // y oszlop

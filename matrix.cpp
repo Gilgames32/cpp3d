@@ -18,8 +18,12 @@ Matrix::Matrix(const Matrix &mx) : sizex(mx.sizex), sizey(mx.sizey) {
 void Matrix::operator=(const Matrix &mx)
 {
     // TODO!!! delete old
-    sizex = mx.sizex();
-    sizey = mx.sizey();
+    for (int i = 0; i < sizex; i++)
+        delete[] grid[i];
+    delete[] grid;
+
+    sizex = mx.sizex;
+    sizey = mx.sizey;
     grid = new int*[sizex];
     for (int s = 0; s < sizex; s++)
     {
