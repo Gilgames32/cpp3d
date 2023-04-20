@@ -44,9 +44,7 @@ Game::Game(const char* saveName) {
     }
 
     // LOAD PLAYER
-    int pposx = 0, pposy = 0;
-    levelFile >> pposx >> pposy;
-    player = Player(Vector2(pposx, pposy), Vector2(1, 0));
+    levelFile >> player.pos.x >> player.pos.y;
 
     // LOAD LEVEL GRID
     // x sor
@@ -63,17 +61,21 @@ Game::Game(const char* saveName) {
             levelFile >> grid[s][o];
         }
     }
-    level = Matrix(sizex, sizey, grid);
-
+    level.sizex = sizex;
+    level.sizey = sizey;
+    level.grid = grid;
+    
+    
+    /*
     // LOAD ENTITIES
     levelFile >> entSize;
     for (int i = 0; i < entSize; i++)
     {
         int tempid, posx, posy;
         levelFile >> tempid >> posx >> posy;
-        entities[entSize] = Entity(tempid, Vector2(posx, posy));
+        entities[i] = Entity(tempid, Vector2(posx, posy));
     }
-    
+    */
 
 
     // close

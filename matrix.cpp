@@ -1,16 +1,33 @@
 #include "matrix.h"
 
 
-Matrix::Matrix(int sizex, int sizey, int** grid) : sizex(sizex), sizey(sizey), grid(grid) {}
+Matrix::Matrix(int mxsizex, int mxsizey, int** mxgrid) : sizex(mxsizex), sizey(mxsizey), grid(nullptr)
+{
+    if (sizex != 0)
+    {
+        grid = new int*[sizex];
+        for (int s = 0; s < sizex; s++)
+        {
+            grid[s] = new int[sizey];
+            for (int o = 0; o < sizey; o++)
+            {
+                grid[s][o] = mxgrid[s][o];
+            }
+        }
+    }
+}
 
 Matrix::Matrix(const Matrix &mx) : sizex(mx.sizex), sizey(mx.sizey) {
-    grid = new int*[sizex];
-    for (int s = 0; s < sizex; s++)
+    if (sizex != 0)
     {
-        grid[s] = new int[sizey];
-        for (int o = 0; o < sizey; o++)
+        grid = new int*[sizex];
+        for (int s = 0; s < sizex; s++)
         {
-            grid[s][o] = mx.grid[s][o];
+            grid[s] = new int[sizey];
+            for (int o = 0; o < sizey; o++)
+            {
+                grid[s][o] = mx.grid[s][o];
+            }
         }
     }
 }

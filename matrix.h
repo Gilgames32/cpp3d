@@ -10,7 +10,7 @@ public:
     int sizex, sizey;
     int **grid;
 
-    Matrix(int sizex = 0, int sizey = 0, int**grid = nullptr);
+    Matrix(int sizex = 0, int sizey = 0, int**grid = 0);
     Matrix(const Matrix &);
     void operator=(const Matrix &);
     ~Matrix();
