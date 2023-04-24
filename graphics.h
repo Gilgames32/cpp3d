@@ -31,6 +31,7 @@ public:
     void Render();
     void DrawMinimap(const Game &);
     void DrawPerspective(const Game &);
+    void DrawSprites(const Game &);
 };
 
 class WindowInput : public Input

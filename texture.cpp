@@ -119,5 +119,9 @@ void Palette::AddTexture(const char *s)
 
 Texture& Palette::operator[](int index) const
 {
-    return *(textures[index]);
+    // todo: built in placeholder
+    if (index >= size)
+        return *(textures[0]);
+    else
+        return *(textures[index]);
 }

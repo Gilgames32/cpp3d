@@ -31,6 +31,7 @@ int main(int argc, char const *argv[])
 
         win.Clear();
         win.DrawPerspective(mainGame);
+        win.DrawSprites(mainGame);
         win.DrawMinimap(mainGame);
         win.Render();
 

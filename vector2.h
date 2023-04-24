@@ -27,18 +27,27 @@ public:
     //~Vector2();
 };
 
+// same type but handled together
 template <typename T>
-class pair
+class duo
 {
 private:
     /* data */
 public:
     T x, y;
-    pair(T x0 = 0, T y0 = 0)
-    {
-        x = x0;
-        y = y0;
-    }
+    duo(T x0 = 0, T y0 = 0) : x(x0), y(y0) {}
+};
+
+// different types handled together
+template <typename A, typename B>
+class pair
+{
+private:
+    /* data */
+public:
+    A a;
+    B b;
+    pair(A a0 = 0, B b0 = 0) : a(a0), b(b0) {}
 };
 
 #endif

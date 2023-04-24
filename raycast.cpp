@@ -4,14 +4,14 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
     : space(spaceGrid), start(startVector), dir(dirVector)
 {
     // kiindulási cella
-    cell = pair<int>(start.x, start.y);
+    cell = duo<int>(start.x, start.y);
 
     // egyik x vagy y oldalról a legközelebbi átellenes oldalig a távolság
     // 1 helyett átfogó kéne
     Vector2 deltaDist = Vector2(abs(1 / dir.x), abs(1 / dir.y));
 
     // lépegetés irányának előjele, -1 vagy 1
-    pair<int> stepDir;
+    duo<int> stepDir;
     stepDir.x = dir.x < 0 ? -1 : 1;
     stepDir.y = dir.y < 0 ? -1 : 1;
 

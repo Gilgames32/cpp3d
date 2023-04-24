@@ -26,7 +26,7 @@ public:
     bool side;
 
     // a becsapódási cella értéke
-    pair<int> cell;
+    duo<int> cell;
 
     // a pálya
     const Matrix &space;
