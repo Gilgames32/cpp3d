@@ -21,6 +21,7 @@ Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8
     wallTextures.AddTexture("./ass/grass_side.png");
     wallTextures.AddTexture("./ass/rolopipi.png");
 
+    spriteTextures.AddTexture("./ass/placeholder.png");
 
 
 
@@ -146,6 +147,33 @@ void Window::DrawPerspective(const Game &game)
 
     // unluck framebuffer
     frameBuffer.UnLock();
+}
+
+void Window::DrawSprites(const Game &game)
+{
+    // sortable array of entities
+    pair<Entity*, double> *sortedEnts = new pair<Entity*, double>[game.entSize];
+    
+    // distance between camera  and sprites
+    for (int i = 0; i < game.entSize; i++)
+    {
+        sortedEnts[i].a = game.entities + i;
+        Vector2 distance = game.player.pos - sortedEnts[i].a->pos;
+        sortedEnts[i].b = distance.abs();
+    }
+
+    // bubble sort by distance
+    for (int i = 0; i < game.entSize - 1; i++)
+        for (int j = 0; j < game.entSize - i - 1; j++)
+            if (sortedEnts[j].b > sortedEnts[j+1].b)
+            {
+                pair<Entity*, double> temp = sortedEnts[j];
+                sortedEnts[j] = sortedEnts[j+1];
+                sortedEnts[j+1] = temp;
+            }
+    
+    // ended here
+
 }
 
 WindowInput::WindowInput() : Input() {}
