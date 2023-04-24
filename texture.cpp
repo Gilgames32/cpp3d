@@ -111,16 +111,13 @@ void Palette::AddTexture(Texture *t)
     textures = temp;
 }
 
+void Palette::AddTexture(const char *s)
+{
+    Texture *t = new Texture(s);
+    AddTexture(t);
+}
+
 Texture& Palette::operator[](int index) const
 {
     return *(textures[index]);
-}
-
-Palette Sprite::lookUpTable = Palette();
-
-Sprite::Sprite(int id, const Vector2& pos) : Entity(id, pos) {}
-
-Texture& Sprite::getTexture()
-{
-    return lookUpTable[id];
 }

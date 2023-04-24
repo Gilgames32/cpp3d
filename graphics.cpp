@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8888), pattern(), frameBuffer()
+Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8888), wallTextures(), frameBuffer()
 {
     // initialize sdl
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -17,7 +17,14 @@ Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8
     Texture::windowFormat = format;
 
     // load textures
-    pattern = Texture("grass_side.png");
+    wallTextures.AddTexture("./ass/placeholder.png");
+    wallTextures.AddTexture("./ass/grass_side.png");
+    wallTextures.AddTexture("./ass/rolopipi.png");
+
+
+
+
+
 
     // create a framebuffer
     frameBuffer = Texture(w, h);
@@ -102,11 +109,14 @@ void Window::DrawPerspective(const Game &game)
         if (drawEnd >= heigth)
             drawEnd = heigth - 1;
 
+        // adott textúra
+        Texture& pattern = wallTextures[cast.CellValue()];
+
         // textúra X oszlopa
         int textureX = cast.WallX() * double(pattern.width);
-        if (cast.side == 0 && cast.dir.x > 0)
-            textureX = pattern.width - textureX - 1;
-        if (cast.side == 1 && cast.dir.y < 0)
+
+        // bizonyos oldalak tükrözve jelennek meg, erre fix
+        if (cast.side == 0 && cast.dir.x < 0 || cast.side == 1 && cast.dir.y > 0)
             textureX = pattern.width - textureX - 1;
 
         // nyújtás mértéke

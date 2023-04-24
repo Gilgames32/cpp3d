@@ -44,19 +44,10 @@ private:
 public:
     Palette();
     ~Palette();
+    void AddTexture(const char *);
     void AddTexture(Texture *t);
 
     Texture& operator[](int index) const;
-};
-
-
-class Sprite : public Entity
-{
-public:
-    static Palette lookUpTable;
-    Sprite(int id = 0, const Vector2& pos = Vector2());
-    Texture& getTexture();
-    //~Sprite();
 };
 
 #endif // TEXTURE_H

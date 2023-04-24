@@ -4,7 +4,7 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
     : space(spaceGrid), start(startVector), dir(dirVector)
 {
     // kiindulási cella
-    pair<int> cell(start.x, start.y);
+    cell = pair<int>(start.x, start.y);
 
     // egyik x vagy y oldalról a legközelebbi átellenes oldalig a távolság
     // 1 helyett átfogó kéne
@@ -62,4 +62,9 @@ double Ray::WallX()
         wallX = start.x + wallDist * dir.x;
     wallX -= floor(wallX);
     return wallX;
+}
+
+int Ray::CellValue()
+{
+    return space[cell.x][cell.y];
 }

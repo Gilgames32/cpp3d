@@ -25,12 +25,18 @@ public:
     // a becsapódási oldal
     bool side;
 
+    // a becsapódási cella értéke
+    pair<int> cell;
+
+    // a pálya
     const Matrix &space;
 
     Ray(const Matrix &sapceGrid, const Vector2 &startVector, const Vector2 &dirVector);
     Ray(const Ray &ray);
 
     double WallX();
+
+    int CellValue();
 
     //~Ray();
 };

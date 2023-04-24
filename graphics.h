@@ -21,7 +21,8 @@ private:
 
     Texture frameBuffer;
     double *zBuffer;
-    Texture pattern;
+    Palette wallTextures;
+    Palette spriteTextures;
 
 public:
     Window(int = 800, int = 600);
