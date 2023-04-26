@@ -60,7 +60,7 @@ Uint32 Texture::GetPixel(int x, int y)
 {
     if (x >= width || x < 0 || y >= height || y < 0)
         return 0x00000000;
-    
+
     Uint32 pixelPosition = y * (pitch / sizeof(Uint32)) + x;
     return pixels[pixelPosition];
 }
@@ -73,7 +73,6 @@ void Texture::SetPixel(int x, int y, Uint32 set)
 
 Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
 {
-    // https://en.wikipedia.org/wiki/Alpha_compositing
     // feltételezzük hogy ABGR vagy ARGB
     // 0xAABBGGRR
 
@@ -82,15 +81,14 @@ Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
         return add;
     if (addAlpha == 0)
         return base;
-    
-    
-    double baseAlpha = base >> 24 && 0xFF / 255;
-    double omegAlpha = addAlpha + baseAlpha * (1-addAlpha);
 
+    // https://en.wikipedia.org/wiki/Alpha_compositing
+    double baseAlpha = base >> 24 && 0xFF / 255;
+    double omegAlpha = addAlpha + baseAlpha * (1 - addAlpha);
     Uint32 color = 0;
-    Uint8 red   = (addAlpha * (add >> 0  & 0xFF) + baseAlpha * (1-addAlpha) * (base >> 0  & 0xFF)) / omegAlpha;
-    Uint8 green = (addAlpha * (add >> 8  & 0xFF) + baseAlpha * (1-addAlpha) * (base >> 8  & 0xFF)) / omegAlpha;
-    Uint8 blue  = (addAlpha * (add >> 16 & 0xFF) + baseAlpha * (1-addAlpha) * (base >> 16  & 0xFF)) / omegAlpha;
+    Uint8 red = (addAlpha * (add >> 0 & 0xFF) + baseAlpha * (1 - addAlpha) * (base >> 0 & 0xFF)) / omegAlpha;
+    Uint8 green = (addAlpha * (add >> 8 & 0xFF) + baseAlpha * (1 - addAlpha) * (base >> 8 & 0xFF)) / omegAlpha;
+    Uint8 blue = (addAlpha * (add >> 16 & 0xFF) + baseAlpha * (1 - addAlpha) * (base >> 16 & 0xFF)) / omegAlpha;
     Uint8 alpha = omegAlpha * 255;
 
     color = alpha << 24 | blue << 16 | green << 8 | red << 0;
@@ -112,7 +110,7 @@ void Texture::Clear()
     {
         for (int x = 0; x < width; x++)
         {
-            pixels[y * (pitch / sizeof(Uint32)) + x] = 0;
+            pixels[y * (pitch / sizeof(Uint32)) + x] = 0xFF000000;
         }
     }
 }
@@ -129,7 +127,7 @@ Palette::~Palette()
 
 void Palette::AddTexture(Texture *t)
 {
-    Texture **temp = new Texture*[size+1];
+    Texture **temp = new Texture *[size + 1];
     for (int i = 0; i < size; i++)
     {
         temp[i] = textures[i];
@@ -146,7 +144,7 @@ void Palette::AddTexture(const char *s)
     AddTexture(t);
 }
 
-Texture& Palette::operator[](int index) const
+Texture &Palette::operator[](int index) const
 {
     // todo: built in placeholder
     if (index >= size)

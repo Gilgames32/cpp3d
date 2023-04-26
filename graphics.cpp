@@ -141,7 +141,7 @@ void Window::DrawPerspective(const Game &game)
 
             // igény szerint sötétítés
             if (cast.side)
-                //pixel = (pixel >> 1) & 0xFF7F7F7F;
+                // pixel = (pixel >> 1) & 0xFF7F7F7F;
                 pixel = Texture::AlphaBlend(0xFF000000, pixel & 0x77FFFFFF);
 
             // bufferbe írjuk
@@ -163,7 +163,7 @@ void Window::DrawSprites(const Game &game)
 {
     // lezárjuk, mert rajzolni fogunk
     frameBuffer.Lock();
-    
+
     // entitások szortírozó tömbje
     // tárulunk egy entitrásra mutató pointert, és a hozzá tartozó távolságot a játékostól
     pair<Entity *, double> *sortedEnts = new pair<Entity *, double>[game.entSize];
@@ -217,40 +217,44 @@ void Window::DrawSprites(const Game &game)
         // a sprite közepének képernyőn vett koordinátája
         int spriteScreenX = (width / 2) * (1 + entPosCameraSpace.x / entPosCameraSpace.y);
 
-        // calculate height of the sprite on screen
-        int spriteHeight = abs(int(height / (entPosCameraSpace.y))); // using "transformY" instead of the real distance prevents fisheye
-        // calculate lowest and highest pixel to fill in current stripe
-        int drawStartY = -spriteHeight / 2 + height / 2;
-        if (drawStartY < 0)
-            drawStartY = 0;
-        int drawEndY = spriteHeight / 2 + height / 2;
-        if (drawEndY >= height)
-            drawEndY = height - 1;
+        // sprite mérete a képernyőn
+        // nincs külön szélesség és magasság, minden sprite négyzet alakú, a képek nyújtva lesznek
+        int spriteSize = abs(int(height / (entPosCameraSpace.y)));
 
-        // calculate width of the sprite
-        int spriteWidth = abs(int(height / (entPosCameraSpace.y))); // same as height of sprite, given that it's square
-        int drawStartX = -spriteWidth / 2 + spriteScreenX;
-        if (drawStartX < 0)
-            drawStartX = 0;
-        int drawEndX = spriteWidth / 2 + spriteScreenX;
-        if (drawEndX > width)
-            drawEndX = width;
+        duo<int> drawStart, drawEnd;
+        // sprite alja és teteje a képernyőn
+        drawStart.y = -spriteSize / 2 + height / 2;
+        if (drawStart.y < 0)
+            drawStart.y = 0;
+        drawEnd.y = spriteSize / 2 + height / 2;
+        if (drawEnd.y >= height)
+            drawEnd.y = height - 1;
+
+        // sprite szélei a képernyőn
+        drawStart.x = -spriteSize / 2 + spriteScreenX;
+        if (drawStart.x < 0)
+            drawStart.x = 0;
+        drawEnd.x = spriteSize / 2 + spriteScreenX;
+        if (drawEnd.x >= width)
+            drawEnd.x = width - 1;
 
         // a sprite minden oszlopán végigmegyünk
-        for (int stripe = drawStartX; stripe < drawEndX; stripe++)
+        for (int stripe = drawStart.x; stripe < drawEnd.x; stripe++)
         {
             // ha előttunk van
             // és a fal nem takarja ki, azaz a zbufferben tárolt távolság nagyobb mint a pozíciója
             if (entPosCameraSpace.y > 0 && entPosCameraSpace.y < zBuffer[stripe])
             {
-                int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * spriteTex.width / spriteWidth) / 256;
-                for (int y = drawStartY; y < drawEndY; y++) // for every pixel of the current stripe
+                // textúra x koordinátája
+                int texX = (stripe - (-spriteSize / 2 + spriteScreenX)) * spriteTex.width / spriteSize;
+                for (int y = drawStart.y; y < drawEnd.y; y++) // for every pixel of the current stripe
                 {
-                    int d = y * 256 - height * 128 + spriteHeight * 128; // 256 and 128 factors to avoid floats
-                    int texY = ((d * spriteTex.height) / spriteHeight) / 256;
-                    Uint32 color = spriteTex.GetPixel(texX, texY); // get current color from the texture
-                    frameBuffer.SetPixel(stripe, y, Texture::AlphaBlend(frameBuffer.GetPixel(stripe, y), color));
-                        
+                    // textúra y koordinátája
+                    int texY = ((y - height / 2 + spriteSize / 2) * spriteTex.height) / spriteSize;
+                    Uint32 color = spriteTex.GetPixel(texX, texY);
+                    // átlátszó textúrák miatt színkeverés
+                    color = Texture::AlphaBlend(frameBuffer.GetPixel(stripe, y), color);
+                    frameBuffer.SetPixel(stripe, y, color);
                 }
             }
         }
