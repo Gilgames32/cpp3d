@@ -55,9 +55,3 @@ Vector2 &Vector2::normalize()
     }
     return *this;
 }
-
-template <typename T>
-duo<T>::duo(T x0, T y0) : x(x0), y(y0) {}
-
-template <typename A, typename B>
-pair<A, B>::pair(A a0, B b0) : a(a0), b(b0) {}

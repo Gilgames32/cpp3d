@@ -35,7 +35,7 @@ private:
     /* data */
 public:
     T x, y;
-    duo(T x0 = 0, T y0 = 0);
+    duo(T x0 = 0, T y0 = 0)  : x(x0), y(y0) {}
 };
 
 // different types handled together
@@ -47,7 +47,7 @@ private:
 public:
     A a;
     B b;
-    pair(A a0 = 0, B b0 = 0);
+    pair(A a0 = 0, B b0 = 0) : a(a0), b(b0) {}
 };
 
 #endif
