@@ -4,7 +4,7 @@ Entity::Entity(int id, const Vector2& pos) : id(id), pos(pos) {}
 
 Vector2 Player::plane() const
 {
-    return Vector2(-dir.y, dir.x) * 0.66;
+    return Vector2(-dir.y, dir.x) * 0.66; // fov
 }
 
 Player::Player(Vector2 position, Vector2 direction) : Entity(-1, position), dir(direction) {}

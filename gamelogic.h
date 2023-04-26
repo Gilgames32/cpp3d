@@ -23,7 +23,7 @@ public:
     Vector2 dir;
     Vector2 plane() const;
 
-    Player(Vector2 position = Vector2(), Vector2 direction = Vector2(1, 0));
+    Player(Vector2 position = Vector2(), Vector2 direction = Vector2(0, 1));
     Player(const Player &);
 };
 

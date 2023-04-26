@@ -62,8 +62,8 @@ void Window::Clear()
 
 void Window::Render()
 {
-    // copy the buffer onto the screen
-    SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
+    // copy the framebuffer onto the screen
+    // SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
 
     // put the contents of the renderer to the screen
     SDL_RenderPresent(renderer);
@@ -77,6 +77,10 @@ void Window::DrawMinimap(const Game &game)
             if (game.level[i][j] != 0)
                 rectangleColor(renderer, i * 10, j * 10, (i + 1) * 10, (j + 1) * 10, 0xFFFFFFFF);
 
+    // draw entities
+    for (int i = 0; i < game.entSize; i++)
+        circleColor(renderer, game.entities[i].pos.x * 10, game.entities[i].pos.y * 10, 2, 0x00FF00FF);
+    
     // draw player
     circleColor(renderer, game.player.pos.x * 10, game.player.pos.y * 10, 2, 0xFF0000FF);
 }
@@ -151,6 +155,7 @@ void Window::DrawPerspective(const Game &game)
 
 void Window::DrawSprites(const Game &game)
 {
+    frameBuffer.Lock();
     // sortable array of entities
     pair<Entity*, double> *sortedEnts = new pair<Entity*, double>[game.entSize];
     
@@ -165,7 +170,7 @@ void Window::DrawSprites(const Game &game)
     // bubble sort by distance
     for (int i = 0; i < game.entSize - 1; i++)
         for (int j = 0; j < game.entSize - i - 1; j++)
-            if (sortedEnts[j].b > sortedEnts[j+1].b)
+            if (sortedEnts[j].b < sortedEnts[j+1].b)
             {
                 pair<Entity*, double> temp = sortedEnts[j];
                 sortedEnts[j] = sortedEnts[j+1];
@@ -173,7 +178,49 @@ void Window::DrawSprites(const Game &game)
             }
     
     // ended here
+    /*
+    4: Project the sprite on the camera plane (in 2D): subtract the player position from the sprite position, then multiply the result with the inverse of the 2x2 camera matrix
+    5: Calculate the size of the sprite on the screen (both in x and y direction) by using the perpendicular distance
+    6: Draw the sprites vertical stripe by vertical stripe, don't draw the vertical stripe if the distance is further away than the 1D ZBuffer of the walls of the current stripe
+    7: Draw the vertical stripe pixel by pixel, make sure there's an invisible color or all sprites would be rectangles
+    */
+    //shu
 
+    // project it to the camera
+    for (int i = 0; i < game.entSize; i++)
+    {
+        // aliases
+        Entity& ent = *(sortedEnts[i].a);
+        Vector2 dir = game.player.dir;
+        Vector2 plane = game.player.plane();
+
+        // relative position to camera
+        Vector2 relativeEntPos = ent.pos - game.player.pos;
+
+        // transform sprite with the inverse camera matrix
+        //  [ planeX   dirX ] ^-1                                      [ dirY      -dirX ]
+        //  [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
+        //  [ planeY   dirY ]                                          [ -planeY  planeX ]
+
+        // mátrix determiniánsának reciproka
+        double detRec = 1.0 / (plane.x * dir.y - dir.x * plane.y);
+
+        // sprites position in camera space
+        Vector2 transform;
+        transform.x = detRec * (dir.y * relativeEntPos.x - dir.x * relativeEntPos.y);
+        // mivel a kamera síkjára merőleges ezért igazából egy kamerától való távolságot jelent
+        transform.y = detRec * (-plane.y * relativeEntPos.x + plane.x * relativeEntPos.y);
+
+        // the center of the sprite on the screen
+        int spriteScreenX = int((width / 2) * (1 + transform.x / transform.y));
+        // debugging
+        circleColor(renderer, spriteScreenX, heigth/2, 6, 0xFFFFFFFF);
+
+        
+    }
+
+    delete[] sortedEnts;
+    frameBuffer.UnLock();
 }
 
 WindowInput::WindowInput() : Input() {}
