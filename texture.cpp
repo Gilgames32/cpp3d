@@ -58,6 +58,7 @@ Texture::~Texture()
 
 Uint32 Texture::GetPixel(int x, int y)
 {
+    // todo: return invalid if out of range
     Uint32 pixelPosition = y * (pitch / sizeof(Uint32)) + x;
     return pixels[pixelPosition];
 }
@@ -66,6 +67,34 @@ void Texture::SetPixel(int x, int y, Uint32 set)
 {
     Uint32 pixelPosition = y * (pitch / sizeof(Uint32)) + x;
     pixels[pixelPosition] = set;
+}
+
+Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
+{
+    // feltételezzük hogy ABGR vagy ARGB
+    // 0xAABBGGRR
+
+    double addAlpha = double(add >> 24 & 0xFF) / 255;
+    if (addAlpha == 1)
+        return add;
+    if (addAlpha == 0)
+        return base;
+    
+    
+    double baseAlpha = base >> 24 && 0xFF / 255;
+
+    // ha a közös alfa túllóg 1-en
+    if (addAlpha + baseAlpha > 1)
+        baseAlpha = 1 - addAlpha;
+
+    Uint32 color = 0;
+    Uint8 red   = (base >> 0  & 0xFF) * baseAlpha + (add >> 0  & 0xFF) * addAlpha;
+    Uint8 green = (base >> 8  & 0xFF) * baseAlpha + (add >> 8  & 0xFF) * addAlpha;
+    Uint8 blue  = (base >> 16 & 0xFF) * baseAlpha + (add >> 16 & 0xFF) * addAlpha;
+    Uint8 alpha = (baseAlpha + addAlpha) * 255;
+
+    color = alpha << 24 | blue << 16 | green << 8 | red << 0;
+    return color;
 }
 
 void Texture::Lock()

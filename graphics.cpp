@@ -15,6 +15,7 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
 
     // set color format
     Texture::windowFormat = format;
+    std::cout << SDL_GetPixelFormatName(format) << std::endl;
 
     // load textures
     wallTextures.AddTexture("./ass/placeholder.png");
@@ -22,10 +23,7 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
     wallTextures.AddTexture("./ass/rolopipi.png");
 
     spriteTextures.AddTexture("./ass/placeholder.png");
-
-
-
-
+    spriteTextures.AddTexture("./ass/fokyouman.png");
 
     // create a framebuffer
     frameBuffer = Texture(w, h);
@@ -80,7 +78,7 @@ void Window::DrawMinimap(const Game &game)
     // draw entities
     for (int i = 0; i < game.entSize; i++)
         circleColor(renderer, game.entities[i].pos.x * 10, game.entities[i].pos.y * 10, 2, 0x00FF00FF);
-    
+
     // draw player
     circleColor(renderer, game.player.pos.x * 10, game.player.pos.y * 10, 2, 0xFF0000FF);
 }
@@ -115,7 +113,7 @@ void Window::DrawPerspective(const Game &game)
             drawEnd = height - 1;
 
         // adott textúra
-        Texture& pattern = wallTextures[cast.CellValue()];
+        Texture &pattern = wallTextures[cast.CellValue()];
 
         // textúra X oszlopa
         int textureX = cast.WallX() * double(pattern.width);
@@ -139,7 +137,8 @@ void Window::DrawPerspective(const Game &game)
 
             // igény szerint sötétítés
             if (cast.side)
-                pixel = (pixel >> 1) & 0xFF7F7F7F;
+                //pixel = (pixel >> 1) & 0xFF7F7F7F;
+                pixel = Texture::AlphaBlend(0xFF000000, pixel & 0x77FFFFFF);
 
             // bufferbe írjuk
             frameBuffer.SetPixel(x, y, pixel);
@@ -158,11 +157,14 @@ void Window::DrawPerspective(const Game &game)
 
 void Window::DrawSprites(const Game &game)
 {
+    // lezárjuk, mert rajzolni fogunk
     frameBuffer.Lock();
-    // sortable array of entities
-    pair<Entity*, double> *sortedEnts = new pair<Entity*, double>[game.entSize];
     
-    // distance between camera  and sprites
+    // entitások szortírozó tömbje
+    // tárulunk egy entitrásra mutató pointert, és a hozzá tartozó távolságot a játékostól
+    pair<Entity *, double> *sortedEnts = new pair<Entity *, double>[game.entSize];
+
+    // távolságok kiszámítása
     for (int i = 0; i < game.entSize; i++)
     {
         sortedEnts[i].a = game.entities + i;
@@ -170,93 +172,83 @@ void Window::DrawSprites(const Game &game)
         sortedEnts[i].b = distance.abs();
     }
 
-    // bubble sort by distance
+    // buborékrendezés, legtávolabbi legelől a tömbben
     for (int i = 0; i < game.entSize - 1; i++)
         for (int j = 0; j < game.entSize - i - 1; j++)
-            if (sortedEnts[j].b < sortedEnts[j+1].b)
+            if (sortedEnts[j].b < sortedEnts[j + 1].b)
             {
-                pair<Entity*, double> temp = sortedEnts[j];
-                sortedEnts[j] = sortedEnts[j+1];
-                sortedEnts[j+1] = temp;
+                pair<Entity *, double> temp = sortedEnts[j];
+                sortedEnts[j] = sortedEnts[j + 1];
+                sortedEnts[j + 1] = temp;
             }
-    
 
-    /*
-    5: Calculate the size of the sprite on the screen (both in x and y direction) by using the perpendicular distance
-    6: Draw the sprites vertical stripe by vertical stripe, don't draw the vertical stripe if the distance is further away than the 1D ZBuffer of the walls of the current stripe
-    7: Draw the vertical stripe pixel by pixel, make sure there's an invisible color or all sprites would be rectangles
-    */
-
-    // project it to the camera
+    // megjelenítés a kamerán
     for (int i = 0; i < game.entSize; i++)
     {
-        // aliases
-        Entity& ent = *(sortedEnts[i].a);
+        // alias
+        Entity &ent = *(sortedEnts[i].a);
         Vector2 dir = game.player.dir;
         Vector2 plane = game.player.plane();
-        Texture& spriteTex = spriteTextures[ent.id];
+        Texture &spriteTex = spriteTextures[ent.id];
 
-        // relative position to player
-        Vector2 relativeEntPos = ent.pos - game.player.pos;
+        // játékoshoz relatív pozíciója
+        Vector2 entPosPlayerSpace = ent.pos - game.player.pos;
 
-        // transform sprite with the inverse camera matrix
-        //  [ planeX   dirX ] ^-1                                      [ dirY      -dirX ]
-        //  [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
-        //  [ planeY   dirY ]                                          [ -planeY  planeX ]
+        // kamera mátrixának inverzével transzformáljuk az entitás pozícióját
+        // így megkapjuk a kamerához relatív pozícióját
+        // BSZ1 my beloved
+        /*
+            [ planeX   dirX ] ^-1                 1              [ dirY      -dirX ]
+            [               ]       =  -----------------------   [                 ]
+            [ planeY   dirY ]          planeX*dirY-dirX*planeY   [ -planeY  planeX ]
+        */
 
         // mátrix determiniánsának reciproka
         double detRec = 1.0 / (plane.x * dir.y - dir.x * plane.y);
+        Vector2 entPosCameraSpace;
+        entPosCameraSpace.x = detRec * (dir.y * entPosPlayerSpace.x - dir.x * entPosPlayerSpace.y);
+        // mivel a kamera síkjára merőleges ezért igazából y egy kamerától való mélységet jelent
+        entPosCameraSpace.y = detRec * (-plane.y * entPosPlayerSpace.x + plane.x * entPosPlayerSpace.y);
 
-        // sprites position in camera space
-        Vector2 transform;
-        transform.x = detRec * (dir.y * relativeEntPos.x - dir.x * relativeEntPos.y);
-        // mivel a kamera síkjára merőleges ezért igazából egy kamerától való távolságot jelent
-        transform.y = detRec * (-plane.y * relativeEntPos.x + plane.x * relativeEntPos.y);
+        // a sprite közepének képernyőn vett koordinátája
+        int spriteScreenX = (width / 2) * (1 + entPosCameraSpace.x / entPosCameraSpace.y);
 
-        // the center of the sprite on the screen
-        int spriteScreenX = int((width / 2) * (1 + transform.x / transform.y));
-        // debugging
-        circleColor(renderer, spriteScreenX, height/2, 6, 0xFFFFFFFF);
+        // calculate height of the sprite on screen
+        int spriteHeight = abs(int(height / (entPosCameraSpace.y))); // using "transformY" instead of the real distance prevents fisheye
+        // calculate lowest and highest pixel to fill in current stripe
+        int drawStartY = -spriteHeight / 2 + height / 2;
+        if (drawStartY < 0)
+            drawStartY = 0;
+        int drawEndY = spriteHeight / 2 + height / 2;
+        if (drawEndY >= height)
+            drawEndY = height - 1;
 
-        // parameters for scaling and moving the sprites
-        #define uDiv 1
-        #define vDiv 1
-        #define vMove 0.0
-        int vMoveScreen = int(vMove / transform.y);
-
-        //calculate height of the sprite on screen
-        int spriteHeight = abs(int (height / (transform.y))) / vDiv; //using "transformY" instead of the real distance prevents fisheye
-        //calculate lowest and highest pixel to fill in current stripe
-        int drawStartY = -spriteHeight / 2 + height / 2 + vMoveScreen;
-        if(drawStartY < 0) drawStartY = 0;
-        int drawEndY = spriteHeight / 2 + height / 2 + vMoveScreen;
-        if(drawEndY >= height) drawEndY = height - 1;
-
-        //calculate width of the sprite
-        int spriteWidth = abs(int (height / (transform.y))) / uDiv; // same as height of sprite, given that it's square
+        // calculate width of the sprite
+        int spriteWidth = abs(int(height / (entPosCameraSpace.y))); // same as height of sprite, given that it's square
         int drawStartX = -spriteWidth / 2 + spriteScreenX;
-        if(drawStartX < 0) drawStartX = 0;
+        if (drawStartX < 0)
+            drawStartX = 0;
         int drawEndX = spriteWidth / 2 + spriteScreenX;
-        if(drawEndX > width) drawEndX = width;
+        if (drawEndX > width)
+            drawEndX = width;
 
-        circleColor(renderer, spriteScreenX, height/2, spriteHeight/4, 0xFFFFFFFF);
-
-        //loop through every vertical stripe of the sprite on screen
-        for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+        // loop through every vertical stripe of the sprite on screen
+        for (int stripe = drawStartX; stripe < drawEndX; stripe++)
         {
-            //the conditions in the if are:
-            //1) it's in front of camera plane so you don't see things behind you
-            //2) ZBuffer, with perpendicular distance
-            if(transform.y > 0 && transform.y < zBuffer[stripe])
+            // the conditions in the if are:
+            // 1) it's in front of camera plane so you don't see things behind you
+            // 2) ZBuffer, with perpendicular distance
+            if (entPosCameraSpace.y > 0 && entPosCameraSpace.y < zBuffer[stripe])
             {
                 int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * spriteTex.width / spriteWidth) / 256;
-                for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+                for (int y = drawStartY; y < drawEndY; y++) // for every pixel of the current stripe
                 {
-                    int d = (y - vMoveScreen) * 256 - height * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+                    int d = y * 256 - height * 128 + spriteHeight * 128; // 256 and 128 factors to avoid floats
                     int texY = ((d * spriteTex.height) / spriteHeight) / 256;
-                    Uint32 color = spriteTex.GetPixel(texX, texY); //get current color from the texture
-                    if((color & 0x00FFFFFF) != 0) 
-                        frameBuffer.SetPixel(stripe, y, color); //paint pixel if it isn't black, black is the invisible color
+                    Uint32 color = spriteTex.GetPixel(texX, texY); // get current color from the texture
+                    if ((color & 0xFF000000) != 0)
+                        frameBuffer.SetPixel(stripe, y, Texture::AlphaBlend(frameBuffer.GetPixel(stripe, y), color)); // paint pixel if it isn't black, black is the invisible color
+                        
                 }
             }
         }

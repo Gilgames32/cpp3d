@@ -29,7 +29,8 @@ public:
     ~Texture();
 
     Uint32 GetPixel(int x, int y);
-    void SetPixel(int x, int y, Uint32 pixel);
+    void SetPixel(int x, int y, Uint32 set);
+    static Uint32 AlphaBlend(Uint32 base, Uint32 add);
     void Clear();
 
     void Lock();
