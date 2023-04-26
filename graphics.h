@@ -14,7 +14,7 @@
 class Window
 {
 private:
-    const int width, heigth;
+    const int width, height;
     SDL_Window *window;
     SDL_Renderer *renderer;
     Uint32 format;

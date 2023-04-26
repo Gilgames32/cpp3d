@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-Window::Window(int w, int h) : width(w), heigth(h), format(SDL_PIXELFORMAT_ABGR8888), wallTextures(), frameBuffer()
+Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8888), wallTextures(), frameBuffer()
 {
     // initialize sdl
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -63,7 +63,7 @@ void Window::Clear()
 void Window::Render()
 {
     // copy the framebuffer onto the screen
-    // SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
+    SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
 
     // put the contents of the renderer to the screen
     SDL_RenderPresent(renderer);
@@ -104,15 +104,15 @@ void Window::DrawPerspective(const Game &game)
         Ray cast = Ray(game.level, game.player.pos, rayDir);
 
         // a fal magassága:
-        int lineHeight = heigth / cast.wallDist;
+        int lineHeight = height / cast.wallDist;
         // legfelső rajzolható pixel
-        int drawStart = -lineHeight / 2 + heigth / 2;
+        int drawStart = -lineHeight / 2 + height / 2;
         if (drawStart < 0)
             drawStart = 0;
         // legalsó rajzolható pixel
-        int drawEnd = lineHeight / 2 + heigth / 2;
-        if (drawEnd >= heigth)
-            drawEnd = heigth - 1;
+        int drawEnd = lineHeight / 2 + height / 2;
+        if (drawEnd >= height)
+            drawEnd = height - 1;
 
         // adott textúra
         Texture& pattern = wallTextures[cast.CellValue()];
@@ -128,7 +128,7 @@ void Window::DrawPerspective(const Game &game)
         double scale = double(pattern.height) / lineHeight;
 
         // ha nem látszódik az egész textúra, a tetejét elhagyjuk
-        double textureY = (drawStart - heigth / 2 + lineHeight / 2) * scale;
+        double textureY = (drawStart - height / 2 + lineHeight / 2) * scale;
 
         // méretre nyújtjuk/zsugorítjuk a textúrát
         for (int y = drawStart; y < drawEnd; y++)
@@ -144,6 +144,9 @@ void Window::DrawPerspective(const Game &game)
             // bufferbe írjuk
             frameBuffer.SetPixel(x, y, pixel);
         }
+
+        // load it to the zbuffer
+        zBuffer[x] = cast.wallDist;
 
         // minimap for debug
         lineColor(renderer, cast.end.x * 10, cast.end.y * 10, cast.start.x * 10, cast.start.y * 10, 0x0000FFFF);
@@ -177,14 +180,12 @@ void Window::DrawSprites(const Game &game)
                 sortedEnts[j+1] = temp;
             }
     
-    // ended here
+
     /*
-    4: Project the sprite on the camera plane (in 2D): subtract the player position from the sprite position, then multiply the result with the inverse of the 2x2 camera matrix
     5: Calculate the size of the sprite on the screen (both in x and y direction) by using the perpendicular distance
     6: Draw the sprites vertical stripe by vertical stripe, don't draw the vertical stripe if the distance is further away than the 1D ZBuffer of the walls of the current stripe
     7: Draw the vertical stripe pixel by pixel, make sure there's an invisible color or all sprites would be rectangles
     */
-    //shu
 
     // project it to the camera
     for (int i = 0; i < game.entSize; i++)
@@ -193,8 +194,9 @@ void Window::DrawSprites(const Game &game)
         Entity& ent = *(sortedEnts[i].a);
         Vector2 dir = game.player.dir;
         Vector2 plane = game.player.plane();
+        Texture& spriteTex = spriteTextures[ent.id];
 
-        // relative position to camera
+        // relative position to player
         Vector2 relativeEntPos = ent.pos - game.player.pos;
 
         // transform sprite with the inverse camera matrix
@@ -214,9 +216,50 @@ void Window::DrawSprites(const Game &game)
         // the center of the sprite on the screen
         int spriteScreenX = int((width / 2) * (1 + transform.x / transform.y));
         // debugging
-        circleColor(renderer, spriteScreenX, heigth/2, 6, 0xFFFFFFFF);
+        circleColor(renderer, spriteScreenX, height/2, 6, 0xFFFFFFFF);
 
-        
+        // parameters for scaling and moving the sprites
+        #define uDiv 1
+        #define vDiv 1
+        #define vMove 0.0
+        int vMoveScreen = int(vMove / transform.y);
+
+        //calculate height of the sprite on screen
+        int spriteHeight = abs(int (height / (transform.y))) / vDiv; //using "transformY" instead of the real distance prevents fisheye
+        //calculate lowest and highest pixel to fill in current stripe
+        int drawStartY = -spriteHeight / 2 + height / 2 + vMoveScreen;
+        if(drawStartY < 0) drawStartY = 0;
+        int drawEndY = spriteHeight / 2 + height / 2 + vMoveScreen;
+        if(drawEndY >= height) drawEndY = height - 1;
+
+        //calculate width of the sprite
+        int spriteWidth = abs(int (height / (transform.y))) / uDiv; // same as height of sprite, given that it's square
+        int drawStartX = -spriteWidth / 2 + spriteScreenX;
+        if(drawStartX < 0) drawStartX = 0;
+        int drawEndX = spriteWidth / 2 + spriteScreenX;
+        if(drawEndX > width) drawEndX = width;
+
+        circleColor(renderer, spriteScreenX, height/2, spriteHeight/4, 0xFFFFFFFF);
+
+        //loop through every vertical stripe of the sprite on screen
+        for(int stripe = drawStartX; stripe < drawEndX; stripe++)
+        {
+            //the conditions in the if are:
+            //1) it's in front of camera plane so you don't see things behind you
+            //2) ZBuffer, with perpendicular distance
+            if(transform.y > 0 && transform.y < zBuffer[stripe])
+            {
+                int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * spriteTex.width / spriteWidth) / 256;
+                for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+                {
+                    int d = (y - vMoveScreen) * 256 - height * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+                    int texY = ((d * spriteTex.height) / spriteHeight) / 256;
+                    Uint32 color = spriteTex.GetPixel(texX, texY); //get current color from the texture
+                    if((color & 0x00FFFFFF) != 0) 
+                        frameBuffer.SetPixel(stripe, y, color); //paint pixel if it isn't black, black is the invisible color
+                }
+            }
+        }
     }
 
     delete[] sortedEnts;
