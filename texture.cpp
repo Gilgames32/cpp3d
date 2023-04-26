@@ -110,7 +110,7 @@ void Texture::Clear()
     {
         for (int x = 0; x < width; x++)
         {
-            pixels[y * (pitch / sizeof(Uint32)) + x] = 0xFF000000;
+            pixels[y * (pitch / sizeof(Uint32)) + x] = y > height/2 ? 0xFF555555 : 0xFF222222;
         }
     }
 }

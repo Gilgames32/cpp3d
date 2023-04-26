@@ -6,9 +6,10 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
     SDL_Init(SDL_INIT_EVERYTHING);
 
     // create window and renderer
-    // todo: game name
-    window = SDL_CreateWindow("NHZ", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
+    // vices érted mert telefonkönyv oszt 3d xddddddd
+    window = SDL_CreateWindow("Telefonkönyv", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_SHOWN);
+    //SDL_RenderSetLogicalSize(renderer, width, height);
 
     // set default renderer of textures
     Texture::windowRenderer = renderer;
@@ -19,15 +20,14 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
 
     // load textures
     wallTextures.AddTexture("./ass/placeholder.png");
-    wallTextures.AddTexture("./ass/grass_side.png");
-    wallTextures.AddTexture("./ass/rolopipi.png");
-    wallTextures.AddTexture("./ass/debug12.png");
-    wallTextures.AddTexture("./ass/debug21.png");
+    wallTextures.AddTexture("./ass/sourcewall_og.png");
+    wallTextures.AddTexture("./ass/cobblestone_mossy.png");
+    wallTextures.AddTexture("./ass/cobblestone.png");
 
     spriteTextures.AddTexture("./ass/placeholder.png");
     spriteTextures.AddTexture("./ass/fokyouman.png");
     spriteTextures.AddTexture("./ass/glas.png");
-    spriteTextures.AddTexture("./ass/debug21.png");
+    spriteTextures.AddTexture("./ass/citen.png");
 
     // create a framebuffer
     frameBuffer = Texture(w, h);
