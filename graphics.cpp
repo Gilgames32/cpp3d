@@ -21,9 +21,13 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
     wallTextures.AddTexture("./ass/placeholder.png");
     wallTextures.AddTexture("./ass/grass_side.png");
     wallTextures.AddTexture("./ass/rolopipi.png");
+    wallTextures.AddTexture("./ass/debug12.png");
+    wallTextures.AddTexture("./ass/debug21.png");
 
     spriteTextures.AddTexture("./ass/placeholder.png");
     spriteTextures.AddTexture("./ass/fokyouman.png");
+    spriteTextures.AddTexture("./ass/glas.png");
+    spriteTextures.AddTexture("./ass/debug21.png");
 
     // create a framebuffer
     frameBuffer = Texture(w, h);
@@ -232,12 +236,11 @@ void Window::DrawSprites(const Game &game)
         if (drawEndX > width)
             drawEndX = width;
 
-        // loop through every vertical stripe of the sprite on screen
+        // a sprite minden oszlopán végigmegyünk
         for (int stripe = drawStartX; stripe < drawEndX; stripe++)
         {
-            // the conditions in the if are:
-            // 1) it's in front of camera plane so you don't see things behind you
-            // 2) ZBuffer, with perpendicular distance
+            // ha előttunk van
+            // és a fal nem takarja ki, azaz a zbufferben tárolt távolság nagyobb mint a pozíciója
             if (entPosCameraSpace.y > 0 && entPosCameraSpace.y < zBuffer[stripe])
             {
                 int texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * spriteTex.width / spriteWidth) / 256;
@@ -246,8 +249,7 @@ void Window::DrawSprites(const Game &game)
                     int d = y * 256 - height * 128 + spriteHeight * 128; // 256 and 128 factors to avoid floats
                     int texY = ((d * spriteTex.height) / spriteHeight) / 256;
                     Uint32 color = spriteTex.GetPixel(texX, texY); // get current color from the texture
-                    if ((color & 0xFF000000) != 0)
-                        frameBuffer.SetPixel(stripe, y, Texture::AlphaBlend(frameBuffer.GetPixel(stripe, y), color)); // paint pixel if it isn't black, black is the invisible color
+                    frameBuffer.SetPixel(stripe, y, Texture::AlphaBlend(frameBuffer.GetPixel(stripe, y), color));
                         
                 }
             }

@@ -91,7 +91,7 @@ Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
     Uint8 red   = (base >> 0  & 0xFF) * baseAlpha + (add >> 0  & 0xFF) * addAlpha;
     Uint8 green = (base >> 8  & 0xFF) * baseAlpha + (add >> 8  & 0xFF) * addAlpha;
     Uint8 blue  = (base >> 16 & 0xFF) * baseAlpha + (add >> 16 & 0xFF) * addAlpha;
-    Uint8 alpha = (baseAlpha + addAlpha) * 255;
+    Uint8 alpha = (baseAlpha + baseAlpha * addAlpha) * 255;
 
     color = alpha << 24 | blue << 16 | green << 8 | red << 0;
     return color;
