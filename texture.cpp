@@ -58,7 +58,9 @@ Texture::~Texture()
 
 Uint32 Texture::GetPixel(int x, int y)
 {
-    // todo: return invalid if out of range
+    if (x >= width || x < 0 || y >= height || y < 0)
+        return 0x00000000;
+    
     Uint32 pixelPosition = y * (pitch / sizeof(Uint32)) + x;
     return pixels[pixelPosition];
 }
@@ -71,6 +73,7 @@ void Texture::SetPixel(int x, int y, Uint32 set)
 
 Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
 {
+    // https://en.wikipedia.org/wiki/Alpha_compositing
     // feltételezzük hogy ABGR vagy ARGB
     // 0xAABBGGRR
 
@@ -82,16 +85,13 @@ Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
     
     
     double baseAlpha = base >> 24 && 0xFF / 255;
-
-    // ha a közös alfa túllóg 1-en
-    if (addAlpha + baseAlpha > 1)
-        baseAlpha = 1 - addAlpha;
+    double omegAlpha = addAlpha + baseAlpha * (1-addAlpha);
 
     Uint32 color = 0;
-    Uint8 red   = (base >> 0  & 0xFF) * baseAlpha + (add >> 0  & 0xFF) * addAlpha;
-    Uint8 green = (base >> 8  & 0xFF) * baseAlpha + (add >> 8  & 0xFF) * addAlpha;
-    Uint8 blue  = (base >> 16 & 0xFF) * baseAlpha + (add >> 16 & 0xFF) * addAlpha;
-    Uint8 alpha = (baseAlpha + baseAlpha * addAlpha) * 255;
+    Uint8 red   = (addAlpha * (add >> 0  & 0xFF) + baseAlpha * (1-addAlpha) * (base >> 0  & 0xFF)) / omegAlpha;
+    Uint8 green = (addAlpha * (add >> 8  & 0xFF) + baseAlpha * (1-addAlpha) * (base >> 8  & 0xFF)) / omegAlpha;
+    Uint8 blue  = (addAlpha * (add >> 16 & 0xFF) + baseAlpha * (1-addAlpha) * (base >> 16  & 0xFF)) / omegAlpha;
+    Uint8 alpha = omegAlpha * 255;
 
     color = alpha << 24 | blue << 16 | green << 8 | red << 0;
     return color;
