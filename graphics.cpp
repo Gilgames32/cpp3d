@@ -166,7 +166,7 @@ void Window::DrawSprites(const Game &game)
 
     // entitások szortírozó tömbje
     // tárulunk egy entitrásra mutató pointert, és a hozzá tartozó távolságot a játékostól
-    pair<Entity *, double> *sortedEnts = new pair<Entity *, double>[game.entSize];
+    Pair<Entity *, double> *sortedEnts = new Pair<Entity *, double>[game.entSize];
 
     // távolságok kiszámítása
     for (int i = 0; i < game.entSize; i++)
@@ -181,7 +181,7 @@ void Window::DrawSprites(const Game &game)
         for (int j = 0; j < game.entSize - i - 1; j++)
             if (sortedEnts[j].b < sortedEnts[j + 1].b)
             {
-                pair<Entity *, double> temp = sortedEnts[j];
+                Pair<Entity *, double> temp = sortedEnts[j];
                 sortedEnts[j] = sortedEnts[j + 1];
                 sortedEnts[j + 1] = temp;
             }
@@ -221,7 +221,7 @@ void Window::DrawSprites(const Game &game)
         // nincs külön szélesség és magasság, minden sprite négyzet alakú, a képek nyújtva lesznek
         int spriteSize = abs(int(height / (entPosCameraSpace.y)));
 
-        duo<int> drawStart, drawEnd;
+        Duo<int> drawStart, drawEnd;
         // sprite alja és teteje a képernyőn
         drawStart.y = -spriteSize / 2 + height / 2;
         if (drawStart.y < 0)
@@ -266,7 +266,7 @@ void Window::DrawSprites(const Game &game)
 
 WindowInput::WindowInput() : Input() {}
 
-void WindowInput::UpdateKeys(SDL_KeyboardEvent keyEvent)
+void WindowInput::UpdateKeys(const SDL_KeyboardEvent& keyEvent)
 {
     switch (keyEvent.keysym.sym)
     {
@@ -295,7 +295,7 @@ void WindowInput::UpdateKeys(SDL_KeyboardEvent keyEvent)
     dir = Vector2(d - a, w - s);
 }
 
-void WindowInput::UpdateMouse(SDL_MouseMotionEvent mouseEvent)
+void WindowInput::UpdateMouse(const SDL_MouseMotionEvent& mouseEvent)
 {
     turn += mouseEvent.xrel; // multiply by sensitivity latur
 }

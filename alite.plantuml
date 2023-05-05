@@ -1,0 +1,171 @@
+@startuml Telefonkönyv
+
+package gamelogic {
+    class Entity {
+        + id: int
+        + pos: Vector2
+        + Entity(int id, const Vector2& pos)
+        + Move(const Matrix &grid, const Vector2 moveDir, double deltaTime): void
+    }
+
+    class Player {
+        + dir: Vector2
+        + plane() const: Vector2
+        + Player(const Vector2& position, const Vector2& direction)
+        + Player(const Player &)
+    }
+    Entity <|-- Player
+
+    class Input {
+        + dir: Vector2
+        + turn: double
+        + Input(const Vector2& dir, double turn)
+        + GetTurn(): double
+    }
+
+    class Game {
+        + level: Matrix
+        + player: Player
+        + entSize: int
+        + Entity *entities
+        + Game(const char* saveName)
+        + SimulateGame(Input &inp, double deltaTime): void
+    }
+}
+
+package graphics {
+    Interface SDL
+    class Window {
+        - width: const int
+        - height: const int
+        - window: SDL_Window *
+        - renderer: SDL_Renderer *
+        - format: Uint32
+        - frameBuffer: Texture
+        - zBuffer: double *
+        - wallTextures: Palette
+        - spriteTextures: Palette
+        + Window(int w, int h)
+        + ~Window()
+        + Clear(): void
+        + Render(): void
+        + DrawMinimap(const Game& game): void
+        + DrawPerspective(const Game& game): void
+        + DrawSprites(const Game& game): void
+    }
+    Window -- SDL
+
+
+    class WindowInput {
+        - w: bool
+        - a: bool
+        - s: bool
+        - d: bool
+        + WindowInput()
+        + UpdateKeys(SDL_KeyboardEvent keyEvent): void
+        + UpdateMouse(SDL_MouseMotionEvent mouseEvent): void
+    }
+    Input <|-- WindowInput
+    WindowInput -- SDL
+}
+
+package matrix {
+    class Matrix {
+
+        + sizex: int
+        + sizey: int
+        + grid: int **
+        + Matrix(int sizex, int sizey, int**grid)
+        + Matrix(const Matrix &)
+        + operator=(const Matrix &): void
+        + ~Matrix()
+        + *operator[](size_t index) const: int
+    }
+}
+
+package raycast {
+    class Ray {
+        + start: const Vector2
+        + end: Vector2
+        + dir: const Vector2
+        + sideDist: Vector2
+        + wallDist: double
+        + side: bool
+        + cell: Duo<int>
+        + space: const Matrix&
+        + Ray(const Matrix& sapceGrid, const Vector2 &startVector, const Vector2 &dirVector)
+        + Ray(const Ray& ray)
+        + WallX(): double
+        + CellValue(): int
+    }
+}
+
+
+package texture {
+    class Texture {
+        + windowRenderer: static SDL_Renderer *
+        + windowFormat: static Uint32
+        + texture: SDL_Texture *
+        + width, height: int
+        + pixels: Uint32 *
+        + pitch: int
+        + Texture()
+        + Texture(const char *fileName)
+        + Texture(const int w, const int h)
+        + Texture(const Texture &)
+        + Texture &operator=(const Texture &)
+        + ~Texture()
+        + GetPixel(int x, int y): Uint32
+        + SetPixel(int x, int y, Uint32 set): void
+        + static AlphaBlend(Uint32 base, Uint32 add): Uint32
+        + Clear(): void
+        + Lock(): void
+        + UnLock(): void
+    }
+    Texture -- SDL
+
+    class Palette {
+        - size: int
+        - textures: Texture **
+        + Palette()
+        + ~Palette()
+        + AddTexture(const char *): void
+        + AddTexture(Texture *t): void
+        + operator[](int index) const: Texture&
+    }
+    Palette o-- Texture
+}
+
+
+package vector2 {
+    class Vector2 {
+        + x: double
+        + y: double
+        + Vector2(double x, double y)
+        + Vector2(const Vector2 &v)
+        + &operator=(const Vector2 &v): Vector2
+        + operator+(const Vector2 &v) const: Vector2
+        + &operator+=(const Vector2 &v): Vector2
+        + operator*(const double lambda) const: Vector2
+        + operator-(const Vector2 &v) const: Vector2
+        + &rotate(const double rad): Vector2
+        + abs() const: double
+        + &normalize(): Vector2
+    }
+
+    class Duo {
+        + T x
+        + T y
+        + Duo(T x0, T y0)
+    }
+
+    class Pair {
+        + A a
+        + B b
+        + Pair(A a0, B b0)
+    }
+}
+
+
+
+@enduml

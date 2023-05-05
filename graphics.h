@@ -25,13 +25,13 @@ private:
     Palette spriteTextures;
 
 public:
-    Window(int = 800, int = 600);
+    Window(int w = 800, int h = 600);
     ~Window();
     void Clear();
     void Render();
-    void DrawMinimap(const Game &);
-    void DrawPerspective(const Game &);
-    void DrawSprites(const Game &);
+    void DrawMinimap(const Game& game);
+    void DrawPerspective(const Game& game);
+    void DrawSprites(const Game& game);
 };
 
 class WindowInput : public Input
@@ -41,8 +41,8 @@ class WindowInput : public Input
 public:
     WindowInput();
     //~Input();
-    void UpdateKeys(SDL_KeyboardEvent keyEvent);
-    void UpdateMouse(SDL_MouseMotionEvent mouseEvent);
+    void UpdateKeys(const SDL_KeyboardEvent& keyEvent);
+    void UpdateMouse(const SDL_MouseMotionEvent& mouseEvent);
 };
 
 #endif // GRAPHICS_H

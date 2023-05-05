@@ -1,0 +1,63 @@
+@startuml Telefonkönyv
+
+package GAME {
+    class Entity
+    Entity o-- Vector2
+    Entity -- Ray
+    Entity -- Matrix
+
+    class Player
+    Entity <|-- Player
+    Player o-- Vector2
+
+    class Input
+    Input o-- Vector2
+
+    class Game
+    Game o-- Matrix
+    Game *-- Player
+    Game *-- Entity
+    Game -- Input
+}
+
+package GRAPHICS {
+    Interface SDL
+    class Window
+    Window -- SDL
+    Window o-- Texture
+    Window o-- Palette
+    Window -- Game
+    Window -- Ray
+    Window -- Pair
+    Window -- Duo
+
+
+    class WindowInput
+    Input <|-- WindowInput
+    WindowInput -- SDL
+}
+
+class Matrix
+
+
+class Ray
+Ray o-- Vector2
+Ray o-- Duo
+Ray o-- Matrix
+
+
+
+class Texture
+Texture -- SDL
+
+class Palette
+Palette o-- Texture
+
+class Vector2
+
+class Duo
+
+class Pair
+
+
+@enduml

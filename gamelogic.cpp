@@ -7,7 +7,7 @@ Vector2 Player::plane() const
     return Vector2(-dir.y, dir.x) * 0.66; // fov
 }
 
-Player::Player(Vector2 position, Vector2 direction) : Entity(-1, position), dir(direction) {}
+Player::Player(const Vector2& position, const Vector2& direction) : Entity(-1, position), dir(direction) {}
 
 Player::Player(const Player &p) : Entity(-1, p.pos), dir(p.dir) {}
 
@@ -26,7 +26,7 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime)
         pos = nextPos;
 }
 
-Input::Input(Vector2 dir, double turn) : dir(dir), turn(turn) {}
+Input::Input(const Vector2& dir, double turn) : dir(dir), turn(turn) {}
 
 double Input::GetTurn()
 {
@@ -83,7 +83,7 @@ Game::Game(const char* saveName) {
     levelFile.close();
 }
 
-void Game::SimulateGame(Input &inp, const double deltaTime)
+void Game::SimulateGame(Input &inp, double deltaTime)
 {
     player.dir.rotate(inp.turn / 180);
     inp.turn = 0;

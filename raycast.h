@@ -26,13 +26,13 @@ public:
     bool side;
 
     // a becsapódási cella értéke
-    duo<int> cell;
+    Duo<int> cell;
 
     // a pálya
-    const Matrix &space;
+    const Matrix& space;
 
-    Ray(const Matrix &sapceGrid, const Vector2 &startVector, const Vector2 &dirVector);
-    Ray(const Ray &ray);
+    Ray(const Matrix& sapceGrid, const Vector2& startVector, const Vector2& dirVector);
+    Ray(const Ray& ray);
 
     double WallX();
 
