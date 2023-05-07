@@ -43,6 +43,7 @@ public:
     //~Input();
     void UpdateKeys(const SDL_KeyboardEvent& keyEvent);
     void UpdateMouse(const SDL_MouseMotionEvent& mouseEvent);
+    void SetShootTrigger();
 };
 
 #endif // GRAPHICS_H

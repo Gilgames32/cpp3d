@@ -4,6 +4,7 @@
 #include "vector2.h"
 #include "matrix.h"
 #include "raycast.h"
+#include <iostream>
 
 class Entity
 {
@@ -25,18 +26,20 @@ public:
 
     Player(const Vector2& position = Vector2(), const Vector2& direction = Vector2(0, 1));
     Player(const Player &);
+    bool Shoot();
 };
 
 class Input
 {
 protected:
-    //
+    double turn;
+    bool shootTrigger;
 public:
     Vector2 dir;
-    double turn;
     Input(const Vector2& dir = Vector2(), double turn = 0);
     //~Input();
     double GetTurn();
+    bool GetShootTrigger();
 };
 
 class Game

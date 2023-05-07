@@ -55,6 +55,7 @@ int main(int argc, char const *argv[])
 
             case SDL_MOUSEBUTTONDOWN:
                 SDL_SetRelativeMouseMode(SDL_TRUE);
+                inp.SetShootTrigger();
                 break;
 
             default:

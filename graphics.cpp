@@ -299,3 +299,8 @@ void WindowInput::UpdateMouse(const SDL_MouseMotionEvent& mouseEvent)
 {
     turn += mouseEvent.xrel; // multiply by sensitivity latur
 }
+
+void WindowInput::SetShootTrigger()
+{
+    shootTrigger = true;
+}

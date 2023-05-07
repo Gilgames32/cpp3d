@@ -1,4 +1,9 @@
 @startuml Telefonkönyv
+skinparam BackgroundColor #8a64d6/#5c3a92
+skinparam ClassBackgroundColor #729efd/#8a64d6
+skinparam ClassHeaderBackgroundColor #3acadf|#729efd
+
+
 
 package GAME {
     class Entity {

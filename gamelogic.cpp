@@ -7,10 +7,6 @@ Vector2 Player::plane() const
     return Vector2(-dir.y, dir.x) * 0.66; // fov
 }
 
-Player::Player(const Vector2& position, const Vector2& direction) : Entity(-1, position), dir(direction) {}
-
-Player::Player(const Player &p) : Entity(-1, p.pos), dir(p.dir) {}
-
 void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime)
 {
     moveDir.normalize();
@@ -26,12 +22,36 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime)
         pos = nextPos;
 }
 
+Player::Player(const Vector2& position, const Vector2& direction) : Entity(-1, position), dir(direction) {}
+
+Player::Player(const Player &p) : Entity(-1, p.pos), dir(p.dir) {}
+
+bool Player::Shoot()
+{
+    // optimalizálás:
+        // csak enemy spriteokra
+        // csak akiket lát
+    // van egy szakaszunk
+    // szakasz és pont távolsága, ha 1 alatti, death
+    std::cout << "shoot" << std::endl;
+
+    // return if hit
+    return false;
+}
+
 Input::Input(const Vector2& dir, double turn) : dir(dir), turn(turn) {}
 
 double Input::GetTurn()
 {
     double re = turn;
     turn = 0;
+    return re;
+}
+
+bool Input::GetShootTrigger() 
+{
+    bool re = shootTrigger;
+    shootTrigger = false;
     return re;
 }
 
@@ -85,10 +105,14 @@ Game::Game(const char* saveName) {
 
 void Game::SimulateGame(Input &inp, double deltaTime)
 {
-    player.dir.rotate(inp.turn / 180);
-    inp.turn = 0;
+    player.dir.rotate(inp.GetTurn() / 180);
 
     Vector2 moveDir(player.dir * inp.dir.y + player.plane() * inp.dir.x);
 
     player.Move(level, moveDir, deltaTime);
+    if (inp.GetShootTrigger())
+    {
+        player.Shoot();
+    }
+    
 }
