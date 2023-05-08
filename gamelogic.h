@@ -26,7 +26,7 @@ public:
 
     Player(const Vector2& position = Vector2(), const Vector2& direction = Vector2(0, 1));
     Player(const Player &);
-    bool Shoot();
+    bool Shoot(const Matrix &level, Entity* entities, int entSize);
 };
 
 class Input

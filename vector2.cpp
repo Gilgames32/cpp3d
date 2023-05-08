@@ -42,7 +42,13 @@ Vector2 &Vector2::rotate(const double rad)
 
 double Vector2::abs() const
 {
+    // return sqrt(abssq()); de inline gyorsabb lesz
     return sqrt(x * x + y * y);
+}
+
+double Vector2::abssq() const
+{
+    return x * x + y * y;
 }
 
 Vector2 &Vector2::normalize()
@@ -54,4 +60,44 @@ Vector2 &Vector2::normalize()
         y /= len;
     }
     return *this;
+}
+
+double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p, int dontCare)
+{
+    // https://www.youtube.com/watch?v=egmZJU-1zPU
+    Vector2 ab = b - a;
+    Vector2 ap = p - a;
+    double skalar = DotProduct(ab, ap);
+    double lensq = ab.abssq();
+    // basically hogy hol van a vonalon, aránylag
+    double d =  skalar / lensq;
+    Vector2 closest;
+
+    // magyarán ha csak azok érdekelnek, akik
+    if (d <= 0)
+    {
+        // this is a terrible way of doing this
+        if(dontCare != 0)
+            return dontCare;
+        else
+            closest = a;
+    }
+    else if (d >= 1)
+    {
+        if(dontCare != 0)
+            return dontCare;
+        else
+            closest = b;
+    }
+    else
+    {
+        closest = a + ab * d;
+    }
+
+    return (p - closest).abs();
+}
+
+double Vector2::DotProduct(const Vector2& a, const Vector2& b)
+{
+    return a.x * b.x + a.y * b.y;
 }

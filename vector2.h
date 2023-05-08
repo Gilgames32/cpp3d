@@ -21,10 +21,17 @@ public:
     Vector2 &rotate(const double rad);
 
     double abs() const;
+    double abssq() const;
 
     // returns the same vector but 1 unit long
     Vector2 &normalize();
     //~Vector2();
+
+    // pont és szakasz távolsága
+    static double PointSegDist(const Vector2& seg1, const Vector2& seg2, const Vector2 p, int dontCare = 0);
+
+    // skaláris szorzat
+    static double DotProduct(const Vector2& a, const Vector2& b);
 };
 
 // same type but handled together

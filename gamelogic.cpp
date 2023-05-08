@@ -26,15 +26,29 @@ Player::Player(const Vector2& position, const Vector2& direction) : Entity(-1, p
 
 Player::Player(const Player &p) : Entity(-1, p.pos), dir(p.dir) {}
 
-bool Player::Shoot()
+bool Player::Shoot(const Matrix &level, Entity* entities, int entSize)
 {
+    // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
+    
     // optimalizálás:
         // csak enemy spriteokra
         // csak akiket lát
+        // helyett csak akik benne vannak a látási távba
+        // helyett closest to furthest
     // van egy szakaszunk
     // szakasz és pont távolsága, ha 1 alatti, death
     std::cout << "shoot" << std::endl;
 
+    Ray trail(level, pos, dir);
+
+    // sort and break on find
+    // filter ones in range
+
+    for (int i = 0; i < entSize; i++)
+    {
+        double dist = Vector2::PointSegDist(trail.start, trail.end, entities[i].pos, 1);
+        entities[i].id = dist < .5 ? 1 : 0;
+    }
     // return if hit
     return false;
 }
@@ -112,7 +126,7 @@ void Game::SimulateGame(Input &inp, double deltaTime)
     player.Move(level, moveDir, deltaTime);
     if (inp.GetShootTrigger())
     {
-        player.Shoot();
+        player.Shoot(level, entities, entSize);
     }
     
 }
