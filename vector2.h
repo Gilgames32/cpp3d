@@ -28,7 +28,7 @@ public:
     //~Vector2();
 
     // pont és szakasz távolsága
-    static double PointSegDist(const Vector2& seg1, const Vector2& seg2, const Vector2 p, int dontCare = 0);
+    static double PointSegDist(const Vector2& seg1, const Vector2& seg2, const Vector2 p, bool &perp, Vector2 &closest);
 
     // skaláris szorzat
     static double DotProduct(const Vector2& a, const Vector2& b);

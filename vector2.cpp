@@ -62,7 +62,7 @@ Vector2 &Vector2::normalize()
     return *this;
 }
 
-double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p, int dontCare)
+double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p, bool &perp, Vector2 &closest)
 {
     // https://www.youtube.com/watch?v=egmZJU-1zPU
     Vector2 ab = b - a;
@@ -71,27 +71,22 @@ double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p
     double lensq = ab.abssq();
     // basically hogy hol van a vonalon, aránylag
     double d =  skalar / lensq;
-    Vector2 closest;
 
     // magyarán ha csak azok érdekelnek, akik
     if (d <= 0)
     {
-        // this is a terrible way of doing this
-        if(dontCare != 0)
-            return dontCare;
-        else
-            closest = a;
+        closest = a;
+        perp = false;
     }
     else if (d >= 1)
     {
-        if(dontCare != 0)
-            return dontCare;
-        else
-            closest = b;
+        closest = b;
+        perp = false;
     }
     else
     {
         closest = a + ab * d;
+        perp = true;
     }
 
     return (p - closest).abs();
