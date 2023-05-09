@@ -20,6 +20,9 @@ public:
 
 class Player : public Entity
 {
+private:
+    double shootCoolDown;
+    double damageCoolDown;
 public:
     Vector2 dir;
     Vector2 plane() const;
@@ -33,7 +36,7 @@ class Input
 {
 protected:
     double turn;
-    bool shootTrigger;
+    bool shootTrigger = false;
 public:
     Vector2 dir;
     Input(const Vector2& dir = Vector2(), double turn = 0);
