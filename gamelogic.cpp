@@ -2,24 +2,37 @@
 
 Entity::Entity(int id, const Vector2& pos) : id(id), pos(pos) {}
 
-Vector2 Player::plane() const
-{
-    return Vector2(-dir.y, dir.x) * 0.66; // fov
-}
-
-void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime)
+void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double speed)
 {
     moveDir.normalize();
-    Vector2 nextPos = pos + moveDir * (deltaTime * .005);
+    Vector2 nextPos = pos + moveDir * (deltaTime * speed / 1000);
 
     Ray path(grid, pos, moveDir);
 
-    const double snapRange = .05;
+    const double snapRange = 0.01;
+    double dist = (path.end - pos).abs() - snapRange;
 
-    if ((path.end - pos).abs() - snapRange < (nextPos - pos).abs())
-        pos += moveDir * (path.wallDist - snapRange);
+    if (dist <= (nextPos - pos).abs())
+    {
+        pos += moveDir * dist;
+        /*
+        Vector2 slide = pos - nextPos - moveDir * dist;
+        if (path.side)
+            slide.x = 0;
+        else
+            slide.y = 0;
+        pos += slide;
+        */
+    }
     else
+    {
         pos = nextPos;
+    }
+}
+
+Vector2 Player::plane() const
+{
+    return Vector2(-dir.y, dir.x) * 0.66; // fov
 }
 
 Player::Player(const Vector2& position, const Vector2& direction) : Entity(-1, position), dir(direction) {}
@@ -83,6 +96,30 @@ bool Player::Shoot(const Matrix &level, Entity* entities, int entSize)
     sortedHits[mindex].a->id = 2;
     std::cout << "hit" << std::endl;
     return true;
+}
+
+void Player::DecreaseCoolDowns(double deltaTime)
+{
+    if (shootCoolDown != 0)
+    {
+        shootCoolDown -= deltaTime;
+        if (shootCoolDown < 0)
+            shootCoolDown = 0;
+    }
+
+    if (damageCoolDown != 0)
+    {
+        damageCoolDown -= deltaTime;
+        if (damageCoolDown < 0)
+            damageCoolDown = 0;
+    }
+    
+}
+
+bool Player::DamagePlayer(int damage)
+{
+    health -= damage;
+    return health <= 0;
 }
 
 Input::Input(const Vector2& dir, double turn) : dir(dir), turn(turn) {}
@@ -151,14 +188,31 @@ Game::Game(const char* saveName) {
 
 void Game::SimulateGame(Input &inp, double deltaTime)
 {
+    // decrease cooldowns
+    player.DecreaseCoolDowns(deltaTime);
+    
+    // process inputs
     player.dir.rotate(inp.GetTurn() / 180);
-
-    Vector2 moveDir(player.dir * inp.dir.y + player.plane() * inp.dir.x);
-
-    player.Move(level, moveDir, deltaTime);
-    if (inp.GetShootTrigger())
+    if (inp.dir != Vector2(0, 0))
     {
-        player.Shoot(level, entities, entSize);
+        Vector2 moveDir(player.dir * inp.dir.y + player.plane() * inp.dir.x);
+        player.Move(level, moveDir, deltaTime, 3);
     }
+
+    // shooting
+    if (inp.GetShootTrigger())
+        player.Shoot(level, entities, entSize);
+
+    // process entities
+    for (int i = 0; i < entSize; i++)
+    {
+        // ha látja a playert
+        Ray view(level, entities[i].pos, player.pos - entities[i].pos);
+        if ((view.end - view.start).abs() > (player.pos - view.start).abs())
+        {
+            entities[i].Move(level, player.pos - view.start, deltaTime);
+        }
+    }
+    
     
 }

@@ -15,12 +15,13 @@ public:
     // Entity(const Entity&);
     //~Entity();
 
-    void Move(const Matrix &grid, const Vector2 moveDir, double deltaTime);
+    void Move(const Matrix &grid, const Vector2 moveDir, double deltaTime, double speed = 1);
 };
 
 class Player : public Entity
 {
 private:
+    int health;
     double shootCoolDown;
     double damageCoolDown;
 public:
@@ -30,6 +31,8 @@ public:
     Player(const Vector2& position = Vector2(), const Vector2& direction = Vector2(0, 1));
     Player(const Player &);
     bool Shoot(const Matrix &level, Entity* entities, int entSize);
+    void DecreaseCoolDowns(double deltaTime);
+    bool DamagePlayer(int damage);
 };
 
 class Input

@@ -96,3 +96,13 @@ double Vector2::DotProduct(const Vector2& a, const Vector2& b)
 {
     return a.x * b.x + a.y * b.y;
 }
+
+bool Vector2::operator==(const Vector2 &v) const
+{
+    return x == v.x && y == v.y;
+}
+
+bool Vector2::operator!=(const Vector2 &v) const
+{
+    return !(*this == v);
+}
