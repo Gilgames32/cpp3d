@@ -4,25 +4,45 @@ Entity::Entity(int id, const Vector2& pos) : id(id), pos(pos) {}
 
 void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double speed)
 {
-    moveDir.normalize();
-    Vector2 nextPos = pos + moveDir * (deltaTime * speed / 1000);
+    // egységnyi hosszúságúra nyújtjuk
+    moveDir = moveDir.normalize();
 
+    // kívánt következő pozíció
+    Vector2 nextPos = pos + moveDir * (deltaTime*speed/1000);
+
+    // raycastoljuk, hogy vezet-e oda falmentes út
     Ray path(grid, pos, moveDir);
 
-    const double snapRange = 0.01;
-    double dist = (path.end - pos).abs() - snapRange;
+    // tetszőleges pontossággal megközelítjük a falat
+    double snap = 0.01;
+    double maxDist = path.wallDist - snap;
+    if (maxDist < 0) maxDist = 0;
+    double movDist = (pos - nextPos).abs();
 
-    if (dist <= (nextPos - pos).abs())
+    // ha a becsapódás közelebb van mint a megtenni kívánt út, az azt jelenti hogy falba ütköznénk
+    if (movDist > maxDist)
     {
-        pos += moveDir * dist;
-        /*
-        Vector2 slide = pos - nextPos - moveDir * dist;
+        // falig
+        pos += moveDir * maxDist;
+
+        // maradék momentum átalakítása csúszásba
+        Vector2 slide = nextPos - pos - moveDir * maxDist;
+        // attól függően hogy melyik oldalon csúszunk elhagyjuk az egyik komponenst
         if (path.side)
-            slide.x = 0;
-        else
             slide.y = 0;
-        pos += slide;
-        */
+        else
+            slide.x = 0;
+
+        // ezt is raycastoljuk
+        Ray slidePath(grid, pos, slide.normalize());
+        double slideMax = slidePath.wallDist - snap;
+        if (slideMax < 0) slideMax = 0;
+        double slideDist = slide.abs();
+        if (slideDist > slideMax)
+            pos += slide.normalize() * slideMax;
+            // ezt már nincs értelme tovább slideolni mert merőleges
+        else
+            pos += slide;
     }
     else
     {

@@ -2,6 +2,7 @@
 #define VECTOR2_H
 
 #include "math.h"
+#include <iostream>
 
 class Vector2
 {
@@ -25,7 +26,7 @@ public:
     double abssq() const;
 
     // returns the same vector but 1 unit long
-    Vector2 &normalize();
+    Vector2 normalize() const;
     //~Vector2();
 
     // pont és szakasz távolsága
@@ -34,6 +35,8 @@ public:
     // skaláris szorzat
     static double DotProduct(const Vector2& a, const Vector2& b);
 };
+
+std::ostream& operator<<(std::ostream& os, const Vector2& v);
 
 // same type but handled together
 template <typename T>

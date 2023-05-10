@@ -53,7 +53,7 @@ Ray::Ray(const Ray &ray) : start(ray.start),
                            side(ray.side),
                            space(ray.space) {}
 
-double Ray::WallX()
+double Ray::WallX() const
 {
     double wallX;
     if (side == 0)
@@ -64,7 +64,7 @@ double Ray::WallX()
     return wallX;
 }
 
-int Ray::CellValue()
+int Ray::CellValue() const
 {
     return space[cell.x][cell.y];
 }

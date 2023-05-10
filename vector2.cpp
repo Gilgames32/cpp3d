@@ -51,15 +51,12 @@ double Vector2::abssq() const
     return x * x + y * y;
 }
 
-Vector2 &Vector2::normalize()
+Vector2 Vector2::normalize() const
 {
     double len = abs();
-    if (len != 0)
-    {
-        x /= len;
-        y /= len;
-    }
-    return *this;
+    if (len == 0)
+        throw "NEPTUNKOD";
+    return Vector2(x/len, y/len);
 }
 
 double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p, bool &perp, Vector2 &closest)
@@ -105,4 +102,10 @@ bool Vector2::operator==(const Vector2 &v) const
 bool Vector2::operator!=(const Vector2 &v) const
 {
     return !(*this == v);
+}
+
+std::ostream& operator<<(std::ostream& os, const Vector2& v)
+{
+    os << v.x << ',' << v.y;
+    return os;
 }

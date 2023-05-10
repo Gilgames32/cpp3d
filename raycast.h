@@ -25,7 +25,7 @@ public:
     // a becsapódási oldal
     bool side;
 
-    // a becsapódási cella értéke
+    // a becsapódási cella koordinátája
     Duo<int> cell;
 
     // a pálya
@@ -34,9 +34,9 @@ public:
     Ray(const Matrix& sapceGrid, const Vector2& startVector, const Vector2& dirVector);
     Ray(const Ray& ray);
 
-    double WallX();
+    double WallX() const;
 
-    int CellValue();
+    int CellValue() const;
 
     //~Ray();
 };
