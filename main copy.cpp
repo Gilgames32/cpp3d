@@ -5,6 +5,8 @@
 #include "graphics.h"
 #include "gamelogic.h"
 
+#include "memtrace.h"
+
 // todo: put em in classes bit by bit
 // trust me :clueless:
 

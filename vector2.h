@@ -1,8 +1,10 @@
-#ifndef VECTOR2_H
+#if !defined(VECTOR2_H)
 #define VECTOR2_H
 
+#include "iostream"
 #include "math.h"
-#include <iostream>
+
+#include "memtrace.h"
 
 class Vector2
 {

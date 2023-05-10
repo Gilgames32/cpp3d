@@ -1,11 +1,16 @@
 #if !defined(TEXTURE_H)
 #define TEXTURE_H
 
+#include "iostream"
+
 #include "SDL2/SDL.h"
 #include "SDL2/SDL2_gfxPrimitives.h"
 #include "SDL2/SDL_image.h"
-#include <iostream>
+
 #include "gamelogic.h"
+
+#include "memtrace.h"
+
 
 class Texture
 {

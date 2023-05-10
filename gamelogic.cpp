@@ -63,7 +63,7 @@ bool Player::Shoot(const Matrix &level, Entity* entities, int entSize)
 {
     // i mean it works but this is ugly as hell man
 
-
+    // TODO: std vektor lol
     
     // optimalizálás:
         // csak enemy spriteokra
@@ -100,6 +100,7 @@ bool Player::Shoot(const Matrix &level, Entity* entities, int entSize)
     if (hitSize == 0)
     {
         std::cout << "miss" << std::endl;
+        delete[] sortedHits;
         return false;
     }
     
@@ -115,6 +116,7 @@ bool Player::Shoot(const Matrix &level, Entity* entities, int entSize)
     }
     sortedHits[mindex].a->id = 2;
     std::cout << "hit" << std::endl;
+    delete[] sortedHits;
     return true;
 }
 
@@ -204,6 +206,11 @@ Game::Game(const char* saveName) {
 
     // close
     levelFile.close();
+}
+
+Game::~Game()
+{
+    delete[] entities;
 }
 
 void Game::SimulateGame(Input &inp, double deltaTime)

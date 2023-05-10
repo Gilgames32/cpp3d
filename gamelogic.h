@@ -1,10 +1,14 @@
 #if !defined(GAMELOGIC_H)
 #define GAMELOGIC_H
 
+#include "iostream"
+
 #include "vector2.h"
 #include "matrix.h"
 #include "raycast.h"
-#include <iostream>
+
+#include "memtrace.h"
+
 
 class Entity
 {
@@ -57,7 +61,8 @@ public:
     Entity *entities;
 
     Game(const char* saveName);
-    //~Game();
+    ~Game();
+
     void SimulateGame(Input &inp, double deltaTime);
 };
 

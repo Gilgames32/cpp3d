@@ -1,8 +1,11 @@
 #if !defined(MATRIX_H)
 #define MATRIX_H
 
-#include <iostream>
-#include <fstream>
+#include "iostream"
+#include "fstream"
+
+#include "memtrace.h"
+
 
 class Matrix
 {

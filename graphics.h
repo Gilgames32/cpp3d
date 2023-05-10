@@ -2,6 +2,7 @@
 #define GRAPHICS_H
 
 #include "iostream"
+
 #include "SDL2/SDL.h"
 #include "SDL2/SDL2_gfxPrimitives.h"
 
@@ -9,6 +10,8 @@
 #include "gamelogic.h"
 #include "raycast.h"
 #include "texture.h"
+
+#include "memtrace.h"
 
 
 class Window

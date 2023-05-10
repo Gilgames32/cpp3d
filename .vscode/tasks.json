@@ -22,7 +22,8 @@
                 "-lSDL2",
                 "-lSDL2_gfx",
                 "-lSDL2_image",
-                ""
+                "-D",
+                "MEMTRACE"
             ],
             "options": {
                 "cwd": "${fileDirname}"

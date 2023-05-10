@@ -1,8 +1,13 @@
 #if !defined(RAYCAST_H)
 #define RAYCAST_H
 
+#include "iostream"
+
 #include "vector2.h"
 #include "matrix.h"
+
+#include "memtrace.h"
+
 
 class Ray
 {
