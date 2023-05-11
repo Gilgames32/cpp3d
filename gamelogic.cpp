@@ -50,7 +50,7 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
     }
 }
 
-Vector2 Player::plane() const
+Vector2 Player::GetPlane() const
 {
     return Vector2(-dir.y, dir.x) * 0.66; // fov
 }
@@ -122,14 +122,14 @@ bool Player::Shoot(const Matrix &level, Entity* entities, int entSize)
 
 void Player::DecreaseCoolDowns(double deltaTime)
 {
-    if (shootCoolDown != 0)
+    if (shootCoolDown > 0)
     {
         shootCoolDown -= deltaTime;
         if (shootCoolDown < 0)
             shootCoolDown = 0;
     }
 
-    if (damageCoolDown != 0)
+    if (damageCoolDown > 0)
     {
         damageCoolDown -= deltaTime;
         if (damageCoolDown < 0)
@@ -140,7 +140,14 @@ void Player::DecreaseCoolDowns(double deltaTime)
 
 bool Player::DamagePlayer(int damage)
 {
+    if (damageCoolDown > 0)
+        return false;
+    
+    const double damageCoolDownMax = 1000;
+    damageCoolDown = damageCoolDownMax;
+    
     health -= damage;
+    std::cout << damageCoolDown << " " << health << "\n";
     return health <= 0;
 }
 
@@ -213,7 +220,7 @@ Game::~Game()
     delete[] entities;
 }
 
-void Game::SimulateGame(Input &inp, double deltaTime)
+bool Game::SimulateGame(Input &inp, double deltaTime)
 {
     // decrease cooldowns
     player.DecreaseCoolDowns(deltaTime);
@@ -222,7 +229,7 @@ void Game::SimulateGame(Input &inp, double deltaTime)
     player.dir.rotate(inp.GetTurn() / 180);
     if (inp.dir != Vector2(0, 0))
     {
-        Vector2 moveDir(player.dir * inp.dir.y + player.plane() * inp.dir.x);
+        Vector2 moveDir(player.dir * inp.dir.y + player.GetPlane() * inp.dir.x);
         player.Move(level, moveDir, deltaTime, 3);
     }
 
@@ -235,11 +242,22 @@ void Game::SimulateGame(Input &inp, double deltaTime)
     {
         // ha látja a playert
         Ray view(level, entities[i].pos, player.pos - entities[i].pos);
-        if ((view.end - view.start).abs() > (player.pos - view.start).abs())
+        double const playerDistance = (player.pos - view.start).abs();
+        if ((view.end - view.start).abs() > playerDistance)
         {
-            entities[i].Move(level, player.pos - view.start, deltaTime);
+            // mozgat ha nincs túl közel
+            const double followStopDist = 0.2;
+            const double damageDist = 0.2;
+            if (playerDistance > followStopDist)
+            {
+                entities[i].Move(level, player.pos - view.start, deltaTime);
+            }
+            if (playerDistance < damageDist)
+            {
+                if(player.DamagePlayer(10))
+                    return true;
+            }
         }
     }
-    
-    
+    return false;
 }

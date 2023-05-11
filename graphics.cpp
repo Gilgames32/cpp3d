@@ -94,7 +94,7 @@ void Window::DrawPerspective(const Game &game)
     frameBuffer.Lock();
 
     // irányra merőleges vektor, azaz a kamera síkjával párhuzamos
-    Vector2 plane = game.player.plane();
+    Vector2 plane = game.player.GetPlane();
     for (int x = 0; x < width; x++)
     {
         // jelenlegi képernyőoszlop kamerához relatív aránya -1...1
@@ -193,7 +193,7 @@ void Window::DrawSprites(const Game &game)
         // alias
         Entity &ent = *(sortedEnts[i].a);
         Vector2 dir = game.player.dir;
-        Vector2 plane = game.player.plane();
+        Vector2 plane = game.player.GetPlane();
         Texture &spriteTex = spriteTextures[ent.id];
 
         // játékoshoz relatív pozíciója
@@ -298,7 +298,8 @@ void WindowInput::UpdateKeys(const SDL_KeyboardEvent& keyEvent)
 
 void WindowInput::UpdateMouse(const SDL_MouseMotionEvent& mouseEvent)
 {
-    turn += mouseEvent.xrel; // multiply by sensitivity latur
+    const double sensitivity = 0.5;
+    turn += mouseEvent.xrel * sensitivity;
 }
 
 void WindowInput::SetShootTrigger()

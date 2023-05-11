@@ -7,9 +7,6 @@
 
 #include "memtrace.h"
 
-// todo: put em in classes bit by bit
-// trust me :clueless:
-
 int main(int argc, char const *argv[])
 {
     Window win;
@@ -29,7 +26,7 @@ int main(int argc, char const *argv[])
         // FPS
         // std::cout << (1000 / deltaTime) << std::endl;
 
-        mainGame.SimulateGame(inp, deltaTime);
+        quit = mainGame.SimulateGame(inp, deltaTime);
 
         win.Clear();
         win.DrawPerspective(mainGame);

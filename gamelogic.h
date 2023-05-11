@@ -25,12 +25,12 @@ public:
 class Player : public Entity
 {
 private:
-    int health;
-    double shootCoolDown;
-    double damageCoolDown;
+    int health = 1000;
+    double shootCoolDown = 0;
+    double damageCoolDown = 0;
 public:
     Vector2 dir;
-    Vector2 plane() const;
+    Vector2 GetPlane() const;
 
     Player(const Vector2& position = Vector2(), const Vector2& direction = Vector2(0, 1));
     Player(const Player &);
@@ -63,7 +63,7 @@ public:
     Game(const char* saveName);
     ~Game();
 
-    void SimulateGame(Input &inp, double deltaTime);
+    bool SimulateGame(Input &inp, double deltaTime);
 };
 
 #endif // GAMELOGIC_H
