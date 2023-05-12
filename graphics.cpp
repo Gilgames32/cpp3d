@@ -52,7 +52,7 @@ void Window::Clear()
 {
     // empty the framebuffer
     frameBuffer.Lock();
-    frameBuffer.Clear();
+    frameBuffer.ClearScreen();
     frameBuffer.UnLock();
 
     // clear the SDL renderer
@@ -65,9 +65,6 @@ void Window::Clear()
 
 void Window::Render()
 {
-    // copy the framebuffer onto the screen
-    SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
-
     // put the contents of the renderer to the screen
     SDL_RenderPresent(renderer);
 }
@@ -158,6 +155,10 @@ void Window::DrawPerspective(const Game &game)
 
     // unluck framebuffer
     frameBuffer.UnLock();
+
+    // copy the framebuffer onto the screen
+    SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
+
 }
 
 void Window::DrawSprites(const Game &game)
@@ -215,6 +216,10 @@ void Window::DrawSprites(const Game &game)
         // mivel a kamera síkjára merőleges ezért igazából y egy kamerától való mélységet jelent
         entPosCameraSpace.y = detRec * (-plane.y * entPosPlayerSpace.x + plane.x * entPosPlayerSpace.y);
 
+        // nem éri meg foglalkozni vele mert nem látjuk
+        if (entPosCameraSpace.y < 0)
+            continue;
+
         // a sprite közepének képernyőn vett koordinátája
         int spriteScreenX = (width / 2) * (1 + entPosCameraSpace.x / entPosCameraSpace.y);
 
@@ -239,6 +244,45 @@ void Window::DrawSprites(const Game &game)
         if (drawEnd.x >= width)
             drawEnd.x = width - 1;
 
+        if (drawEnd.x < drawStart.x)
+            continue;
+        
+
+
+        // a sprite minden oszlopán végigmegyünk
+        int firstStripe = drawStart.x;
+        for (; firstStripe < drawEnd.x; firstStripe++)
+            // első rajzolandó pixel
+            if (entPosCameraSpace.y < zBuffer[firstStripe])
+                break;
+
+        int lastStripe = drawEnd.x;
+        for (; lastStripe > drawStart.x; lastStripe--)
+            // első rajzolandó pixel
+            if (entPosCameraSpace.y > 0 && entPosCameraSpace.y < zBuffer[lastStripe])
+                break;
+
+        if (lastStripe == drawStart.x && firstStripe == drawEnd.x)
+            continue;
+
+        for (int stripe = firstStripe; stripe < lastStripe; stripe++)
+        {
+            for (int y = drawStart.y; y < drawEnd.y; y++)            
+                break;
+                //frameBuffer.SetPixel(stripe, y, 0xFFFFFFFF);
+        }
+
+        double onScreenWidth = drawEnd.x - drawStart.x;
+        SDL_Rect onTextureSource = {spriteTex.width * ((firstStripe - (-spriteSize / 2 + spriteScreenX)) / spriteSize), 0, spriteTex.width * ((lastStripe - (-spriteSize / 2 + spriteScreenX)) / spriteSize), spriteTex.height};
+        SDL_Rect onScreenDestination = {firstStripe, drawStart.y, lastStripe - firstStripe, drawEnd.y - drawStart.y};
+        SDL_RenderCopy(renderer, spriteTex.texture, &onTextureSource, &onScreenDestination);
+        
+        
+
+        std::cout << i << " " << firstStripe << " " << lastStripe << "\n";
+        std::cout << spriteScreenX << " " << drawStart.x << " " << drawEnd.x << "\n";
+
+
         // a sprite minden oszlopán végigmegyünk
         for (int stripe = drawStart.x; stripe < drawEnd.x; stripe++)
         {
@@ -246,16 +290,17 @@ void Window::DrawSprites(const Game &game)
             // és a fal nem takarja ki, azaz a zbufferben tárolt távolság nagyobb mint a pozíciója
             if (entPosCameraSpace.y > 0 && entPosCameraSpace.y < zBuffer[stripe])
             {
+                pixelColor(renderer, stripe, 400, 0xFFFFFFFF);
                 // textúra x koordinátája
                 int texX = (stripe - (-spriteSize / 2 + spriteScreenX)) * spriteTex.width / spriteSize;
                 for (int y = drawStart.y; y < drawEnd.y; y++) // for every pixel of the current stripe
                 {
                     // textúra y koordinátája
                     int texY = ((y - height / 2 + spriteSize / 2) * spriteTex.height) / spriteSize;
-                    Uint32 color = spriteTex.GetPixel(texX, texY);
+                    // Uint32 color = spriteTex.GetPixel(texX, texY);
                     // átlátszó textúrák miatt színkeverés
-                    color = Texture::AlphaBlend(frameBuffer.GetPixel(stripe, y), color);
-                    frameBuffer.SetPixel(stripe, y, color);
+                    // color = Texture::AlphaBlend(frameBuffer.GetPixel(stripe, y), color);
+                    // frameBuffer.SetPixel(stripe, y, color);
                 }
             }
         }

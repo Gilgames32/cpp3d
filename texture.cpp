@@ -20,6 +20,7 @@ Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
     Lock();
     SDL_ConvertPixels(width, height, image->format->format, image->pixels, image->pitch, windowFormat, pixels, pitch);
     UnLock();
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 }
 
 Texture::Texture(const int w, const int h) : width(w), height(h), pixels(nullptr), pitch(0)
@@ -49,6 +50,9 @@ Texture::Texture(const Texture &t) : width(t.width), height(t.height)
     Lock();
     SDL_ConvertPixels(width, height, windowFormat, t.pixels, t.pitch, windowFormat, pixels, pitch);
     UnLock();
+    SDL_BlendMode blend;
+    SDL_GetTextureBlendMode(t.texture, &blend);
+    SDL_SetTextureBlendMode(texture, blend);
 }
 
 Texture::~Texture()
@@ -104,13 +108,24 @@ void Texture::UnLock()
     SDL_UnlockTexture(texture);
 }
 
-void Texture::Clear()
+void Texture::ClearScreen()
 {
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
         {
             pixels[y * (pitch / sizeof(Uint32)) + x] = y > height/2 ? 0xFF555555 : 0xFF222222;
+        }
+    }
+}
+
+void Texture::Clear()
+{
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            pixels[y * (pitch / sizeof(Uint32)) + x] = 0;
         }
     }
 }
