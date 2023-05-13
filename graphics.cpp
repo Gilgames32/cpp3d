@@ -262,48 +262,21 @@ void Window::DrawSprites(const Game &game)
             if (entPosCameraSpace.y > 0 && entPosCameraSpace.y < zBuffer[lastStripe])
                 break;
 
+        // optimization
         if (lastStripe == drawStart.x && firstStripe == drawEnd.x)
             continue;
 
-        for (int stripe = firstStripe; stripe < lastStripe; stripe++)
-        {
-            for (int y = drawStart.y; y < drawEnd.y; y++)            
-                break;
-                //frameBuffer.SetPixel(stripe, y, 0xFFFFFFFF);
-        }
 
-        double onScreenWidth = drawEnd.x - drawStart.x;
-        SDL_Rect onTextureSource = {spriteTex.width * ((firstStripe - (-spriteSize / 2 + spriteScreenX)) / spriteSize), 0, spriteTex.width * ((lastStripe - (-spriteSize / 2 + spriteScreenX)) / spriteSize), spriteTex.height};
         SDL_Rect onScreenDestination = {firstStripe, drawStart.y, lastStripe - firstStripe, drawEnd.y - drawStart.y};
+        SDL_Rect onTextureSource = {0, 0, 0, 0};
+        onTextureSource.x = (firstStripe - (-spriteSize / 2 + spriteScreenX)) * spriteTex.width / spriteSize;
+        onTextureSource.w = (lastStripe - (-spriteSize / 2 + spriteScreenX)) * spriteTex.width / spriteSize - onTextureSource.x;
+        onTextureSource.y = ((drawStart.y - height / 2 + spriteSize / 2) * spriteTex.height) / spriteSize;
+        onTextureSource.h = ((drawEnd.y - height / 2 + spriteSize / 2) * spriteTex.height) / spriteSize - onTextureSource.y;
+
         SDL_RenderCopy(renderer, spriteTex.texture, &onTextureSource, &onScreenDestination);
-        
-        
 
-        std::cout << i << " " << firstStripe << " " << lastStripe << "\n";
-        std::cout << spriteScreenX << " " << drawStart.x << " " << drawEnd.x << "\n";
-
-
-        // a sprite minden oszlopán végigmegyünk
-        for (int stripe = drawStart.x; stripe < drawEnd.x; stripe++)
-        {
-            // ha előttunk van
-            // és a fal nem takarja ki, azaz a zbufferben tárolt távolság nagyobb mint a pozíciója
-            if (entPosCameraSpace.y > 0 && entPosCameraSpace.y < zBuffer[stripe])
-            {
-                pixelColor(renderer, stripe, 400, 0xFFFFFFFF);
-                // textúra x koordinátája
-                int texX = (stripe - (-spriteSize / 2 + spriteScreenX)) * spriteTex.width / spriteSize;
-                for (int y = drawStart.y; y < drawEnd.y; y++) // for every pixel of the current stripe
-                {
-                    // textúra y koordinátája
-                    int texY = ((y - height / 2 + spriteSize / 2) * spriteTex.height) / spriteSize;
-                    // Uint32 color = spriteTex.GetPixel(texX, texY);
-                    // átlátszó textúrák miatt színkeverés
-                    // color = Texture::AlphaBlend(frameBuffer.GetPixel(stripe, y), color);
-                    // frameBuffer.SetPixel(stripe, y, color);
-                }
-            }
-        }
+        // known bug: placeholder flashes (suspicion: too small texture)
     }
 
     delete[] sortedEnts;
