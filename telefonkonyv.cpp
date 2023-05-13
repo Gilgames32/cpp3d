@@ -7,6 +7,12 @@
 
 #include "memtrace.h"
 
+/* achievement board:
+ * internal compiler error (fixed by replacing codeblocks's built in mingw)
+ * push_pack causing the debugger to crash
+ */
+
+
 int main(int argc, char const *argv[])
 {
     Window win;
