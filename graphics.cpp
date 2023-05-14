@@ -178,7 +178,7 @@ void Window::DrawSprites(const Game &game)
     for (int i = 0; i < entSize; i++)
     {
         sortedEnts[i].a = &game.GetEntities()[i];
-        sortedEnts[i].b = (player.GetPos() - sortedEnts[i].a->GetPos()).abs();
+        sortedEnts[i].b = (player.GetPos() - sortedEnts[i].a->GetPos()).abssq();
     }
 
     // buborékrendezés, legtávolabbi legelől a tömbben

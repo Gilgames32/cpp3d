@@ -94,7 +94,7 @@ bool Player::Shoot(const Matrix &level, DinTomb<Entity> &entities)
         double dist = Vector2::PointSegDist(trail.GetStart(), trail.GetEnd(), i->GetPos(), perp, closest);
         // ha van rá merőleges és el is találta
         if (perp && dist < .5)
-            hits.Append(Pair<size_t, double>(i.Index(), (closest - pos).abs()));
+            hits.Append(Pair<size_t, double>(i.Index(), (closest - pos).abssq()));
     }
 
     // ha van találat
@@ -246,8 +246,8 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
 
         // ha látja a playert
         Ray view(level, enemyPos, playerPos - enemyPos);
-        double const playerDistance = (playerPos - enemyPos).abs();
-        if ((view.GetEnd() - view.GetStart()).abs() > playerDistance)
+        double const playerDistance = (playerPos - enemyPos).abssq();
+        if ((view.GetEnd() - view.GetStart()).abssq() > playerDistance)
         {
             // mozgat ha nincs túl közel
             const double followStopDist = 0.2;
