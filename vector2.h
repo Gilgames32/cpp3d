@@ -29,7 +29,6 @@ public:
 
     // returns the same vector but 1 unit long
     Vector2 normalize() const;
-    //~Vector2();
 
     // pont és szakasz távolsága
     static double PointSegDist(const Vector2& seg1, const Vector2& seg2, const Vector2 p, bool &perp, Vector2 &closest);
@@ -44,8 +43,6 @@ std::ostream& operator<<(std::ostream& os, const Vector2& v);
 template <typename T>
 class Duo
 {
-private:
-    /* data */
 public:
     T x, y;
     Duo(T x0 = 0, T y0 = 0)  : x(x0), y(y0) {}
@@ -55,8 +52,6 @@ public:
 template <typename A, typename B>
 class Pair
 {
-private:
-    /* data */
 public:
     A a;
     B b;

@@ -50,10 +50,11 @@ class Input
 protected:
     double turn;
     bool shootTrigger = false;
-public:
     Vector2 dir;
+public:
     Input(const Vector2& dir = Vector2(), double turn = 0);
-    //~Input();
+    
+    const Vector2& GetDir() const;
     double GetTurn();
     bool GetShootTrigger();
 };

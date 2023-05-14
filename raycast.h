@@ -11,7 +11,6 @@
 
 class Ray
 {
-public:
     // kiindulási és végkoordináta
     const Vector2 start;
     Vector2 end;
@@ -36,6 +35,7 @@ public:
     // a pálya
     const Matrix& space;
 
+public:
     Ray(const Matrix& sapceGrid, const Vector2& startVector, const Vector2& dirVector);
     Ray(const Ray& ray);
 
@@ -43,6 +43,12 @@ public:
     double WallX() const;
 
     int CellValue() const;
+
+    double GetWallDist() const;
+    bool GetSide() const;
+    const Vector2& GetStart() const;
+    const Vector2& GetEnd() const;
+
 
     //~Ray();
 };

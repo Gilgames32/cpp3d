@@ -16,10 +16,11 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
 
     // raycastoljuk, hogy vezet-e oda falmentes út
     Ray path(grid, pos, moveDir);
+    
 
     // tetszőleges pontossággal megközelítjük a falat
     double snap = 0.01;
-    double maxDist = path.wallDist - snap;
+    double maxDist = path.GetWallDist() - snap;
     if (maxDist < 0) maxDist = 0;
     double movDist = (pos - nextPos).abs();
 
@@ -32,14 +33,14 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
         // maradék momentum átalakítása csúszásba
         Vector2 slide = nextPos - pos - moveDir * maxDist;
         // attól függően hogy melyik oldalon csúszunk elhagyjuk az egyik komponenst
-        if (path.side)
+        if (path.GetSide())
             slide.y = 0;
         else
             slide.x = 0;
 
         // ezt is raycastoljuk
         Ray slidePath(grid, pos, slide.normalize());
-        double slideMax = slidePath.wallDist - snap;
+        double slideMax = slidePath.GetWallDist() - snap;
         if (slideMax < 0) slideMax = 0;
         double slideDist = slide.abs();
         if (slideDist > slideMax)
@@ -89,7 +90,7 @@ bool Player::Shoot(const Matrix &level, DinTomb<Entity>& entities)
     {        
         bool perp;
         Vector2 closest;
-        double dist = Vector2::PointSegDist(trail.start, trail.end, i->GetPos(), perp, closest);
+        double dist = Vector2::PointSegDist(trail.GetStart(), trail.GetEnd(), i->GetPos(), perp, closest);
         // ha van rá merőleges és el is találta
         if (perp && dist < .5)
             hits.Append(Pair<size_t, double>(i.Index(), (closest - pos).abs()));
@@ -160,6 +161,11 @@ bool Input::GetShootTrigger()
     return re;
 }
 
+const Vector2& Input::GetDir() const
+{
+    return dir;
+}
+
 Game::Game(const char* saveName) {
     // open
     std::ifstream levelFile(saveName);
@@ -225,9 +231,9 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
     
     // process inputs
     player.Rotate(inp.GetTurn() / 180);
-    if (inp.dir != Vector2(0, 0))
+    if (inp.GetDir() != Vector2(0, 0))
     {
-        Vector2 moveDir(player.GetDir() * inp.dir.y + player.GetPlane() * inp.dir.x);
+        Vector2 moveDir(player.GetDir() * inp.GetDir().y + player.GetPlane() * inp.GetDir().x);
         player.Move(level, moveDir, deltaTime, 3);
     }
 
@@ -245,14 +251,14 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
         // ha látja a playert
         Ray view(level, enemyPos, playerPos - enemyPos);
         double const playerDistance = (playerPos - enemyPos).abs();
-        if ((view.end - view.start).abs() > playerDistance)
+        if ((view.GetEnd() - view.GetStart()).abs() > playerDistance)
         {
             // mozgat ha nincs túl közel
             const double followStopDist = 0.2;
             const double damageDist = 0.2;
             if (playerDistance > followStopDist)
             {
-                i->Move(level, playerPos - view.start, deltaTime);
+                i->Move(level, playerPos - view.GetStart(), deltaTime);
             }
             if (playerDistance < damageDist)
             {

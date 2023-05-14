@@ -22,6 +22,7 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
 
     // ameddig tart a bor addig megyek
     // TODO: ha esetleg out of bounds lennénk
+    //       vagy csináljuk meg hogy a mátrix ad vissza nullát ha oob
     while (space[cell.x][cell.y] == 0)
     {
         // DDA algoritmus
@@ -64,7 +65,9 @@ double Ray::WallX() const
     return wallX;
 }
 
-int Ray::CellValue() const
-{
-    return space[cell.x][cell.y];
-}
+int Ray::CellValue() const { return space[cell.x][cell.y]; }
+
+double Ray::GetWallDist() const { return wallDist; }
+bool Ray::GetSide() const { return side; }
+const Vector2 &Ray::GetStart() const { return start; }
+const Vector2 &Ray::GetEnd() const { return end; }

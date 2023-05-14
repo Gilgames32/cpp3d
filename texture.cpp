@@ -1,11 +1,20 @@
 #include "texture.h"
 
 Uint32 Texture::windowFormat = SDL_PIXELFORMAT_ABGR8888;
-SDL_Renderer *windowRenderer = nullptr;
 
-SDL_Renderer *Texture::windowRenderer = nullptr;
+SDL_Renderer* Texture::windowRenderer = nullptr;
 
-Texture::Texture() : texture(nullptr), width(0), height(0), pixels(nullptr), pitch(0) {}
+void Texture::SetRenderer(SDL_Renderer *renderer)
+{
+    windowRenderer = renderer;
+}
+
+void Texture::SetFormat(Uint32 format)
+{
+    windowFormat = format;
+}
+
+Texture::Texture() : texture(nullptr), size(Duo<int>(0, 0)), pixels(nullptr), pitch(0) {}
 
 Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
 {
@@ -14,16 +23,16 @@ Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
     {
         throw "WPO0HL";
     }
-    width = image->w;
-    height = image->h;
-    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, width, height);
+    size.x = image->w;
+    size.y = image->h;
+    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, size.x, size.y);
     Lock();
-    SDL_ConvertPixels(width, height, image->format->format, image->pixels, image->pitch, windowFormat, pixels, pitch);
+    SDL_ConvertPixels(size.x, size.y, image->format->format, image->pixels, image->pitch, windowFormat, pixels, pitch);
     UnLock();
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 }
 
-Texture::Texture(const int w, const int h) : width(w), height(h), pixels(nullptr), pitch(0)
+Texture::Texture(int w, int h) : size(Duo<int>(w, h)), pixels(nullptr), pitch(0)
 {
     texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, w, h);
     // FONTOS!! Lock hívás minden konstrukciónál a pixel és pitch beállításhoz
@@ -34,21 +43,20 @@ Texture::Texture(const int w, const int h) : width(w), height(h), pixels(nullptr
 
 Texture &Texture::operator=(const Texture &t)
 {
-    width = t.width;
-    height = t.height;
-    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, width, height);
+    size = t.size;
+    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, size.x, size.y);
     Lock();
-    SDL_ConvertPixels(width, height, windowFormat, t.pixels, t.pitch, windowFormat, pixels, pitch);
+    SDL_ConvertPixels(size.x, size.y, windowFormat, t.pixels, t.pitch, windowFormat, pixels, pitch);
     UnLock();
     return *this;
 }
 
-Texture::Texture(const Texture &t) : width(t.width), height(t.height)
+Texture::Texture(const Texture &t) : size(t.size)
 {
     std::cout << "ennek nem kéne meghívódni" << std::endl;
-    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, width, height);
+    texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, size.x, size.y);
     Lock();
-    SDL_ConvertPixels(width, height, windowFormat, t.pixels, t.pitch, windowFormat, pixels, pitch);
+    SDL_ConvertPixels(size.x, size.y, windowFormat, t.pixels, t.pitch, windowFormat, pixels, pitch);
     UnLock();
     SDL_BlendMode blend;
     SDL_GetTextureBlendMode(t.texture, &blend);
@@ -60,9 +68,9 @@ Texture::~Texture()
     SDL_DestroyTexture(texture);
 }
 
-Uint32 Texture::GetPixel(int x, int y)
+Uint32 Texture::GetPixel(int x, int y) const
 {
-    if (x >= width || x < 0 || y >= height || y < 0)
+    if (x >= size.x || x < 0 || y >= size.y || y < 0)
         return 0x00000000;
 
     Uint32 pixelPosition = y * (pitch / sizeof(Uint32)) + x;
@@ -99,6 +107,21 @@ Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
     return color;
 }
 
+const SDL_Texture* Texture::GetTexture() const
+{
+    return texture;
+}
+
+SDL_Texture* Texture::GetTexture()
+{
+    return texture;
+}
+
+const Duo<int>& Texture::GetSize() const
+{
+    return size;
+}
+
 void Texture::Lock()
 {
     SDL_LockTexture(texture, nullptr, (void **)&pixels, &pitch);
@@ -110,20 +133,20 @@ void Texture::UnLock()
 
 void Texture::ClearScreen()
 {
-    for (int y = 0; y < height; y++)
+    for (int y = 0; y < size.y; y++)
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size.x; x++)
         {
-            pixels[y * (pitch / sizeof(Uint32)) + x] = y > height/2 ? 0xFF555555 : 0xFF222222;
+            pixels[y * (pitch / sizeof(Uint32)) + x] = y > size.y/2 ? 0xFF555555 : 0xFF222222;
         }
     }
 }
 
 void Texture::Clear()
 {
-    for (int y = 0; y < height; y++)
+    for (int y = 0; y < size.y; y++)
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size.x; x++)
         {
             pixels[y * (pitch / sizeof(Uint32)) + x] = 0;
         }
@@ -159,11 +182,16 @@ void Palette::AddTexture(const char *s)
     AddTexture(t);
 }
 
-Texture &Palette::operator[](int index) const
+Texture &Palette::operator[](int index)
 {
     // todo: built in placeholder
     if (index >= size)
         return *(textures[0]);
     else
         return *(textures[index]);
+}
+
+const Texture &Palette::operator[](int index) const
+{
+    return operator[](index);
 }

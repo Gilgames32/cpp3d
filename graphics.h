@@ -32,7 +32,7 @@ public:
     ~Window();
     void Clear();
     void Render();
-    void DrawMinimap(const Game& game);
+    void DrawHUD(const Game& game);
     void DrawPerspective(const Game& game);
     void DrawSprites(const Game& game);
 };

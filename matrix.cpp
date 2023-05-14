@@ -32,7 +32,6 @@ Matrix::Matrix(const Matrix &mx) : size(mx.GetSize()) {
 
 void Matrix::operator=(const Matrix &mx)
 {
-    // TODO!!! delete old
     for (int i = 0; i < size.x; i++)
         delete[] grid[i];
     delete[] grid;

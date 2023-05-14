@@ -12,10 +12,10 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
     //SDL_RenderSetLogicalSize(renderer, width, height);
 
     // set default renderer of textures
-    Texture::windowRenderer = renderer;
+    Texture::SetRenderer(renderer);
 
     // set color format
-    Texture::windowFormat = format;
+    Texture::SetFormat(format);
     std::cout << SDL_GetPixelFormatName(format) << std::endl;
 
     // load textures
@@ -31,7 +31,7 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
 
     // create a framebuffer
     frameBuffer = Texture(w, h);
-    SDL_SetTextureBlendMode(frameBuffer.texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureBlendMode(frameBuffer.GetTexture(), SDL_BLENDMODE_BLEND);
 
     // create zbuffer
     zBuffer = new double[width];
@@ -69,7 +69,7 @@ void Window::Render()
     SDL_RenderPresent(renderer);
 }
 
-void Window::DrawMinimap(const Game &game)
+void Window::DrawHUD(const Game &game)
 {
     // draw tiles
     for (int i = 0; i < game.GetLevel().GetSize().x; i++)
@@ -107,7 +107,7 @@ void Window::DrawPerspective(const Game &game)
         Ray cast = Ray(game.GetLevel(), player.GetPos(), rayDir);
 
         // a fal magassága:
-        int lineHeight = height / cast.wallDist;
+        int lineHeight = height / cast.GetWallDist();
         // legfelső rajzolható pixel
         int drawStart = -lineHeight / 2 + height / 2;
         if (drawStart < 0)
@@ -118,17 +118,18 @@ void Window::DrawPerspective(const Game &game)
             drawEnd = height - 1;
 
         // adott textúra
-        Texture &pattern = wallTextures[cast.CellValue()];
+        const Texture &pattern = wallTextures[cast.CellValue()];
+        const Duo<int>& pSize = pattern.GetSize();
 
         // textúra X oszlopa
-        int textureX = cast.WallX() * double(pattern.width);
+        int textureX = cast.WallX() * double(pSize.x);
 
         // bizonyos oldalak tükrözve jelennek meg, erre fix
-        if (cast.side == 0 && cast.dir.x < 0 || cast.side == 1 && cast.dir.y > 0)
-            textureX = pattern.width - textureX - 1;
+        if (cast.GetSide() == 0 && rayDir.x < 0 || cast.GetSide() == 1 &&rayDir.y > 0)
+            textureX = pSize.x - textureX - 1;
 
         // nyújtás mértéke
-        double scale = double(pattern.height) / lineHeight;
+        double scale = double(pSize.y) / lineHeight;
 
         // ha nem látszódik az egész textúra, a tetejét elhagyjuk
         double textureY = (drawStart - height / 2 + lineHeight / 2) * scale;
@@ -141,7 +142,7 @@ void Window::DrawPerspective(const Game &game)
             textureY += scale;
 
             // igény szerint sötétítés
-            if (cast.side)
+            if (cast.GetSide())
                 // pixel = (pixel >> 1) & 0xFF7F7F7F;
                 pixel = Texture::AlphaBlend(0xFF000000, pixel & 0x77FFFFFF);
 
@@ -150,17 +151,14 @@ void Window::DrawPerspective(const Game &game)
         }
 
         // load it to the zbuffer
-        zBuffer[x] = cast.wallDist;
-
-        // minimap for debug
-        lineColor(renderer, cast.end.x * 10, cast.end.y * 10, cast.start.x * 10, cast.start.y * 10, 0x0000FFFF);
+        zBuffer[x] = cast.GetWallDist();
     }
 
     // unluck framebuffer
     frameBuffer.UnLock();
 
     // copy the framebuffer onto the screen
-    SDL_RenderCopy(renderer, frameBuffer.texture, nullptr, nullptr);
+    SDL_RenderCopy(renderer, frameBuffer.GetTexture(), nullptr, nullptr);
 
 }
 
@@ -199,9 +197,10 @@ void Window::DrawSprites(const Game &game)
     {
         // alias
         const Entity &ent = *(sortedEnts[i].a);
-        const Vector2 dir = player.GetDir();
+        const Vector2 &dir = player.GetDir();
         const Vector2 plane = player.GetPlane();
-        const Texture &spriteTex = spriteTextures[ent.GetID()];
+        Texture &spriteTex = spriteTextures[ent.GetID()];
+        const Duo<int> &spriteTexSize = spriteTex.GetSize();
 
         // játékoshoz relatív pozíciója
         Vector2 entPosPlayerSpace = ent.GetPos() - player.GetPos();
@@ -275,12 +274,12 @@ void Window::DrawSprites(const Game &game)
 
         SDL_Rect onScreenDestination = {firstStripe, drawStart.y, lastStripe - firstStripe, drawEnd.y - drawStart.y};
         SDL_Rect onTextureSource = {0, 0, 0, 0};
-        onTextureSource.x = (firstStripe - (-spriteSize / 2 + spriteScreenX)) * spriteTex.width / spriteSize;
-        onTextureSource.w = (lastStripe - (-spriteSize / 2 + spriteScreenX)) * spriteTex.width / spriteSize - onTextureSource.x;
-        onTextureSource.y = ((drawStart.y - height / 2 + spriteSize / 2) * spriteTex.height) / spriteSize;
-        onTextureSource.h = ((drawEnd.y - height / 2 + spriteSize / 2) * spriteTex.height) / spriteSize - onTextureSource.y;
+        onTextureSource.x = (firstStripe - (-spriteSize / 2 + spriteScreenX)) * spriteTexSize.x / spriteSize;
+        onTextureSource.w = (lastStripe - (-spriteSize / 2 + spriteScreenX)) * spriteTexSize.x / spriteSize - onTextureSource.x;
+        onTextureSource.y = ((drawStart.y - height / 2 + spriteSize / 2) * spriteTexSize.y) / spriteSize;
+        onTextureSource.h = ((drawEnd.y - height / 2 + spriteSize / 2) * spriteTexSize.y) / spriteSize - onTextureSource.y;
 
-        SDL_RenderCopy(renderer, spriteTex.texture, &onTextureSource, &onScreenDestination);
+        SDL_RenderCopy(renderer, spriteTex.GetTexture(), &onTextureSource, &onScreenDestination);
 
         // known bug: placeholder flashes (suspicion: too small texture)
     }

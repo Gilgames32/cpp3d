@@ -7,6 +7,7 @@
 #include "SDL2/SDL2_gfxPrimitives.h"
 #include "SDL2/SDL_image.h"
 
+#include "vector2.h"
 #include "gamelogic.h"
 
 #include "memtrace.h"
@@ -15,15 +16,14 @@
 class Texture
 {
 private:
-public:
     static SDL_Renderer *windowRenderer;
     static Uint32 windowFormat;
-
     SDL_Texture *texture;
-    int width, height;
+    Duo<int> size;
     Uint32 *pixels;
     int pitch;
 
+public:
     Texture();
     Texture(const char *fileName);
     Texture(const int w, const int h);
@@ -33,9 +33,17 @@ public:
 
     ~Texture();
 
-    Uint32 GetPixel(int x, int y);
-    void SetPixel(int x, int y, Uint32 set);
+    static void SetRenderer(SDL_Renderer *renderer);
+    static void SetFormat(Uint32 format);
+
     static Uint32 AlphaBlend(Uint32 base, Uint32 add);
+
+    Uint32 GetPixel(int x, int y) const;
+    void SetPixel(int x, int y, Uint32 set);
+    SDL_Texture* GetTexture();
+    const SDL_Texture* GetTexture() const;
+    const Duo<int>& GetSize() const;
+    
     void Clear();
     void ClearScreen();
 
@@ -54,7 +62,9 @@ public:
     void AddTexture(const char *);
     void AddTexture(Texture *t);
 
-    Texture& operator[](int index) const;
+    // sdl limitációk miatt nem lehet konstans textúrával visszatérni
+    Texture& operator[](int index);
+    const Texture& operator[](int index) const;
 };
 
 #endif // TEXTURE_H
