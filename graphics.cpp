@@ -72,38 +72,39 @@ void Window::Render()
 void Window::DrawMinimap(const Game &game)
 {
     // draw tiles
-    for (int i = 0; i < game.level.sizex; i++)
-        for (int j = 0; j < game.level.sizey; j++)
-            if (game.level[i][j] != 0)
+    for (int i = 0; i < game.GetLevel().GetSize().x; i++)
+        for (int j = 0; j < game.GetLevel().GetSize().y; j++)
+            if (game.GetLevel()[i][j] != 0)
                 rectangleColor(renderer, i * 10, j * 10, (i + 1) * 10, (j + 1) * 10, 0xFFFFFFFF);
 
-    /*
     // draw entities
-    for (int i = 0; i < game.entSize; i++)
-        circleColor(renderer, game.entities[i].pos.x * 10, game.entities[i].pos.y * 10, 2, 0x00FF00FF);
-    */
+    for (auto i = game.GetEntities().begin(); i != game.GetEntities().end(); ++i)
+        circleColor(renderer, i->GetPos().x * 10, i->GetPos().y * 10, 2, 0x00FF00FF);
 
     // draw player
-    circleColor(renderer, game.player.pos.x * 10, game.player.pos.y * 10, 2, 0xFF0000FF);
+    circleColor(renderer, game.GetPlayer().GetPos().x * 10, game.GetPlayer().GetPos().y * 10, 2, 0xFF0000FF);
 }
 
 void Window::DrawPerspective(const Game &game)
 {
+    // aliases
+    const Player& player = game.GetPlayer();
+
     // lock buffer so we can write it
     frameBuffer.Lock();
 
     // irányra merőleges vektor, azaz a kamera síkjával párhuzamos
-    Vector2 plane = game.player.GetPlane();
+    Vector2 plane = player.GetPlane();
     for (int x = 0; x < width; x++)
     {
         // jelenlegi képernyőoszlop kamerához relatív aránya -1...1
         double camX = 2 * double(x) / width - 1;
 
         // sugár irányvektora
-        Vector2 rayDir = game.player.dir + plane * camX;
+        Vector2 rayDir = player.GetDir() + plane * camX;
 
         // a sugár
-        Ray cast = Ray(game.level, game.player.pos, rayDir);
+        Ray cast = Ray(game.GetLevel(), player.GetPos(), rayDir);
 
         // a fal magassága:
         int lineHeight = height / cast.wallDist;
@@ -165,20 +166,22 @@ void Window::DrawPerspective(const Game &game)
 
 void Window::DrawSprites(const Game &game)
 {
+    // aliases
+    const Player& player = game.GetPlayer();
+    
     // lezárjuk, mert rajzolni fogunk
     frameBuffer.Lock();
 
     // entitások szortírozó tömbje
     // tárulunk egy entitrásra mutató pointert, és a hozzá tartozó távolságot a játékostól
-    int entSize = game.ent.Size();
+    int entSize = game.GetEntities().Size();
     Pair<const Entity *, double> *sortedEnts = new Pair<const Entity *, double>[entSize];
 
     // távolságok kiszámítása
     for (int i = 0; i < entSize; i++)
     {
-        sortedEnts[i].a = &game.ent[i];
-        Vector2 distance = game.player.pos - sortedEnts[i].a->pos;
-        sortedEnts[i].b = distance.abs();
+        sortedEnts[i].a = &game.GetEntities()[i];
+        sortedEnts[i].b = (player.GetPos() - sortedEnts[i].a->GetPos()).abs();
     }
 
     // buborékrendezés, legtávolabbi legelől a tömbben
@@ -196,12 +199,12 @@ void Window::DrawSprites(const Game &game)
     {
         // alias
         const Entity &ent = *(sortedEnts[i].a);
-        const Vector2 dir = game.player.dir;
-        const Vector2 plane = game.player.GetPlane();
-        const Texture &spriteTex = spriteTextures[ent.id];
+        const Vector2 dir = player.GetDir();
+        const Vector2 plane = player.GetPlane();
+        const Texture &spriteTex = spriteTextures[ent.GetID()];
 
         // játékoshoz relatív pozíciója
-        Vector2 entPosPlayerSpace = ent.pos - game.player.pos;
+        Vector2 entPosPlayerSpace = ent.GetPos() - player.GetPos();
 
         // kamera mátrixának inverzével transzformáljuk az entitás pozícióját
         // így megkapjuk a kamerához relatív pozícióját

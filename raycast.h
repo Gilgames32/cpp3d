@@ -39,6 +39,7 @@ public:
     Ray(const Matrix& sapceGrid, const Vector2& startVector, const Vector2& dirVector);
     Ray(const Ray& ray);
 
+    // a fal cellát pontosan hol találta el 0...1
     double WallX() const;
 
     int CellValue() const;

@@ -39,6 +39,7 @@ public:
 
 class WindowInput : public Input
 {
+private:
     bool w = 0, a = 0, s = 0, d = 0;
 
 public:

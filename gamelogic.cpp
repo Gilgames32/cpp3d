@@ -1,12 +1,10 @@
 #include "gamelogic.h"
 
 Entity::Entity(int id, const Vector2& pos) : id(id), pos(pos) {}
-Entity::Entity(const Entity& e) : id(e.id), pos(e.pos) {}
-void Entity::operator=(const Entity& e) 
-{
-    id = e.id;
-    pos = e.pos;
-}
+
+int Entity::GetID() const { return id; }
+
+const Vector2& Entity::GetPos() const { return pos; }
 
 void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double speed)
 {
@@ -56,14 +54,24 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
     }
 }
 
+Player::Player(const Vector2& position, const Vector2& direction) : Entity(-1, position), dir(direction) {}
+
+Player::Player(const Player &p) : Entity(-1, p.GetPos()), dir(p.dir) {}
+
+const Vector2& Player::GetDir() const
+{
+    return dir;
+}
+
 Vector2 Player::GetPlane() const
 {
     return Vector2(-dir.y, dir.x) * 0.66; // fov
 }
 
-Player::Player(const Vector2& position, const Vector2& direction) : Entity(-1, position), dir(direction) {}
-
-Player::Player(const Player &p) : Entity(-1, p.pos), dir(p.dir) {}
+void Player::Rotate(double turn) 
+{
+    dir.rotate(turn);
+}
 
 bool Player::Shoot(const Matrix &level, DinTomb<Entity>& entities)
 {
@@ -81,7 +89,7 @@ bool Player::Shoot(const Matrix &level, DinTomb<Entity>& entities)
     {        
         bool perp;
         Vector2 closest;
-        double dist = Vector2::PointSegDist(trail.start, trail.end, i->pos, perp, closest);
+        double dist = Vector2::PointSegDist(trail.start, trail.end, i->GetPos(), perp, closest);
         // ha van rá merőleges és el is találta
         if (perp && dist < .5)
             hits.Append(Pair<size_t, double>(i.Index(), (closest - pos).abs()));
@@ -161,7 +169,9 @@ Game::Game(const char* saveName) {
     }
 
     // LOAD PLAYER
-    levelFile >> player.pos.x >> player.pos.y;
+    int px, py;
+    levelFile >> px >> py;
+    player = Player(Vector2(px, py));
 
     // LOAD LEVEL GRID
     // x sor
@@ -178,9 +188,13 @@ Game::Game(const char* saveName) {
             levelFile >> grid[s][o];
         }
     }
-    level.sizex = sizex;
-    level.sizey = sizey;
-    level.grid = grid;
+    level = Matrix(sizex, sizey, grid);
+    for (int i = 0; i < sizex; i++)
+    {
+        delete[] grid[i];
+    }
+    delete[] grid;
+    
     
     
 
@@ -191,7 +205,7 @@ Game::Game(const char* saveName) {
     {
         int tempid, posx, posy;
         levelFile >> tempid >> posx >> posy;
-        ent.Append(Entity(tempid, Vector2(posx, posy)));
+        entities.Append(Entity(tempid, Vector2(posx, posy)));
     }
 
 
@@ -200,10 +214,9 @@ Game::Game(const char* saveName) {
     levelFile.close();
 }
 
-Game::~Game()
-{
-    //delete[] entities;
-}
+const Matrix& Game::GetLevel() const { return level; }
+const Player& Game::GetPlayer() const { return player; }
+const DinTomb<Entity>& Game::GetEntities() const { return entities; }
 
 bool Game::SimulateGame(Input &inp, double deltaTime)
 {
@@ -211,23 +224,27 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
     player.DecreaseCoolDowns(deltaTime);
     
     // process inputs
-    player.dir.rotate(inp.GetTurn() / 180);
+    player.Rotate(inp.GetTurn() / 180);
     if (inp.dir != Vector2(0, 0))
     {
-        Vector2 moveDir(player.dir * inp.dir.y + player.GetPlane() * inp.dir.x);
+        Vector2 moveDir(player.GetDir() * inp.dir.y + player.GetPlane() * inp.dir.x);
         player.Move(level, moveDir, deltaTime, 3);
     }
 
     // shooting
     if (inp.GetShootTrigger())
-        player.Shoot(level, ent);
+        player.Shoot(level, entities);
 
     // process entities
-    for (auto i = ent.begin(); i != ent.end(); ++i)
+    for (auto i = entities.begin(); i != entities.end(); ++i)
     {
+        // aliases
+        const Vector2& enemyPos = i->GetPos();
+        const Vector2& playerPos = player.GetPos();
+
         // ha látja a playert
-        Ray view(level, i->pos, player.pos - i->pos);
-        double const playerDistance = (player.pos - view.start).abs();
+        Ray view(level, enemyPos, playerPos - enemyPos);
+        double const playerDistance = (playerPos - enemyPos).abs();
         if ((view.end - view.start).abs() > playerDistance)
         {
             // mozgat ha nincs túl közel
@@ -235,7 +252,7 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
             const double damageDist = 0.2;
             if (playerDistance > followStopDist)
             {
-                i->Move(level, player.pos - view.start, deltaTime);
+                i->Move(level, playerPos - view.start, deltaTime);
             }
             if (playerDistance < damageDist)
             {
