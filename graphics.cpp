@@ -77,9 +77,11 @@ void Window::DrawMinimap(const Game &game)
             if (game.level[i][j] != 0)
                 rectangleColor(renderer, i * 10, j * 10, (i + 1) * 10, (j + 1) * 10, 0xFFFFFFFF);
 
+    /*
     // draw entities
     for (int i = 0; i < game.entSize; i++)
         circleColor(renderer, game.entities[i].pos.x * 10, game.entities[i].pos.y * 10, 2, 0x00FF00FF);
+    */
 
     // draw player
     circleColor(renderer, game.player.pos.x * 10, game.player.pos.y * 10, 2, 0xFF0000FF);
@@ -168,34 +170,35 @@ void Window::DrawSprites(const Game &game)
 
     // entitások szortírozó tömbje
     // tárulunk egy entitrásra mutató pointert, és a hozzá tartozó távolságot a játékostól
-    Pair<Entity *, double> *sortedEnts = new Pair<Entity *, double>[game.entSize];
+    int entSize = game.ent.Size();
+    Pair<const Entity *, double> *sortedEnts = new Pair<const Entity *, double>[entSize];
 
     // távolságok kiszámítása
-    for (int i = 0; i < game.entSize; i++)
+    for (int i = 0; i < entSize; i++)
     {
-        sortedEnts[i].a = game.entities + i;
+        sortedEnts[i].a = &game.ent[i];
         Vector2 distance = game.player.pos - sortedEnts[i].a->pos;
         sortedEnts[i].b = distance.abs();
     }
 
     // buborékrendezés, legtávolabbi legelől a tömbben
-    for (int i = 0; i < game.entSize - 1; i++)
-        for (int j = 0; j < game.entSize - i - 1; j++)
+    for (int i = 0; i < entSize - 1; i++)
+        for (int j = 0; j < entSize - i - 1; j++)
             if (sortedEnts[j].b < sortedEnts[j + 1].b)
             {
-                Pair<Entity *, double> temp = sortedEnts[j];
+                Pair<const Entity *, double> temp = sortedEnts[j];
                 sortedEnts[j] = sortedEnts[j + 1];
                 sortedEnts[j + 1] = temp;
             }
 
     // megjelenítés a kamerán
-    for (int i = 0; i < game.entSize; i++)
+    for (int i = 0; i < entSize; i++)
     {
         // alias
-        Entity &ent = *(sortedEnts[i].a);
-        Vector2 dir = game.player.dir;
-        Vector2 plane = game.player.GetPlane();
-        Texture &spriteTex = spriteTextures[ent.id];
+        const Entity &ent = *(sortedEnts[i].a);
+        const Vector2 dir = game.player.dir;
+        const Vector2 plane = game.player.GetPlane();
+        const Texture &spriteTex = spriteTextures[ent.id];
 
         // játékoshoz relatív pozíciója
         Vector2 entPosPlayerSpace = ent.pos - game.player.pos;

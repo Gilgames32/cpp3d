@@ -1,6 +1,12 @@
 #include "gamelogic.h"
 
 Entity::Entity(int id, const Vector2& pos) : id(id), pos(pos) {}
+Entity::Entity(const Entity& e) : id(e.id), pos(e.pos) {}
+void Entity::operator=(const Entity& e) 
+{
+    id = e.id;
+    pos = e.pos;
+}
 
 void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double speed)
 {
@@ -59,64 +65,43 @@ Player::Player(const Vector2& position, const Vector2& direction) : Entity(-1, p
 
 Player::Player(const Player &p) : Entity(-1, p.pos), dir(p.dir) {}
 
-bool Player::Shoot(const Matrix &level, Entity* entities, int entSize)
+bool Player::Shoot(const Matrix &level, DinTomb<Entity>& entities)
 {
-    // i mean it works but this is ugly as hell man
-
-    // TODO: std vektor lol
-    
-    // optimalizálás:
-        // csak enemy spriteokra
-        // closest to furthest !!! closest point számít nem entpos
-        // minkeres sort helyett
-    // van egy szakaszunk
-    // szakasz és pont távolsága, ha 1/2 alatti, death
+    // tekintsük a lövést egy szakasznak
+    // ha 1/2 egységen belül van az találat (egy egység széles spriteok)
+    // ezek közül a legközelebbi számí találatnak, nincs piercing
     std::cout << "shoot-";
-
 
     // a lövés csíkja
     Ray trail(level, pos, dir);
 
-    // sort and break on find
-    // filter ones in range
-    int hitSize = 0;
-    // .a: entity pointer   .b: dist between closest point and player
-    Pair<Entity *, double> *sortedHits = new Pair<Entity *, double>[entSize];
-    for (int i = 0; i < entSize; i++)
-    {
-        // reset sprite (degugging)
-        entities[i].id = 0;
-        
+    // találatok tömbje
+    DinTomb<Pair<size_t, double>> hits;
+    for (auto i = entities.begin(); i != entities.end(); ++i)
+    {        
         bool perp;
         Vector2 closest;
-        double dist = Vector2::PointSegDist(trail.start, trail.end, entities[i].pos, perp, closest);
-
+        double dist = Vector2::PointSegDist(trail.start, trail.end, i->pos, perp, closest);
+        // ha van rá merőleges és el is találta
         if (perp && dist < .5)
-        {
-            entities[i].id = 1;
-            sortedHits[hitSize++] = Pair<Entity *, double>(entities + i, (closest - pos).abs());
-        }
+            hits.Append(Pair<size_t, double>(i.Index(), (closest - pos).abs()));
     }
-    if (hitSize == 0)
+
+    // ha van találat
+    if (hits.Size() == 0)
     {
         std::cout << "miss" << std::endl;
-        delete[] sortedHits;
         return false;
     }
-    
 
-    // minkeres
-    int mindex = 0;
-    for (int i = 0; i < hitSize; i++)
-    {
-        if (sortedHits[i].b < sortedHits[mindex].b)
-        {
-            mindex = i;
-        }
-    }
-    sortedHits[mindex].a->id = 2;
+    // legközelebbi indexe
+    size_t mindex = 0;
+    for (auto i = hits.begin(); i != hits.end(); ++i)
+        if (i->b < hits[mindex].b)
+            mindex = i.Index();
+
+    entities.Delete(hits[mindex].a);
     std::cout << "hit" << std::endl;
-    delete[] sortedHits;
     return true;
 }
 
@@ -200,13 +185,13 @@ Game::Game(const char* saveName) {
     
 
     // LOAD ENTITIES
+    int entSize;
     levelFile >> entSize;
-    entities = new Entity[entSize];
     for (int i = 0; i < entSize; i++)
     {
         int tempid, posx, posy;
         levelFile >> tempid >> posx >> posy;
-        entities[i] = Entity(tempid, Vector2(posx, posy));
+        ent.Append(Entity(tempid, Vector2(posx, posy)));
     }
 
 
@@ -217,7 +202,7 @@ Game::Game(const char* saveName) {
 
 Game::~Game()
 {
-    delete[] entities;
+    //delete[] entities;
 }
 
 bool Game::SimulateGame(Input &inp, double deltaTime)
@@ -235,13 +220,13 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
 
     // shooting
     if (inp.GetShootTrigger())
-        player.Shoot(level, entities, entSize);
+        player.Shoot(level, ent);
 
     // process entities
-    for (int i = 0; i < entSize; i++)
+    for (auto i = ent.begin(); i != ent.end(); ++i)
     {
         // ha látja a playert
-        Ray view(level, entities[i].pos, player.pos - entities[i].pos);
+        Ray view(level, i->pos, player.pos - i->pos);
         double const playerDistance = (player.pos - view.start).abs();
         if ((view.end - view.start).abs() > playerDistance)
         {
@@ -250,7 +235,7 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
             const double damageDist = 0.2;
             if (playerDistance > followStopDist)
             {
-                entities[i].Move(level, player.pos - view.start, deltaTime);
+                i->Move(level, player.pos - view.start, deltaTime);
             }
             if (playerDistance < damageDist)
             {
