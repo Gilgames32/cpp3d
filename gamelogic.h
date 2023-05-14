@@ -28,7 +28,7 @@ public:
 class Player : public Entity
 {
 private:
-    int health = 1000;
+    int health = 100;
     double shootCoolDown = 0;
     double damageCoolDown = 0;
     Vector2 dir;

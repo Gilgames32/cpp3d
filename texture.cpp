@@ -90,7 +90,7 @@ void Texture::SetPixel(int x, int y, Uint32 set)
 
 Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
 {
-    // feltételezzük hogy ABGR vagy ARGB
+    // feltételezzük, hogy ABGR vagy ARGB
     // 0xAABBGGRR (grrrrrr...)
 
     // skippeljük amikor csak lehet mert ez processzoron megy xd
@@ -147,6 +147,8 @@ void Texture::ClearScreen()
     {
         for (int x = 0; x < size.x; x++)
         {
+            // képernyő fele ilyen a másik olyan, tökéletes az illúzióhot
+            // todo: maybe hogy lehessen ezt is állítani valahogy
             pixels[y * (pitch / sizeof(Uint32)) + x] = y > size.y / 2 ? 0xFF555555 : 0xFF222222;
         }
     }
@@ -196,7 +198,7 @@ void Palette::AddTexture(const char *s)
 Texture &Palette::operator[](int index)
 {
     // todo: built in placeholder
-    if (index >= size || index < 0)
+    if (index < 0 || index >= size)
         return *(textures[0]);
     else
         return *(textures[index]);

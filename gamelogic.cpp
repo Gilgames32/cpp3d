@@ -24,7 +24,7 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
         maxDist = 0;
     double movDist = (pos - nextPos).abs();
 
-    // ha a becsapódás közelebb van mint a megtenni kívánt út, az azt jelenti hogy falba ütköznénk
+    // ha a becsapódás közelebb van mint a megtenni kívánt út, az azt jelenti, hogy falba ütköznénk
     if (movDist > maxDist)
     {
         // falig
@@ -32,7 +32,7 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
 
         // maradék momentum átalakítása csúszásba
         Vector2 slide = nextPos - pos - moveDir * maxDist;
-        // attól függően hogy melyik oldalon csúszunk elhagyjuk az egyik komponenst
+        // attól függően, hogy melyik oldalon csúszunk elhagyjuk az egyik komponenst
         if (path.GetSide())
             slide.y = 0;
         else

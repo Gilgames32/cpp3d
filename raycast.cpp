@@ -21,10 +21,10 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
     sideDist.y = (dir.y < 0 ? start.y - cell.y : cell.y + 1.0 - start.y) * deltaDist.y;
 
     // ameddig tart a bor addig megyek
-    // TODO: ha esetleg out of bounds lennénk
-    //       vagy csináljuk meg hogy a mátrix ad vissza nullát ha oob
-    while (space[cell.x][cell.y] == 0)
-    {
+    // tbh lövésem sincs mit csinál ha out of bounds vagyunk lol
+    // spicy oneliner :3
+    while ( !(cell.x < 0 || cell.y < 0 || cell.x >= spaceGrid.GetSize().x || cell.y >= spaceGrid.GetSize().y) && space[cell.x][cell.y] == 0)
+    {        
         // DDA algoritmus
         if (sideDist.x < sideDist.y)
         {
@@ -46,6 +46,7 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
     end = start + dir * wallDist;
 }
 
+// deszépvagy egyemzuzádat
 Ray::Ray(const Ray &ray) : start(ray.start),
                            end(ray.end),
                            dir(ray.dir),
@@ -58,16 +59,21 @@ double Ray::WallX() const
 {
     double wallX;
     if (side == 0)
-        wallX = start.y + wallDist * dir.y; // posY + perpWallDist * rayDirY;
+        wallX = start.y + wallDist * dir.y;
     else
         wallX = start.x + wallDist * dir.x;
     wallX -= floor(wallX);
     return wallX;
 }
 
+// trust me van értelme gettert írni mindenhez :|
+
 int Ray::CellValue() const { return space[cell.x][cell.y]; }
 
 double Ray::GetWallDist() const { return wallDist; }
+
 bool Ray::GetSide() const { return side; }
+
 const Vector2 &Ray::GetStart() const { return start; }
+
 const Vector2 &Ray::GetEnd() const { return end; }

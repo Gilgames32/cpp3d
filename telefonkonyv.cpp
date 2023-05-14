@@ -14,6 +14,7 @@
 
 int main(int argc, char const *argv[])
 {
+    // init
     Window win;
     Game mainGame("palya.txt");
     WindowInput inp;
@@ -24,21 +25,24 @@ int main(int argc, char const *argv[])
     double deltaTime = 0;
     while (!quit)
     {
+        // calc deltatime
         prev = curr;
         curr = SDL_GetPerformanceCounter();
-
         deltaTime = double((curr - prev) * 1000 / double(SDL_GetPerformanceFrequency()));
         // FPS
         // std::cout << (1000 / deltaTime) << std::endl;
 
+        // játék léptetése
         quit = mainGame.SimulateGame(inp, deltaTime);
 
+        // grafika
         win.Clear();
         win.DrawPerspective(mainGame);
         win.DrawSprites(mainGame);
         win.DrawHUD(mainGame);
         win.Render();
 
+        // input feldolgozás
         while (SDL_PollEvent(&mainEvent))
         {
             switch (mainEvent.type)
@@ -49,7 +53,7 @@ int main(int argc, char const *argv[])
 
             case SDL_KEYDOWN:
             case SDL_KEYUP:
-                // filter repeating signals
+                // ismétlődő input szűrés
                 if (!mainEvent.key.repeat)
                     inp.UpdateKeys(mainEvent.key);
                 break;

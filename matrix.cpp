@@ -57,7 +57,11 @@ Matrix::~Matrix()
     delete[] grid;
 }
 
+// good luck oob tesztelni ha már int tömb lol
 int *Matrix::operator[](size_t index) const
 {
+    if (index < 0 || index >= size.x)
+        throw std::out_of_range("Nem létező oszlop");
+    
     return grid[index];
 }

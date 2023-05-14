@@ -2,23 +2,24 @@
 
 Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8888), wallTextures(), frameBuffer()
 {
-    // initialize sdl
+    // sdl inicializálás
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    // create window and renderer
+    // ablak és renderer
     // vices érted mert telefonkönyv oszt 3d xddddddd
-    window = SDL_CreateWindow("Telefonkönyv", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
+    window = SDL_CreateWindow("Telefonkönyv3D", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_SHOWN);
-    // SDL_RenderSetLogicalSize(renderer, width, height);
+    // SDL_RenderSetLogicalSize(renderer, width, height); // ha esetleg pixelesíteni szeretnénk még rajt
 
-    // set default renderer of textures
+    // alapértelmezett renderer a textúrákhoz
+    // elmagyarázhatnám, hogy miért kell de tldr: az sdl fos
     Texture::SetRenderer(renderer);
 
-    // set color format
+    // szín format beállítás, hogy egységes legyen mer az jó
     Texture::SetFormat(format);
     std::cout << SDL_GetPixelFormatName(format) << std::endl;
 
-    // load textures
+    // textúrák betöltése
     wallTextures.AddTexture("./ass/placeholder.png");
     wallTextures.AddTexture("./ass/sourcewall_og.png");
     wallTextures.AddTexture("./ass/cobblestone_mossy.png");
@@ -29,11 +30,11 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
     spriteTextures.AddTexture("./ass/glas.png");
     spriteTextures.AddTexture("./ass/citen.png");
 
-    // create a framebuffer
+    // falaknak framebuffer
     frameBuffer = Texture(w, h);
     SDL_SetTextureBlendMode(frameBuffer.GetTexture(), SDL_BLENDMODE_BLEND);
 
-    // create zbuffer
+    // zbuffer a mélységnek sprite renderhez
     zBuffer = new double[width];
 
     // trap mouse uwu
@@ -50,12 +51,12 @@ Window::~Window()
 
 void Window::Clear()
 {
-    // empty the framebuffer
+    // képernyőtörlés, padló és plafon beállítás
     frameBuffer.Lock();
     frameBuffer.ClearScreen();
     frameBuffer.UnLock();
 
-    // clear the SDL renderer
+    // hiszed vagy sem, ha ezt nem csináljuk meg, kb 5 mp után az elkezd droppolni 3 alá az fps
     Uint8 r, g, b, a;
     SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -65,12 +66,13 @@ void Window::Clear()
 
 void Window::Render()
 {
-    // put the contents of the renderer to the screen
+    // renderer tartalmát a képernyőre
     SDL_RenderPresent(renderer);
 }
 
 void Window::DrawHUD(const Game &game)
 {
+    // TODO: better hud ffs
     // draw tiles
     for (int i = 0; i < game.GetLevel().GetSize().x; i++)
         for (int j = 0; j < game.GetLevel().GetSize().y; j++)
@@ -90,7 +92,7 @@ void Window::DrawPerspective(const Game &game)
     // aliases
     const Player &player = game.GetPlayer();
 
-    // lock buffer so we can write it
+    // lezárás, hogy tudjuk módosítani
     frameBuffer.Lock();
 
     // irányra merőleges vektor, azaz a kamera síkjával párhuzamos
@@ -150,14 +152,14 @@ void Window::DrawPerspective(const Game &game)
             frameBuffer.SetPixel(x, y, pixel);
         }
 
-        // load it to the zbuffer
+        // mélységi buffer a spriteokhoz
         zBuffer[x] = cast.GetWallDist();
     }
 
-    // unluck framebuffer
+    // feloldás
     frameBuffer.UnLock();
 
-    // copy the framebuffer onto the screen
+    // rendererbe másolás
     SDL_RenderCopy(renderer, frameBuffer.GetTexture(), nullptr, nullptr);
 }
 
