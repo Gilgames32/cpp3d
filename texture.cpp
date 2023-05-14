@@ -20,9 +20,9 @@ Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
 {
     SDL_Surface *image = IMG_Load(fileName);
     if (image == nullptr)
-    {
-        throw "WPO0HL";
-    }
+        //throw "NEPTUNKOD"; ...
+        throw std::runtime_error("Nem betölthető a kép");
+
     size.x = image->w;
     size.y = image->h;
     texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, size.x, size.y);
@@ -36,6 +36,7 @@ Texture::Texture(int w, int h) : size(Duo<int>(w, h)), pixels(nullptr), pitch(0)
 {
     texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, w, h);
     // FONTOS!! Lock hívás minden konstrukciónál a pixel és pitch beállításhoz
+    // how do i know? ...
     Lock();
     Clear();
     UnLock();
@@ -53,7 +54,7 @@ Texture &Texture::operator=(const Texture &t)
 
 Texture::Texture(const Texture &t) : size(t.size)
 {
-    std::cout << "ennek nem kéne meghívódni" << std::endl;
+    // not gonna lie ennek marhára nem kéne meghívódni
     texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, size.x, size.y);
     Lock();
     SDL_ConvertPixels(size.x, size.y, windowFormat, t.pixels, t.pitch, windowFormat, pixels, pitch);
@@ -70,6 +71,7 @@ Texture::~Texture()
 
 Uint32 Texture::GetPixel(int x, int y) const
 {
+    // out of range esetén áttetsző pixelt adunk
     if (x >= size.x || x < 0 || y >= size.y || y < 0)
         return 0x00000000;
 
@@ -79,6 +81,9 @@ Uint32 Texture::GetPixel(int x, int y) const
 
 void Texture::SetPixel(int x, int y, Uint32 set)
 {
+    if (x >= size.x || x < 0 || y >= size.y || y < 0)
+        throw std::out_of_range("Textúrán kívüli pixel");
+
     Uint32 pixelPosition = y * (pitch / sizeof(Uint32)) + x;
     pixels[pixelPosition] = set;
 }
@@ -86,15 +91,20 @@ void Texture::SetPixel(int x, int y, Uint32 set)
 Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
 {
     // feltételezzük hogy ABGR vagy ARGB
-    // 0xAABBGGRR
+    // 0xAABBGGRR (grrrrrr...)
 
-    double addAlpha = double(add >> 24 & 0xFF) / 255;
-    if (addAlpha == 1)
+    // skippeljük amikor csak lehet mert ez processzoron megy xd
+    Uint16 skip = add >> 24 & 0xFF;
+    if (skip == 0xFF)
         return add;
-    if (addAlpha == 0)
+    if (skip == 0x00)
         return base;
+    
+    double addAlpha = double(skip) / 255;
 
     // https://en.wikipedia.org/wiki/Alpha_compositing
+    // lehetőleg mellőzzük mert szegény 1 core amin fut nem nagyon szereti ezt pixelenként futtatni
+    // T-T
     double baseAlpha = base >> 24 && 0xFF / 255;
     double omegAlpha = addAlpha + baseAlpha * (1 - addAlpha);
     Uint32 color = 0;
@@ -154,6 +164,7 @@ void Texture::Clear()
 }
 
 Palette::Palette() : size(0), textures(nullptr) {}
+
 Palette::~Palette()
 {
     for (int i = 0; i < size; i++)
@@ -185,7 +196,7 @@ void Palette::AddTexture(const char *s)
 Texture &Palette::operator[](int index)
 {
     // todo: built in placeholder
-    if (index >= size)
+    if (index >= size || index < 0)
         return *(textures[0]);
     else
         return *(textures[index]);

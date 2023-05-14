@@ -55,13 +55,15 @@ Vector2 Vector2::normalize() const
 {
     double len = abs();
     if (len == 0)
-        throw "NEPTUNKOD";
+        // throw "NEPTUNKOD"; lehet nem kéne
+        throw std::runtime_error("Nem lehet nullvektort normalizálni");
     return Vector2(x / len, y / len);
 }
 
 double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p, bool &perp, Vector2 &closest)
 {
     // https://www.youtube.com/watch?v=egmZJU-1zPU
+    // köszönöm kedves random pali a neten, nagyon hűvös
     Vector2 ab = b - a;
     Vector2 ap = p - a;
     double skalar = DotProduct(ab, ap);
@@ -91,6 +93,8 @@ double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p
 
 double Vector2::DotProduct(const Vector2 &a, const Vector2 &b)
 {
+    // skaláris szorzat
+    // elég értelmetlen neve van ennek angolul
     return a.x * b.x + a.y * b.y;
 }
 
