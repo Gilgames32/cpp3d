@@ -31,13 +31,13 @@ public:
     Vector2 normalize() const;
 
     // pont és szakasz távolsága
-    static double PointSegDist(const Vector2& seg1, const Vector2& seg2, const Vector2 p, bool &perp, Vector2 &closest);
+    static double PointSegDist(const Vector2 &seg1, const Vector2 &seg2, const Vector2 p, bool &perp, Vector2 &closest);
 
     // skaláris szorzat
-    static double DotProduct(const Vector2& a, const Vector2& b);
+    static double DotProduct(const Vector2 &a, const Vector2 &b);
 };
 
-std::ostream& operator<<(std::ostream& os, const Vector2& v);
+std::ostream &operator<<(std::ostream &os, const Vector2 &v);
 
 // same type but handled together
 template <typename T>
@@ -45,7 +45,7 @@ class Duo
 {
 public:
     T x, y;
-    Duo(T x0 = 0, T y0 = 0)  : x(x0), y(y0) {}
+    Duo(T x0 = 0, T y0 = 0) : x(x0), y(y0) {}
 };
 
 // different types handled together

@@ -12,7 +12,6 @@
 
 #include "memtrace.h"
 
-
 class Texture
 {
 private:
@@ -40,10 +39,10 @@ public:
 
     Uint32 GetPixel(int x, int y) const;
     void SetPixel(int x, int y, Uint32 set);
-    SDL_Texture* GetTexture();
-    const SDL_Texture* GetTexture() const;
-    const Duo<int>& GetSize() const;
-    
+    SDL_Texture *GetTexture();
+    const SDL_Texture *GetTexture() const;
+    const Duo<int> &GetSize() const;
+
     void Clear();
     void ClearScreen();
 
@@ -56,6 +55,7 @@ class Palette
 private:
     int size;
     Texture **textures;
+
 public:
     Palette();
     ~Palette();
@@ -63,8 +63,8 @@ public:
     void AddTexture(Texture *t);
 
     // sdl limitációk miatt nem lehet konstans textúrával visszatérni
-    Texture& operator[](int index);
-    const Texture& operator[](int index) const;
+    Texture &operator[](int index);
+    const Texture &operator[](int index) const;
 };
 
 #endif // TEXTURE_H

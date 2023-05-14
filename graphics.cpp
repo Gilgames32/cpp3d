@@ -9,7 +9,7 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
     // vices érted mert telefonkönyv oszt 3d xddddddd
     window = SDL_CreateWindow("Telefonkönyv", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_SHOWN);
-    //SDL_RenderSetLogicalSize(renderer, width, height);
+    // SDL_RenderSetLogicalSize(renderer, width, height);
 
     // set default renderer of textures
     Texture::SetRenderer(renderer);
@@ -88,7 +88,7 @@ void Window::DrawHUD(const Game &game)
 void Window::DrawPerspective(const Game &game)
 {
     // aliases
-    const Player& player = game.GetPlayer();
+    const Player &player = game.GetPlayer();
 
     // lock buffer so we can write it
     frameBuffer.Lock();
@@ -119,13 +119,13 @@ void Window::DrawPerspective(const Game &game)
 
         // adott textúra
         const Texture &pattern = wallTextures[cast.CellValue()];
-        const Duo<int>& pSize = pattern.GetSize();
+        const Duo<int> &pSize = pattern.GetSize();
 
         // textúra X oszlopa
         int textureX = cast.WallX() * double(pSize.x);
 
         // bizonyos oldalak tükrözve jelennek meg, erre fix
-        if (cast.GetSide() == 0 && rayDir.x < 0 || cast.GetSide() == 1 &&rayDir.y > 0)
+        if (cast.GetSide() == 0 && rayDir.x < 0 || cast.GetSide() == 1 && rayDir.y > 0)
             textureX = pSize.x - textureX - 1;
 
         // nyújtás mértéke
@@ -159,14 +159,13 @@ void Window::DrawPerspective(const Game &game)
 
     // copy the framebuffer onto the screen
     SDL_RenderCopy(renderer, frameBuffer.GetTexture(), nullptr, nullptr);
-
 }
 
 void Window::DrawSprites(const Game &game)
 {
     // aliases
-    const Player& player = game.GetPlayer();
-    
+    const Player &player = game.GetPlayer();
+
     // lezárjuk, mert rajzolni fogunk
     frameBuffer.Lock();
 
@@ -251,8 +250,6 @@ void Window::DrawSprites(const Game &game)
 
         if (drawEnd.x < drawStart.x)
             continue;
-        
-
 
         // a sprite minden oszlopán végigmegyünk
         int firstStripe = drawStart.x;
@@ -270,7 +267,6 @@ void Window::DrawSprites(const Game &game)
         // optimization
         if (lastStripe == drawStart.x && firstStripe == drawEnd.x)
             continue;
-
 
         SDL_Rect onScreenDestination = {firstStripe, drawStart.y, lastStripe - firstStripe, drawEnd.y - drawStart.y};
         SDL_Rect onTextureSource = {0, 0, 0, 0};
@@ -290,7 +286,7 @@ void Window::DrawSprites(const Game &game)
 
 WindowInput::WindowInput() : Input() {}
 
-void WindowInput::UpdateKeys(const SDL_KeyboardEvent& keyEvent)
+void WindowInput::UpdateKeys(const SDL_KeyboardEvent &keyEvent)
 {
     switch (keyEvent.keysym.sym)
     {
@@ -319,7 +315,7 @@ void WindowInput::UpdateKeys(const SDL_KeyboardEvent& keyEvent)
     dir = Vector2(d - a, w - s);
 }
 
-void WindowInput::UpdateMouse(const SDL_MouseMotionEvent& mouseEvent)
+void WindowInput::UpdateMouse(const SDL_MouseMotionEvent &mouseEvent)
 {
     const double sensitivity = 0.5;
     turn += mouseEvent.xrel * sensitivity;

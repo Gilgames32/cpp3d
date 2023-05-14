@@ -1,10 +1,10 @@
 #include "gamelogic.h"
 
-Entity::Entity(int id, const Vector2& pos) : id(id), pos(pos) {}
+Entity::Entity(int id, const Vector2 &pos) : id(id), pos(pos) {}
 
 int Entity::GetID() const { return id; }
 
-const Vector2& Entity::GetPos() const { return pos; }
+const Vector2 &Entity::GetPos() const { return pos; }
 
 void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double speed)
 {
@@ -12,16 +12,16 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
     moveDir = moveDir.normalize();
 
     // kívánt következő pozíció
-    Vector2 nextPos = pos + moveDir * (deltaTime*speed/1000);
+    Vector2 nextPos = pos + moveDir * (deltaTime * speed / 1000);
 
     // raycastoljuk, hogy vezet-e oda falmentes út
     Ray path(grid, pos, moveDir);
-    
 
     // tetszőleges pontossággal megközelítjük a falat
     double snap = 0.01;
     double maxDist = path.GetWallDist() - snap;
-    if (maxDist < 0) maxDist = 0;
+    if (maxDist < 0)
+        maxDist = 0;
     double movDist = (pos - nextPos).abs();
 
     // ha a becsapódás közelebb van mint a megtenni kívánt út, az azt jelenti hogy falba ütköznénk
@@ -41,11 +41,12 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
         // ezt is raycastoljuk
         Ray slidePath(grid, pos, slide.normalize());
         double slideMax = slidePath.GetWallDist() - snap;
-        if (slideMax < 0) slideMax = 0;
+        if (slideMax < 0)
+            slideMax = 0;
         double slideDist = slide.abs();
         if (slideDist > slideMax)
             pos += slide.normalize() * slideMax;
-            // ezt már nincs értelme tovább slideolni mert merőleges
+        // ezt már nincs értelme tovább slideolni mert merőleges
         else
             pos += slide;
     }
@@ -55,11 +56,11 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
     }
 }
 
-Player::Player(const Vector2& position, const Vector2& direction) : Entity(-1, position), dir(direction) {}
+Player::Player(const Vector2 &position, const Vector2 &direction) : Entity(-1, position), dir(direction) {}
 
 Player::Player(const Player &p) : Entity(-1, p.GetPos()), dir(p.dir) {}
 
-const Vector2& Player::GetDir() const
+const Vector2 &Player::GetDir() const
 {
     return dir;
 }
@@ -69,12 +70,12 @@ Vector2 Player::GetPlane() const
     return Vector2(-dir.y, dir.x) * 0.66; // fov
 }
 
-void Player::Rotate(double turn) 
+void Player::Rotate(double turn)
 {
     dir.rotate(turn);
 }
 
-bool Player::Shoot(const Matrix &level, DinTomb<Entity>& entities)
+bool Player::Shoot(const Matrix &level, DinTomb<Entity> &entities)
 {
     // tekintsük a lövést egy szakasznak
     // ha 1/2 egységen belül van az találat (egy egység széles spriteok)
@@ -87,7 +88,7 @@ bool Player::Shoot(const Matrix &level, DinTomb<Entity>& entities)
     // találatok tömbje
     DinTomb<Pair<size_t, double>> hits;
     for (auto i = entities.begin(); i != entities.end(); ++i)
-    {        
+    {
         bool perp;
         Vector2 closest;
         double dist = Vector2::PointSegDist(trail.GetStart(), trail.GetEnd(), i->GetPos(), perp, closest);
@@ -129,23 +130,22 @@ void Player::DecreaseCoolDowns(double deltaTime)
         if (damageCoolDown < 0)
             damageCoolDown = 0;
     }
-    
 }
 
 bool Player::DamagePlayer(int damage)
 {
     if (damageCoolDown > 0)
         return false;
-    
+
     const double damageCoolDownMax = 1000;
     damageCoolDown = damageCoolDownMax;
-    
+
     health -= damage;
     std::cout << damageCoolDown << " " << health << "\n";
     return health <= 0;
 }
 
-Input::Input(const Vector2& dir, double turn) : dir(dir), turn(turn) {}
+Input::Input(const Vector2 &dir, double turn) : dir(dir), turn(turn) {}
 
 double Input::GetTurn()
 {
@@ -154,19 +154,20 @@ double Input::GetTurn()
     return re;
 }
 
-bool Input::GetShootTrigger() 
+bool Input::GetShootTrigger()
 {
     bool re = shootTrigger;
     shootTrigger = false;
     return re;
 }
 
-const Vector2& Input::GetDir() const
+const Vector2 &Input::GetDir() const
 {
     return dir;
 }
 
-Game::Game(const char* saveName) {
+Game::Game(const char *saveName)
+{
     // open
     std::ifstream levelFile(saveName);
     if (!levelFile.is_open())
@@ -185,7 +186,7 @@ Game::Game(const char* saveName) {
     // grid [x][y]
     int sizex = 0, sizey = 0;
     levelFile >> sizex >> sizey;
-    int **grid = new int*[sizex];
+    int **grid = new int *[sizex];
     for (int s = 0; s < sizex; s++)
     {
         grid[s] = new int[sizey];
@@ -200,9 +201,6 @@ Game::Game(const char* saveName) {
         delete[] grid[i];
     }
     delete[] grid;
-    
-    
-    
 
     // LOAD ENTITIES
     int entSize;
@@ -214,21 +212,19 @@ Game::Game(const char* saveName) {
         entities.Append(Entity(tempid, Vector2(posx, posy)));
     }
 
-
-
     // close
     levelFile.close();
 }
 
-const Matrix& Game::GetLevel() const { return level; }
-const Player& Game::GetPlayer() const { return player; }
-const DinTomb<Entity>& Game::GetEntities() const { return entities; }
+const Matrix &Game::GetLevel() const { return level; }
+const Player &Game::GetPlayer() const { return player; }
+const DinTomb<Entity> &Game::GetEntities() const { return entities; }
 
 bool Game::SimulateGame(Input &inp, double deltaTime)
 {
     // decrease cooldowns
     player.DecreaseCoolDowns(deltaTime);
-    
+
     // process inputs
     player.Rotate(inp.GetTurn() / 180);
     if (inp.GetDir() != Vector2(0, 0))
@@ -245,8 +241,8 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
     for (auto i = entities.begin(); i != entities.end(); ++i)
     {
         // aliases
-        const Vector2& enemyPos = i->GetPos();
-        const Vector2& playerPos = player.GetPos();
+        const Vector2 &enemyPos = i->GetPos();
+        const Vector2 &playerPos = player.GetPos();
 
         // ha látja a playert
         Ray view(level, enemyPos, playerPos - enemyPos);
@@ -262,7 +258,7 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
             }
             if (playerDistance < damageDist)
             {
-                if(player.DamagePlayer(10))
+                if (player.DamagePlayer(10))
                     return true;
             }
         }

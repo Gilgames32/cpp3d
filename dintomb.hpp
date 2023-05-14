@@ -87,7 +87,7 @@ public:
         return *(data[index]);
     }
 
-    const T &operator[](int index) const 
+    const T &operator[](int index) const
     {
         if (index < 0 || index >= size)
             throw std::out_of_range("alul vagy tul van idexelve halo");

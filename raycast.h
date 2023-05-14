@@ -8,7 +8,6 @@
 
 #include "memtrace.h"
 
-
 class Ray
 {
     // kiindulási és végkoordináta
@@ -33,11 +32,11 @@ class Ray
     Duo<int> cell;
 
     // a pálya
-    const Matrix& space;
+    const Matrix &space;
 
 public:
-    Ray(const Matrix& sapceGrid, const Vector2& startVector, const Vector2& dirVector);
-    Ray(const Ray& ray);
+    Ray(const Matrix &sapceGrid, const Vector2 &startVector, const Vector2 &dirVector);
+    Ray(const Ray &ray);
 
     // a fal cellát pontosan hol találta el 0...1
     double WallX() const;
@@ -46,9 +45,8 @@ public:
 
     double GetWallDist() const;
     bool GetSide() const;
-    const Vector2& GetStart() const;
-    const Vector2& GetEnd() const;
-
+    const Vector2 &GetStart() const;
+    const Vector2 &GetEnd() const;
 
     //~Ray();
 };

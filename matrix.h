@@ -8,7 +8,6 @@
 
 #include "memtrace.h"
 
-
 class Matrix
 {
 private:
@@ -16,14 +15,14 @@ private:
     int **grid;
 
 public:
-    Matrix(int sizex = 0, int sizey = 0, int**grid = 0);
+    Matrix(int sizex = 0, int sizey = 0, int **grid = 0);
     Matrix(const Matrix &);
     ~Matrix();
 
     void operator=(const Matrix &);
     int *operator[](size_t index) const;
 
-    const Duo<int>& GetSize() const; 
+    const Duo<int> &GetSize() const;
 };
 
 #endif // MATRIX_H

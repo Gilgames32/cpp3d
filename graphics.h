@@ -13,7 +13,6 @@
 
 #include "memtrace.h"
 
-
 class Window
 {
 private:
@@ -32,9 +31,9 @@ public:
     ~Window();
     void Clear();
     void Render();
-    void DrawHUD(const Game& game);
-    void DrawPerspective(const Game& game);
-    void DrawSprites(const Game& game);
+    void DrawHUD(const Game &game);
+    void DrawPerspective(const Game &game);
+    void DrawSprites(const Game &game);
 };
 
 class WindowInput : public Input
@@ -45,8 +44,8 @@ private:
 public:
     WindowInput();
     //~Input();
-    void UpdateKeys(const SDL_KeyboardEvent& keyEvent);
-    void UpdateMouse(const SDL_MouseMotionEvent& mouseEvent);
+    void UpdateKeys(const SDL_KeyboardEvent &keyEvent);
+    void UpdateMouse(const SDL_MouseMotionEvent &mouseEvent);
     void SetShootTrigger();
 };
 

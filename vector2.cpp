@@ -56,7 +56,7 @@ Vector2 Vector2::normalize() const
     double len = abs();
     if (len == 0)
         throw "NEPTUNKOD";
-    return Vector2(x/len, y/len);
+    return Vector2(x / len, y / len);
 }
 
 double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p, bool &perp, Vector2 &closest)
@@ -67,7 +67,7 @@ double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p
     double skalar = DotProduct(ab, ap);
     double lensq = ab.abssq();
     // basically hogy hol van a vonalon, aránylag
-    double d =  skalar / lensq;
+    double d = skalar / lensq;
 
     // magyarán ha csak azok érdekelnek, akik
     if (d <= 0)
@@ -89,7 +89,7 @@ double Vector2::PointSegDist(const Vector2 &a, const Vector2 &b, const Vector2 p
     return (p - closest).abs();
 }
 
-double Vector2::DotProduct(const Vector2& a, const Vector2& b)
+double Vector2::DotProduct(const Vector2 &a, const Vector2 &b)
 {
     return a.x * b.x + a.y * b.y;
 }
@@ -104,7 +104,7 @@ bool Vector2::operator!=(const Vector2 &v) const
     return !(*this == v);
 }
 
-std::ostream& operator<<(std::ostream& os, const Vector2& v)
+std::ostream &operator<<(std::ostream &os, const Vector2 &v)
 {
     os << v.x << ',' << v.y;
     return os;

@@ -2,7 +2,7 @@
 
 Uint32 Texture::windowFormat = SDL_PIXELFORMAT_ABGR8888;
 
-SDL_Renderer* Texture::windowRenderer = nullptr;
+SDL_Renderer *Texture::windowRenderer = nullptr;
 
 void Texture::SetRenderer(SDL_Renderer *renderer)
 {
@@ -107,17 +107,17 @@ Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
     return color;
 }
 
-const SDL_Texture* Texture::GetTexture() const
+const SDL_Texture *Texture::GetTexture() const
 {
     return texture;
 }
 
-SDL_Texture* Texture::GetTexture()
+SDL_Texture *Texture::GetTexture()
 {
     return texture;
 }
 
-const Duo<int>& Texture::GetSize() const
+const Duo<int> &Texture::GetSize() const
 {
     return size;
 }
@@ -137,7 +137,7 @@ void Texture::ClearScreen()
     {
         for (int x = 0; x < size.x; x++)
         {
-            pixels[y * (pitch / sizeof(Uint32)) + x] = y > size.y/2 ? 0xFF555555 : 0xFF222222;
+            pixels[y * (pitch / sizeof(Uint32)) + x] = y > size.y / 2 ? 0xFF555555 : 0xFF222222;
         }
     }
 }

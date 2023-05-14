@@ -12,7 +12,6 @@
  * push_pack causing the debugger to crash
  */
 
-
 int main(int argc, char const *argv[])
 {
     Window win;
