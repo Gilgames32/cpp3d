@@ -1,0 +1,318 @@
+@startuml Telefonkönyv3D
+
+'hpp2plantuml.exe -i dintomb.hpp -i gamelogic.h -i graphics.h -i matrix.h -i raycast.h -i texture.h -i vector2.h -o abra.puml
+
+
+
+/' Objects '/
+
+class DinTomb <template<typename T>> {
+	+DinTomb(size_t s)
+	+~DinTomb()
+	+begin() : DTIterator
+	+end() : DTIterator
+	+begin() : DTIteratorConst {query}
+	+end() : DTIteratorConst {query}
+	+operator[](int index) : T&
+	+operator[](int index) : T& {query}
+	-data : T**
+	+Size() : size_t {query}
+	-size : size_t
+	+Append(const T& add) : void
+	+Delete(int index) : void
+}
+
+
+class DinTomb::DTIterator {
+	+DTIterator()
+	+DTIterator(DinTomb& t, size_t offset)
+	+operator++(int) : DTIterator
+	+operator++() : DTIterator&
+	-parent : DinTomb*
+	+operator*() : T& {query}
+	+operator->() : T* {query}
+	+operator!=(DTIterator i) : bool {query}
+	+operator==(DTIterator i) : bool {query}
+	+Index() : size_t
+	-idx : size_t
+}
+
+
+class DinTomb::DTIteratorConst {
+	+DTIteratorConst()
+	+DTIteratorConst(const DinTomb& a, size_t ix)
+	+operator*() : T& {query}
+	+operator->() : T* {query}
+}
+
+
+class Duo <template<typename T>> {
+	+Duo(T x0, T y0)
+	+x : T
+	+y : T
+}
+
+
+class Entity {
+	+Entity(int id, const Vector2& pos)
+	#pos : Vector2
+	+GetPos() : Vector2& {query}
+	+GetID() : int {query}
+	#id : int
+	+Move(const Matrix& grid, const Vector2 moveDir, double deltaTime, double speed) : void
+}
+
+
+class Game {
+	+Game(const char* saveName)
+	-entities : DinTomb<Entity>
+	+GetEntities() : DinTomb<Entity>& {query}
+	-level : Matrix
+	+GetLevel() : Matrix& {query}
+	-player : Player
+	+GetPlayer() : Player& {query}
+	+SimulateGame(Input& inp, double deltaTime) : bool
+}
+
+
+class Input {
+	+Input(const Vector2& dir, double turn)
+	#dir : Vector2
+	+GetDir() : Vector2& {query}
+	+GetShootTrigger() : bool
+	#shootTrigger : bool
+	+GetTurn() : double
+	#turn : double
+}
+
+
+class Matrix {
+	+Matrix(int sizex, int sizey, int** grid)
+	+Matrix(const Matrix &)
+	+~Matrix()
+	-size : Duo<int>
+	+GetSize() : Duo<int>& {query}
+	+operator[](size_t index) : int* {query}
+	-grid : int**
+	+operator=(const Matrix &) : void
+}
+
+
+class Pair <template<typename A, typename B>> {
+	+Pair(A a0, B b0)
+	+a : A
+	+b : B
+}
+
+
+class Palette {
+	+Palette()
+	+~Palette()
+	+operator[](int index) : Texture&
+	+operator[](int index) : Texture& {query}
+	-textures : Texture**
+	-size : int
+	+AddTexture(const char*) : void
+	+AddTexture(Texture* t) : void
+}
+
+
+class Player {
+	+Player(const Vector2& position, const Vector2& direction)
+	+Player(const Player &)
+	+GetPlane() : Vector2 {query}
+	-dir : Vector2
+	+GetDir() : Vector2& {query}
+	+DamagePlayer(int damage) : bool
+	+Shoot(const Matrix& level, DinTomb<Entity>& entities) : bool
+	-damageCoolDown : double
+	-shootCoolDown : double
+	-health : int
+	+DecreaseCoolDowns(double deltaTime) : void
+	+Rotate(double turn) : void
+}
+
+
+class Ray {
+	+Ray(const Matrix& sapceGrid, const Vector2& startVector, const Vector2& dirVector)
+	+Ray(const Ray& ray)
+	-cell : Duo<int>
+	-end : Vector2
+	-sideDist : Vector2
+	+GetEnd() : Vector2& {query}
+	+GetStart() : Vector2& {query}
+	+GetSide() : bool {query}
+	-side : bool
+	-space : const Matrix&
+	-dir : const Vector2
+	-start : const Vector2
+	+GetWallDist() : double {query}
+	+WallX() : double {query}
+	-wallDist : double
+	+CellValue() : int {query}
+}
+
+
+class Texture {
+	+Texture()
+	+Texture(const char* fileName)
+	+Texture(const int w, const int h)
+	+Texture(const Texture &)
+	+~Texture()
+	-size : Duo<int>
+	+GetSize() : Duo<int>& {query}
+	+GetTexture() : SDL_Texture*
+	+GetTexture() : SDL_Texture* {query}
+	-texture : SDL_Texture*
+	+operator=(const Texture &) : Texture&
+	+{static} AlphaBlend(Uint32 base, Uint32 add) : Uint32
+	+GetPixel(int x, int y) : Uint32 {query}
+	-pixels : Uint32*
+	-pitch : int
+	-{static} windowRenderer : static SDL_Renderer*
+	-{static} windowFormat : static Uint32
+	+Clear() : void
+	+ClearScreen() : void
+	+Lock() : void
+	+{static} SetFormat(Uint32 format) : void
+	+SetPixel(int x, int y, Uint32 set) : void
+	+{static} SetRenderer(SDL_Renderer* renderer) : void
+	+UnLock() : void
+}
+
+
+class Vector2 {
+	+Vector2(double x, double y)
+	+Vector2(const Vector2& v)
+	+normalize() : Vector2 {query}
+	+operator*(const double lambda) : Vector2 {query}
+	+operator+(const Vector2& v) : Vector2 {query}
+	+operator-(const Vector2& v) : Vector2 {query}
+	+operator+=(const Vector2& v) : Vector2&
+	+operator=(const Vector2& v) : Vector2&
+	+rotate(const double rad) : Vector2&
+	+operator!=(const Vector2& v) : bool {query}
+	+operator==(const Vector2& v) : bool {query}
+	+{static} DotProduct(const Vector2& a, const Vector2& b) : double
+	+{static} PointSegDist(const Vector2& seg1, const Vector2& seg2, const Vector2 p, bool& perp, Vector2& closest) : double
+	+abs() : double {query}
+	+abssq() : double {query}
+	+x : double
+	+y : double
+}
+
+
+class Window {
+	+Window(int w, int h)
+	+~Window()
+	-spriteTextures : Palette
+	-wallTextures : Palette
+	-renderer : SDL_Renderer*
+	-window : SDL_Window*
+	-frameBuffer : Texture
+	-format : Uint32
+	-height : const int
+	-width : const int
+	-zBuffer : double*
+	+Clear() : void
+	+DrawHUD(const Game& game) : void
+	+DrawPerspective(const Game& game) : void
+	+DrawSprites(const Game& game) : void
+	+Render() : void
+}
+
+
+class WindowInput {
+	+WindowInput()
+	-w : bool
+	-w : bool
+	-w : bool
+	-w : bool
+	-w : bool
+	-w : bool
+	-w : bool
+	+SetShootTrigger() : void
+	+UpdateKeys(const SDL_KeyboardEvent& keyEvent) : void
+	+UpdateMouse(const SDL_MouseMotionEvent& mouseEvent) : void
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+.Entity <|-- .Player
+
+
+.Input <|-- .WindowInput
+
+
+
+
+
+/' Aggregation relationships '/
+
+.DinTomb::DTIterator o-- .DinTomb
+
+
+.Entity *-- .Vector2
+
+
+.Game *-- .DinTomb
+
+
+.Game *-- .Entity
+
+
+.Game *-- .Matrix
+
+
+.Game *-- .Player
+
+
+.Input *-- .Vector2
+
+
+.Matrix *-- .Duo
+
+
+.Palette o-- .Texture
+
+
+.Player *-- .Vector2
+
+
+.Ray *-- .Duo
+
+
+.Ray *-- .Matrix
+
+
+.Ray "4" *-- .Vector2
+
+
+.Texture *-- .Duo
+
+
+.Window "2" *-- .Palette
+
+
+.Window *-- .Texture
+
+
+
+
+
+
+/' Nested objects '/
+
+.DinTomb +-- .DinTomb::DTIterator
+
+
+.DinTomb +-- .DinTomb::DTIteratorConst
+
+
+
+
+@enduml
