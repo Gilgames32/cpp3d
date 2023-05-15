@@ -1,8 +1,12 @@
-#include <iostream>
-#include <math.h>
-#define SDL_MAIN_HANDLED
+#include "iostream"
+#include "gtest_lite.h"
 
+// grafikai része
+#if !defined(CPORTA)
+#define SDL_MAIN_HANDLED
 #include "graphics.h"
+#endif
+
 #include "gamelogic.h"
 
 #include "memtrace.h"
@@ -11,6 +15,19 @@
  * internal compiler error (fixed by replacing codeblocks's built in mingw)
  * push_pack causing the debugger to crash
  */
+
+#if defined(CPORTA)
+
+int main(int argc, char const *argv[])
+{
+    TEST(CorrectFile, GameInitTeszt)
+        EXPECT_NO_THROW(Game mainGame("palya.txt")) << "Hiba történt a fájl megynyitásakor" << std::endl;
+    END
+    
+}
+
+#else
+
 
 int main(int argc, char const *argv[])
 {
@@ -75,3 +92,5 @@ int main(int argc, char const *argv[])
 
     return EXIT_SUCCESS;
 }
+
+#endif // CPORTA
