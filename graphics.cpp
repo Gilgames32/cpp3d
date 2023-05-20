@@ -19,13 +19,15 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
     Texture::SetFormat(format);
     std::cout << SDL_GetPixelFormatName(format) << std::endl;
 
-    // textúrák betöltése
-    wallTextures.AddTexture("./ass/placeholder.png");
-    wallTextures.AddTexture("./ass/sourcewall_og.png");
-    wallTextures.AddTexture("./ass/cobblestone_mossy.png");
-    wallTextures.AddTexture("./ass/cobblestone.png");
+    // alapértelmezett placeholder textúra inicializálás
+    wallTextures.GeneratePlaceholder();
+    spriteTextures.GeneratePlaceholder();
 
-    spriteTextures.AddTexture("./ass/placeholder.png");
+    // textúrák betöltése
+    wallTextures.AddTexture("./ass/sourcewall_og.png", true);
+    wallTextures.AddTexture("./ass/cobblestone_mossy.png", true);
+    wallTextures.AddTexture("./ass/cobblestone.png", true);
+
     spriteTextures.AddTexture("./ass/fokyouman.png");
     spriteTextures.AddTexture("./ass/glas.png");
     spriteTextures.AddTexture("./ass/citen.png");
@@ -120,7 +122,7 @@ void Window::DrawPerspective(const Game &game)
             drawEnd = height - 1;
 
         // adott textúra
-        const Texture &pattern = wallTextures[cast.CellValue()];
+        const Texture &pattern = wallTextures[(cast.CellValue()-1)*2 + cast.GetSide()];
         const Duo<int> &pSize = pattern.GetSize();
 
         // textúra X oszlopa
@@ -139,17 +141,9 @@ void Window::DrawPerspective(const Game &game)
         // méretre nyújtjuk/zsugorítjuk a textúrát
         for (int y = drawStart; y < drawEnd; y++)
         {
-            // textúra adott pixele
-            Uint32 pixel = pattern.GetPixel(textureX, textureY);
+            // textúra adott pixelét a képernyőre rajzoljuk9
+            frameBuffer.SetPixel(x, y, pattern.GetPixel(textureX, textureY));
             textureY += scale;
-
-            // igény szerint sötétítés
-            if (cast.GetSide())
-                // pixel = (pixel >> 1) & 0xFF7F7F7F;
-                pixel = Texture::AlphaBlend(0xFF000000, pixel & 0x77FFFFFF);
-
-            // bufferbe írjuk
-            frameBuffer.SetPixel(x, y, pixel);
         }
 
         // mélységi buffer a spriteokhoz
@@ -200,7 +194,7 @@ void Window::DrawSprites(const Game &game)
         const Entity &ent = *(sortedEnts[i].a);
         const Vector2 &dir = player.GetDir();
         const Vector2 plane = player.GetPlane();
-        Texture &spriteTex = spriteTextures[ent.GetID()];
+        Texture &spriteTex = spriteTextures[ent.GetID()-1];
         const Duo<int> &spriteTexSize = spriteTex.GetSize();
 
         // játékoshoz relatív pozíciója

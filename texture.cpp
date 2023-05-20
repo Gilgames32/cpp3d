@@ -165,7 +165,10 @@ void Texture::Clear()
     }
 }
 
-Palette::Palette() : size(0), textures(nullptr) {}
+Palette::Palette() : size(0)
+{
+    textures = new Texture *[size];
+}
 
 Palette::~Palette()
 {
@@ -174,9 +177,19 @@ Palette::~Palette()
         delete textures[i];
     }
     delete[] textures;
+    delete placeholder;
 }
 
-void Palette::AddTexture(Texture *t)
+void Palette::GeneratePlaceholder()
+{
+    placeholder = new Texture(2, 2);
+    placeholder->SetPixel(0, 0, 0xFFFF00FF);
+    placeholder->SetPixel(1, 1, 0xFFFF00FF);
+    placeholder->SetPixel(0, 1, 0xFF000000);
+    placeholder->SetPixel(1, 0, 0xFF000000);
+}
+
+void Palette::AddTexture(Texture *t, bool darken)
 {
     Texture **temp = new Texture *[size + 1];
     for (int i = 0; i < size; i++)
@@ -187,19 +200,36 @@ void Palette::AddTexture(Texture *t)
     size++;
     delete[] textures;
     textures = temp;
+
+    // add the dark version after if needed
+    if (darken)
+    {
+        Texture* darkt = new Texture(*t);
+        Duo size = darkt->GetSize();
+        for (int x = 0; x < size.x; x++)
+        {
+            for (int y = 0; y < size.y; y++)
+            {
+                // todo: switch order of blending (?)
+                darkt->SetPixel(x, y, Texture::AlphaBlend(0xFF000000, darkt->GetPixel(x, y) & 0x77FFFFFF));
+            }   
+        }
+        // :nyakkendő:
+        AddTexture(darkt, false);
+    }
 }
 
-void Palette::AddTexture(const char *s)
+void Palette::AddTexture(const char *s, bool darken)
 {
     Texture *t = new Texture(s);
-    AddTexture(t);
+    AddTexture(t, darken);
 }
 
 Texture &Palette::operator[](int index)
 {
     // todo: built in placeholder
     if (index < 0 || index >= size)
-        return *(textures[0]);
+        return *placeholder;
     else
         return *(textures[index]);
 }

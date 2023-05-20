@@ -53,14 +53,17 @@ public:
 class Palette
 {
 private:
+    Texture *placeholder;
     int size;
     Texture **textures;
 
 public:
     Palette();
     ~Palette();
-    void AddTexture(const char *);
-    void AddTexture(Texture *t);
+
+    void GeneratePlaceholder();
+    void AddTexture(const char *, bool darken = false);
+    void AddTexture(Texture *t, bool darken = false);
 
     // sdl limitációk miatt nem lehet konstans textúrával visszatérni
     Texture &operator[](int index);
