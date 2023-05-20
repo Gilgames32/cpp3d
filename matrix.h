@@ -11,7 +11,7 @@
 class Matrix
 {
 private:
-    Duo<int> size;
+    Duo<size_t> size;
     int **grid;
 
 public:
@@ -22,7 +22,7 @@ public:
     void operator=(const Matrix &);
     int *operator[](size_t index) const;
 
-    const Duo<int> &GetSize() const;
+    const Duo<size_t> &GetSize() const;
 };
 
 #endif // MATRIX_H

@@ -14,7 +14,7 @@ void Texture::SetFormat(Uint32 format)
     windowFormat = format;
 }
 
-Texture::Texture() : texture(nullptr), size(Duo<int>(0, 0)), pixels(nullptr), pitch(0) {}
+Texture::Texture() : texture(nullptr), size(Duo<size_t>(0, 0)), pixels(nullptr), pitch(0) {}
 
 Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
 {
@@ -32,7 +32,7 @@ Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 }
 
-Texture::Texture(int w, int h) : size(Duo<int>(w, h)), pixels(nullptr), pitch(0)
+Texture::Texture(int w, int h) : size(Duo<size_t>(w, h)), pixels(nullptr), pitch(0)
 {
     texture = SDL_CreateTexture(windowRenderer, windowFormat, SDL_TEXTUREACCESS_STREAMING, w, h);
     // FONTOS!! Lock hívás minden konstrukciónál a pixel és pitch beállításhoz
@@ -127,7 +127,7 @@ SDL_Texture *Texture::GetTexture()
     return texture;
 }
 
-const Duo<int> &Texture::GetSize() const
+const Duo<size_t> &Texture::GetSize() const
 {
     return size;
 }
@@ -143,9 +143,9 @@ void Texture::UnLock()
 
 void Texture::ClearScreen(Uint32 floor, Uint32 cieling)
 {
-    for (int y = 0; y < size.y; y++)
+    for (size_t y = 0; y < size.y; y++)
     {
-        for (int x = 0; x < size.x; x++)
+        for (size_t x = 0; x < size.x; x++)
         {
             // képernyő fele ilyen a másik olyan, tökéletes az illúzióhot
             // todo: maybe hogy lehessen ezt is állítani valahogy
@@ -156,9 +156,9 @@ void Texture::ClearScreen(Uint32 floor, Uint32 cieling)
 
 void Texture::Clear()
 {
-    for (int y = 0; y < size.y; y++)
+    for (size_t y = 0; y < size.y; y++)
     {
-        for (int x = 0; x < size.x; x++)
+        for (size_t x = 0; x < size.x; x++)
         {
             pixels[y * (pitch / sizeof(Uint32)) + x] = 0;
         }
@@ -172,7 +172,7 @@ Palette::Palette() : size(0)
 
 Palette::~Palette()
 {
-    for (int i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
         delete textures[i];
     }
@@ -192,7 +192,7 @@ void Palette::GeneratePlaceholder()
 void Palette::AddTexture(Texture *t, bool darken)
 {
     Texture **temp = new Texture *[size + 1];
-    for (int i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
         temp[i] = textures[i];
     }
@@ -206,9 +206,9 @@ void Palette::AddTexture(Texture *t, bool darken)
     {
         Texture* darkt = new Texture(*t);
         Duo size = darkt->GetSize();
-        for (int x = 0; x < size.x; x++)
+        for (size_t x = 0; x < size.x; x++)
         {
-            for (int y = 0; y < size.y; y++)
+            for (size_t y = 0; y < size.y; y++)
             {
                 // todo: switch order of blending (?)
                 darkt->SetPixel(x, y, Texture::AlphaBlend(0xFF000000, darkt->GetPixel(x, y) & 0x77FFFFFF));
@@ -227,7 +227,6 @@ void Palette::AddTexture(const char *s, bool darken)
 
 Texture &Palette::operator[](int index)
 {
-    // todo: built in placeholder
     if (index < 0 || index >= size)
         return *placeholder;
     else

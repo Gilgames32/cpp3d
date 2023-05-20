@@ -45,7 +45,7 @@ Window::Window(int w, int h, const char *texturePath) : width(w), height(h), for
     // load walls
     int walls;
     levelFile >> walls;
-    for (int i = 0; i < walls; i++)
+    for (size_t i = 0; i < walls; i++)
     {
         std::string imagePath;
         levelFile >> imagePath;
@@ -54,7 +54,7 @@ Window::Window(int w, int h, const char *texturePath) : width(w), height(h), for
     // load sprites
     int sprites;
     levelFile >> sprites;
-    for (int i = 0; i < sprites; i++)
+    for (size_t i = 0; i < sprites; i++)
     {
         std::string imagePath;
         levelFile >> imagePath;
@@ -115,7 +115,7 @@ void Window::DrawPerspective(const Game &game)
 
     // irányra merőleges vektor, azaz a kamera síkjával párhuzamos
     Vector2 plane = player.GetPlane();
-    for (int x = 0; x < width; x++)
+    for (size_t x = 0; x < width; x++)
     {
         // jelenlegi képernyőoszlop kamerához relatív aránya -1...1
         double camX = 2 * double(x) / width - 1;
@@ -139,7 +139,7 @@ void Window::DrawPerspective(const Game &game)
 
         // adott textúra
         const Texture &pattern = wallTextures[(cast.CellValue()-1)*2 + cast.GetSide()];
-        const Duo<int> &pSize = pattern.GetSize();
+        const Duo<size_t> &pSize = pattern.GetSize();
 
         // textúra X oszlopa
         int textureX = cast.WallX() * double(pSize.x);
@@ -155,7 +155,7 @@ void Window::DrawPerspective(const Game &game)
         double textureY = (drawStart - height / 2 + lineHeight / 2) * scale;
 
         // méretre nyújtjuk/zsugorítjuk a textúrát
-        for (int y = drawStart; y < drawEnd; y++)
+        for (size_t y = drawStart; y < drawEnd; y++)
         {
             // textúra adott pixelét a képernyőre rajzoljuk9
             frameBuffer.SetPixel(x, y, pattern.GetPixel(textureX, textureY));
@@ -187,15 +187,15 @@ void Window::DrawSprites(const Game &game)
     Pair<const Entity *, double> *sortedEnts = new Pair<const Entity *, double>[entSize];
 
     // távolságok kiszámítása
-    for (int i = 0; i < entSize; i++)
+    for (size_t i = 0; i < entSize; i++)
     {
         sortedEnts[i].a = &game.GetEntities()[i];
         sortedEnts[i].b = (player.GetPos() - sortedEnts[i].a->GetPos()).abssq();
     }
 
     // buborékrendezés, legtávolabbi legelől a tömbben
-    for (int i = 0; i < entSize - 1; i++)
-        for (int j = 0; j < entSize - i - 1; j++)
+    for (size_t i = 0; i < entSize - 1; i++)
+        for (size_t j = 0; j < entSize - i - 1; j++)
             if (sortedEnts[j].b < sortedEnts[j + 1].b)
             {
                 Pair<const Entity *, double> temp = sortedEnts[j];
@@ -204,14 +204,14 @@ void Window::DrawSprites(const Game &game)
             }
 
     // megjelenítés a kamerán
-    for (int i = 0; i < entSize; i++)
+    for (size_t i = 0; i < entSize; i++)
     {
         // alias
         const Entity &ent = *(sortedEnts[i].a);
         const Vector2 &dir = player.GetDir();
         const Vector2 plane = player.GetPlane();
         Texture &spriteTex = spriteTextures[ent.GetID()-1];
-        const Duo<int> &spriteTexSize = spriteTex.GetSize();
+        const Duo<size_t> &spriteTexSize = spriteTex.GetSize();
 
         // játékoshoz relatív pozíciója
         Vector2 entPosPlayerSpace = ent.GetPos() - player.GetPos();

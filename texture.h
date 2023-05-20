@@ -18,7 +18,7 @@ private:
     static SDL_Renderer *windowRenderer;
     static Uint32 windowFormat;
     SDL_Texture *texture;
-    Duo<int> size;
+    Duo<size_t> size;
     Uint32 *pixels;
     int pitch;
 
@@ -41,7 +41,7 @@ public:
     void SetPixel(int x, int y, Uint32 set);
     SDL_Texture *GetTexture();
     const SDL_Texture *GetTexture() const;
-    const Duo<int> &GetSize() const;
+    const Duo<size_t> &GetSize() const;
 
     void Clear();
     void ClearScreen(Uint32 floor, Uint32 cieling);
@@ -54,7 +54,7 @@ class Palette
 {
 private:
     Texture *placeholder;
-    int size;
+    size_t size;
     Texture **textures;
 
 public:

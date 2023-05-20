@@ -56,7 +56,7 @@ protected:
     Vector2 dir;
 
 public:
-    Input(const Vector2 &dir = Vector2(), double turn = 0);
+    Input(const Vector2 &dir = Vector2(), double turn = 0, bool shoot = false);
 
     const Vector2 &GetDir() const;
     double GetTurn();

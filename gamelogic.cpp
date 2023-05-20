@@ -1,4 +1,5 @@
 #include "gamelogic.h"
+//#define CPORTA
 
 Entity::Entity(int id, const Vector2 &pos) : id(id), pos(pos) {}
 
@@ -19,7 +20,10 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
 
     // tetszőleges pontossággal megközelítjük a falat
     double snap = 0.01;
-    double maxDist = path.GetWallDist() - snap;
+#ifdef CPORTA
+    snap = 0;
+#endif
+    double maxDist = (pos - path.GetEnd()).abs() - snap;
     if (maxDist < 0)
         maxDist = 0;
     double movDist = (pos - nextPos).abs();
@@ -38,17 +42,24 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
         else
             slide.x = 0;
 
-        // ezt is raycastoljuk
-        Ray slidePath(grid, pos, slide.normalize());
-        double slideMax = slidePath.GetWallDist() - snap;
-        if (slideMax < 0)
-            slideMax = 0;
-        double slideDist = slide.abs();
-        if (slideDist > slideMax)
-            pos += slide.normalize() * slideMax;
-        // ezt már nincs értelme tovább slideolni mert merőleges
-        else
-            pos += slide;
+        // ha kell tovább csúsztatni
+        if (slide != Vector2(0, 0))
+        {
+            // ezt is raycastoljuk
+            Ray slidePath(grid, pos, slide.normalize());
+            double slideMax = slidePath.GetWallDist() - snap;
+            if (slideMax < 0)
+                slideMax = 0;
+            double slideDist = slide.abs();
+            if (slideDist > slideMax)
+                pos += slide.normalize() * slideMax;
+            // ezt már nincs értelme tovább slideolni mert merőleges
+            else
+                pos += slide;
+        }
+        
+
+
     }
     else
     {
@@ -151,7 +162,7 @@ bool Player::DamagePlayer(int damage)
     return health <= 0;
 }
 
-Input::Input(const Vector2 &dir, double turn) : dir(dir), turn(turn) {}
+Input::Input(const Vector2 &dir, double turn, bool shoot) : dir(dir), turn(turn), shootTrigger(shoot) {}
 
 double Input::GetTurn()
 {
@@ -190,16 +201,16 @@ Game::Game(const char *saveName)
     int sizex = 0, sizey = 0;
     levelFile >> sizex >> sizey;
     int **grid = new int *[sizex];
-    for (int s = 0; s < sizex; s++)
+    for (size_t s = 0; s < sizex; s++)
     {
         grid[s] = new int[sizey];
-        for (int o = 0; o < sizey; o++)
+        for (size_t o = 0; o < sizey; o++)
         {
             levelFile >> grid[s][o];
         }
     }
     level = Matrix(sizex, sizey, grid);
-    for (int i = 0; i < sizex; i++)
+    for (size_t i = 0; i < sizex; i++)
     {
         delete[] grid[i];
     }
@@ -208,7 +219,7 @@ Game::Game(const char *saveName)
     // load entities
     int entSize;
     levelFile >> entSize;
-    for (int i = 0; i < entSize; i++)
+    for (size_t i = 0; i < entSize; i++)
     {
         int tempid;
         double posx, posy;
@@ -233,7 +244,7 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
     player.Rotate(inp.GetTurn() / 180);
     if (inp.GetDir() != Vector2(0, 0))
     {
-        Vector2 moveDir(player.GetDir() * inp.GetDir().y + player.GetPlane() * inp.GetDir().x);
+        Vector2 moveDir(player.GetDir() * inp.GetDir().y + player.GetPlane().normalize() * inp.GetDir().x);
         player.Move(level, moveDir, deltaTime, 3);
     }
 

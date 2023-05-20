@@ -1,6 +1,8 @@
 #include "iostream"
 #include "gtest_lite.h"
 
+// #define CPORTA
+
 // grafikai része
 #if !defined(CPORTA)
 #define SDL_MAIN_HANDLED
@@ -20,8 +22,24 @@
 
 int main(int argc, char const *argv[])
 {
-    TEST(CorrectFile, GameInitTeszt)
-        EXPECT_NO_THROW(Game mainGame("palya.txt")) << "Hiba történt a fájl megynyitásakor" << std::endl;
+    TEST(file beolvasas, GameTest)
+        EXPECT_THROW(Game mainGame("asd.txt"), std::runtime_error) << "Nem dobott hibát" << std::endl;
+        EXPECT_NO_THROW(Game mainGame("./palyateszt/debug1.txt")) << "Hiba történt a fájl megynyitásakor" << std::endl;
+    END
+
+    TEST(movement, GameTest)
+        Game mainGame("./palyateszt/debug1.txt");
+        Input pootis(Vector2(-1, -1), 1, false);
+        mainGame.SimulateGame(pootis, 1000);
+
+        EXPECT_DOUBLE_EQ(2.0, mainGame.GetPlayer().GetPos().x);
+        EXPECT_DOUBLE_EQ(1.0, mainGame.GetPlayer().GetPos().y);
+    END
+
+    TEST(shooting, GameTest)
+        Game mainGame("./palyateszt/debug2.txt");
+        Input pootis(Vector2(-1, -1), 0, true);
+        EXPECT_TRUE(mainGame.SimulateGame(pootis, 10));
     END
     
 }
