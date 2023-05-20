@@ -74,6 +74,9 @@ void Window::Render()
 
 void Window::DrawHUD(const Game &game, int fps)
 {
+    // crosshair
+    boxColor(renderer, width/2 -1, height/2 -1, width/2 +1, height/2 +1, 0xFFFFFFFF);
+    
     // igen így is lehet betűméretet állítani xd
     SDL_RenderSetLogicalSize(renderer, width/2, height/2);
     stringColor(renderer, 4, 4,  ("FPS - " + std::to_string(fps)).c_str(), 0xFFFFFFFF);
