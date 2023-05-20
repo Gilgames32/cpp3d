@@ -60,6 +60,11 @@ Player::Player(const Vector2 &position, const Vector2 &direction) : Entity(-1, p
 
 Player::Player(const Player &p) : Entity(-1, p.GetPos()), dir(p.dir) {}
 
+int Player::GetHP() const
+{
+    return health;
+}
+
 const Vector2 &Player::GetDir() const
 {
     return dir;
@@ -77,10 +82,15 @@ void Player::Rotate(double turn)
 
 bool Player::Shoot(const Matrix &level, DinTomb<Entity> &entities)
 {
+    std::cout << "shoot-";
+    if (shootCoolDown > 0)
+        return false;
+    const double shootDelay = 180;
+    shootCoolDown = shootDelay;
+
     // tekintsük a lövést egy szakasznak
     // ha 1/2 egységen belül van az találat (egy egység széles spriteok)
     // ezek közül a legközelebbi számí találatnak, nincs piercing
-    std::cout << "shoot-";
 
     // a lövés csíkja
     Ray trail(level, pos, dir);
@@ -137,8 +147,8 @@ bool Player::DamagePlayer(int damage)
     if (damageCoolDown > 0)
         return false;
 
-    const double damageCoolDownMax = 1000;
-    damageCoolDown = damageCoolDownMax;
+    const double damageDelay = 500;
+    damageCoolDown = damageDelay;
 
     health -= damage;
     std::cout << damageCoolDown << " " << health << "\n";
@@ -161,10 +171,7 @@ bool Input::GetShootTrigger()
     return re;
 }
 
-const Vector2 &Input::GetDir() const
-{
-    return dir;
-}
+const Vector2 &Input::GetDir() const { return dir; }
 
 Game::Game(const char *saveName)
 {

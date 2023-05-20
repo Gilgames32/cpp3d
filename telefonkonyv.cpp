@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
         win.Clear();
         win.DrawPerspective(mainGame);
         win.DrawSprites(mainGame);
-        win.DrawHUD(mainGame);
+        win.DrawHUD(mainGame, 1000/deltaTime);
         win.Render();
 
         // input feldolgozás

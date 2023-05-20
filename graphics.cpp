@@ -72,21 +72,13 @@ void Window::Render()
     SDL_RenderPresent(renderer);
 }
 
-void Window::DrawHUD(const Game &game)
+void Window::DrawHUD(const Game &game, int fps)
 {
-    // TODO: better hud ffs
-    // draw tiles
-    for (int i = 0; i < game.GetLevel().GetSize().x; i++)
-        for (int j = 0; j < game.GetLevel().GetSize().y; j++)
-            if (game.GetLevel()[i][j] != 0)
-                rectangleColor(renderer, i * 10, j * 10, (i + 1) * 10, (j + 1) * 10, 0xFFFFFFFF);
-
-    // draw entities
-    for (auto i = game.GetEntities().begin(); i != game.GetEntities().end(); ++i)
-        circleColor(renderer, i->GetPos().x * 10, i->GetPos().y * 10, 2, 0x00FF00FF);
-
-    // draw player
-    circleColor(renderer, game.GetPlayer().GetPos().x * 10, game.GetPlayer().GetPos().y * 10, 2, 0xFF0000FF);
+    // igen így is lehet betűméretet állítani xd
+    SDL_RenderSetLogicalSize(renderer, width/2, height/2);
+    stringColor(renderer, 4, 4,  ("FPS - " + std::to_string(fps)).c_str(), 0xFFFFFFFF);
+    stringColor(renderer, 4, 20, (" HP - " + std::to_string(game.GetPlayer().GetHP())).c_str(), 0xFFFFFFFF);
+    SDL_RenderSetLogicalSize(renderer, width, height);
 }
 
 void Window::DrawPerspective(const Game &game)

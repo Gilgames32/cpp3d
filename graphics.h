@@ -2,6 +2,7 @@
 #define GRAPHICS_H
 
 #include "iostream"
+#include "string"
 
 #include "SDL2/SDL.h"
 #include "SDL2/SDL2_gfxPrimitives.h"
@@ -31,7 +32,7 @@ public:
     ~Window();
     void Clear();
     void Render();
-    void DrawHUD(const Game &game);
+    void DrawHUD(const Game &game, int fps);
     void DrawPerspective(const Game &game);
     void DrawSprites(const Game &game);
 };

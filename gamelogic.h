@@ -34,11 +34,13 @@ private:
     Vector2 dir;
 
 public:
+    int GetHP() const;
     const Vector2 &GetDir() const;
     Vector2 GetPlane() const;
 
     Player(const Vector2 &position = Vector2(), const Vector2 &direction = Vector2(0, 1));
     Player(const Player &);
+
 
     void Rotate(double turn);
     bool Shoot(const Matrix &level, DinTomb<Entity> &entities);
