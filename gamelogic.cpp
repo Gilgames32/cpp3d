@@ -183,7 +183,7 @@ Game::Game(const char *saveName)
     }
 
     // load player
-    int px, py;
+    double px, py;
     levelFile >> px >> py;
     player = Player(Vector2(px + .5, py + .5));
 
@@ -214,7 +214,8 @@ Game::Game(const char *saveName)
     levelFile >> entSize;
     for (int i = 0; i < entSize; i++)
     {
-        int tempid, posx, posy;
+        int tempid;
+        double posx, posy;
         levelFile >> tempid >> posx >> posy;
         entities.Append(Entity(tempid, Vector2(posx + .5, posy +.5)));
     }
