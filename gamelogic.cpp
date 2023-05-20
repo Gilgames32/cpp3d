@@ -82,7 +82,6 @@ void Player::Rotate(double turn)
 
 bool Player::Shoot(const Matrix &level, DinTomb<Entity> &entities)
 {
-    std::cout << "shoot-";
     if (shootCoolDown > 0)
         return false;
     const double shootDelay = 180;
@@ -110,7 +109,6 @@ bool Player::Shoot(const Matrix &level, DinTomb<Entity> &entities)
     // ha van találat
     if (hits.Size() == 0)
     {
-        std::cout << "miss" << std::endl;
         return false;
     }
 
@@ -121,7 +119,6 @@ bool Player::Shoot(const Matrix &level, DinTomb<Entity> &entities)
             mindex = i.Index();
 
     entities.Delete(hits[mindex].a);
-    std::cout << "hit" << std::endl;
     return true;
 }
 
@@ -151,7 +148,6 @@ bool Player::DamagePlayer(int damage)
     damageCoolDown = damageDelay;
 
     health -= damage;
-    std::cout << damageCoolDown << " " << health << "\n";
     return health <= 0;
 }
 
@@ -246,6 +242,12 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
         player.Shoot(level, entities);
 
     // process entities
+    if (entities.Size() == 0)
+    {
+        std::cout << "GAME COMPLETED" << std::endl;
+        return true;
+    }
+    
     for (auto i = entities.begin(); i != entities.end(); ++i)
     {
         // aliases
@@ -267,7 +269,10 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
             if (playerDistance < damageDist)
             {
                 if (player.DamagePlayer(10))
+                {
+                    std::cout << "GAME OVER" << std::endl;
                     return true;
+                }
             }
         }
     }
