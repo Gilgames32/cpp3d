@@ -32,7 +32,7 @@ int main(int argc, char const *argv[])
 int main(int argc, char const *argv[])
 {
     // init
-    Window win;
+    Window win(800, 600, "./ass/textures.txt");
     Game mainGame("palya.txt");
     WindowInput inp;
 

@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8888), wallTextures(), frameBuffer()
+Window::Window(int w, int h, const char *texturePath) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8888), wallTextures(), frameBuffer()
 {
     // sdl inicializálás
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -17,20 +17,6 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
 
     // szín format beállítás, hogy egységes legyen mer az jó
     Texture::SetFormat(format);
-    std::cout << SDL_GetPixelFormatName(format) << std::endl;
-
-    // alapértelmezett placeholder textúra inicializálás
-    wallTextures.GeneratePlaceholder();
-    spriteTextures.GeneratePlaceholder();
-
-    // textúrák betöltése
-    wallTextures.AddTexture("./ass/sourcewall_og.png", true);
-    wallTextures.AddTexture("./ass/cobblestone_mossy.png", true);
-    wallTextures.AddTexture("./ass/cobblestone.png", true);
-
-    spriteTextures.AddTexture("./ass/fokyouman.png");
-    spriteTextures.AddTexture("./ass/glas.png");
-    spriteTextures.AddTexture("./ass/citen.png");
 
     // falaknak framebuffer
     frameBuffer = Texture(w, h);
@@ -41,6 +27,41 @@ Window::Window(int w, int h) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8
 
     // trap mouse uwu
     SDL_SetRelativeMouseMode(SDL_TRUE);
+
+    // alapértelmezett placeholder textúra inicializálás
+    wallTextures.GeneratePlaceholder();
+    spriteTextures.GeneratePlaceholder();
+
+    // textúrák betöltése
+    // open
+    std::ifstream levelFile(texturePath);
+    if (!levelFile.is_open())
+    {
+        throw std::runtime_error("Hiba a fájl megnyitásakor");
+    }
+    // load floor and cieling
+    levelFile >> floorColor;
+    levelFile >> cielingColor;
+    // load walls
+    int walls;
+    levelFile >> walls;
+    for (int i = 0; i < walls; i++)
+    {
+        std::string imagePath;
+        levelFile >> imagePath;
+        wallTextures.AddTexture(imagePath.c_str(), true);
+    }
+    // load sprites
+    int sprites;
+    levelFile >> sprites;
+    for (int i = 0; i < sprites; i++)
+    {
+        std::string imagePath;
+        levelFile >> imagePath;
+        spriteTextures.AddTexture(imagePath.c_str());
+    }
+    // close
+    levelFile.close();
 }
 
 Window::~Window()
@@ -55,7 +76,7 @@ void Window::Clear()
 {
     // képernyőtörlés, padló és plafon beállítás
     frameBuffer.Lock();
-    frameBuffer.ClearScreen();
+    frameBuffer.ClearScreen(floorColor, cielingColor);
     frameBuffer.UnLock();
 
     // hiszed vagy sem, ha ezt nem csináljuk meg, kb 5 mp után az elkezd droppolni 3 alá az fps

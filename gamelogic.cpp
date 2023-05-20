@@ -179,15 +179,15 @@ Game::Game(const char *saveName)
     std::ifstream levelFile(saveName);
     if (!levelFile.is_open())
     {
-        throw "WPO0HL";
+        throw std::runtime_error("Hiba a fájl megnyitásakor");
     }
 
-    // LOAD PLAYER
+    // load player
     int px, py;
     levelFile >> px >> py;
-    player = Player(Vector2(px, py));
+    player = Player(Vector2(px + .5, py + .5));
 
-    // LOAD LEVEL GRID
+    // load grid
     // x sor
     // y oszlop
     // grid [x][y]
@@ -209,14 +209,14 @@ Game::Game(const char *saveName)
     }
     delete[] grid;
 
-    // LOAD ENTITIES
+    // load entities
     int entSize;
     levelFile >> entSize;
     for (int i = 0; i < entSize; i++)
     {
         int tempid, posx, posy;
         levelFile >> tempid >> posx >> posy;
-        entities.Append(Entity(tempid, Vector2(posx, posy)));
+        entities.Append(Entity(tempid, Vector2(posx + .5, posy +.5)));
     }
 
     // close

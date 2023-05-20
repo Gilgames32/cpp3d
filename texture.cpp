@@ -141,7 +141,7 @@ void Texture::UnLock()
     SDL_UnlockTexture(texture);
 }
 
-void Texture::ClearScreen()
+void Texture::ClearScreen(Uint32 floor, Uint32 cieling)
 {
     for (int y = 0; y < size.y; y++)
     {
@@ -149,7 +149,7 @@ void Texture::ClearScreen()
         {
             // képernyő fele ilyen a másik olyan, tökéletes az illúzióhot
             // todo: maybe hogy lehessen ezt is állítani valahogy
-            pixels[y * (pitch / sizeof(Uint32)) + x] = y > size.y / 2 ? 0xFF555555 : 0xFF222222;
+            pixels[y * (pitch / sizeof(Uint32)) + x] = y > size.y / 2 ? floor : cieling;
         }
     }
 }

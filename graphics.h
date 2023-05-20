@@ -24,11 +24,12 @@ private:
 
     Texture frameBuffer;
     double *zBuffer;
+    Uint32 floorColor, cielingColor;
     Palette wallTextures;
     Palette spriteTextures;
 
 public:
-    Window(int w = 800, int h = 600);
+    Window(int w, int h, const char *textures);
     ~Window();
     void Clear();
     void Render();

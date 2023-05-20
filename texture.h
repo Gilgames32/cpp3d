@@ -44,7 +44,7 @@ public:
     const Duo<int> &GetSize() const;
 
     void Clear();
-    void ClearScreen();
+    void ClearScreen(Uint32 floor, Uint32 cieling);
 
     void Lock();
     void UnLock();
