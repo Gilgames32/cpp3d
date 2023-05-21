@@ -177,13 +177,14 @@ void Window::DrawSprites(const Game &game)
 {
     // aliases
     const Player &player = game.GetPlayer();
+    int entSize = game.GetEntities().Size();
+    if (entSize <= 0) { return; }
 
     // lezárjuk, mert rajzolni fogunk
     frameBuffer.Lock();
 
     // entitások szortírozó tömbje
     // tárulunk egy entitrásra mutató pointert, és a hozzá tartozó távolságot a játékostól
-    int entSize = game.GetEntities().Size();
     Pair<const Entity *, double> *sortedEnts = new Pair<const Entity *, double>[entSize];
 
     // távolságok kiszámítása
