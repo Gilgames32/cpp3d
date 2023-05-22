@@ -63,7 +63,7 @@ Texture::~Texture()
     SDL_DestroyTexture(texture);
 }
 
-Uint32 Texture::GetPixel(int x, int y) const
+Uint32 Texture::GetPixel(size_t x, size_t y) const
 {
     // out of range esetén áttetsző pixelt adunk
     if (x >= size.x || x < 0 || y >= size.y || y < 0)
@@ -73,7 +73,7 @@ Uint32 Texture::GetPixel(int x, int y) const
     return pixels[pixelPosition];
 }
 
-void Texture::SetPixel(int x, int y, Uint32 set)
+void Texture::SetPixel(size_t x, size_t y, Uint32 set)
 {
     if (x >= size.x || x < 0 || y >= size.y || y < 0)
         throw std::out_of_range("Textúrán kívüli pixel");
@@ -210,7 +210,7 @@ void Palette::AddTexture(const char *s, bool darken)
     AddTexture(t, darken);
 }
 
-Texture &Palette::operator[](int index)
+Texture &Palette::operator[](size_t index)
 {
     if (index < 0 || index >= size)
         return *placeholder;
@@ -218,4 +218,10 @@ Texture &Palette::operator[](int index)
         return *(textures[index]);
 }
 
-const Texture &Palette::operator[](int index) const { return operator[](index); }
+const Texture &Palette::operator[](size_t index) const
+{
+    if (index < 0 || index >= size)
+        return *placeholder;
+    else
+        return *(textures[index]);
+}

@@ -4,7 +4,7 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
     : start(startVector), dir(dirVector)
 {
     // kiindulási cella
-    Duo<int> cell(start.x, start.y);
+    Duo<size_t> cell(start.x, start.y);
 
     // egyik x vagy y oldalról a legközelebbi átellenes oldalig a távolság
     // 1 helyett átfogó kéne
@@ -42,6 +42,8 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
             side = true;
         }
     }
+
+    cellValue = spaceGrid[cell.x][cell.y];
 
     // egy kis matek
     wallDist = side == 0 ? sideDist.x - deltaDist.x : sideDist.y - deltaDist.y;

@@ -173,7 +173,7 @@ bool Player::DamagePlayer(int damage)
     return health <= 0;
 }
 
-Input::Input(const Vector2 &dir, double turn, bool shoot) : dir(dir), turn(turn), shootTrigger(shoot) {}
+Input::Input(const Vector2 &dir, double turn, bool shoot) : turn(turn), shootTrigger(shoot), dir(dir) {}
 
 double Input::GetTurn()
 {
@@ -212,16 +212,16 @@ Game::Game(const char *saveName)
     int sizex = 0, sizey = 0;
     levelFile >> sizex >> sizey;
     int **grid = new int *[sizex];
-    for (size_t s = 0; s < sizex; s++)
+    for (int s = 0; s < sizex; s++)
     {
         grid[s] = new int[sizey];
-        for (size_t o = 0; o < sizey; o++)
+        for (int o = 0; o < sizey; o++)
         {
             levelFile >> grid[s][o];
         }
     }
     level = Matrix(sizex, sizey, grid);
-    for (size_t i = 0; i < sizex; i++)
+    for (int i = 0; i < sizex; i++)
     {
         delete[] grid[i];
     }
@@ -230,7 +230,7 @@ Game::Game(const char *saveName)
     // load entities
     int entSize;
     levelFile >> entSize;
-    for (size_t i = 0; i < entSize; i++)
+    for (int i = 0; i < entSize; i++)
     {
         int tempid;
         double posx, posy;

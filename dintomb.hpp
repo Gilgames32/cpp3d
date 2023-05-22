@@ -60,7 +60,7 @@ public:
         data = temp;
     }
 
-    void Delete(int index)
+    void Delete(size_t index)
     {
         if (index < 0 || index >= size)
             throw std::out_of_range("Tartományon kívül eső index");
@@ -79,7 +79,7 @@ public:
         data = temp;
     }
 
-    T &operator[](int index)
+    T &operator[](size_t index)
     {
         if (index < 0 || index >= size)
             throw std::out_of_range("Tartományon kívül eső index");
@@ -87,7 +87,7 @@ public:
         return *(data[index]);
     }
 
-    const T &operator[](int index) const
+    const T &operator[](size_t index) const
     {
         if (index < 0 || index >= size)
             throw std::out_of_range("Tartományon kívül eső index");

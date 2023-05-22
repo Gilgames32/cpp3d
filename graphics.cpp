@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-Window::Window(int w, int h, const char *texturePath) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8888), wallTextures(), frameBuffer()
+Window::Window(int w, int h, const char *texturePath) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8888), frameBuffer(), wallTextures()
 {
     // sdl inicializálás
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -41,7 +41,7 @@ Window::Window(int w, int h, const char *texturePath) : width(w), height(h), for
     levelFile >> floorColor;
     levelFile >> cielingColor;
     // load walls
-    int walls;
+    size_t walls;
     levelFile >> walls;
     for (size_t i = 0; i < walls; i++)
     {
@@ -50,7 +50,7 @@ Window::Window(int w, int h, const char *texturePath) : width(w), height(h), for
         wallTextures.AddTexture(imagePath.c_str(), true);
     }
     // load sprites
-    int sprites;
+    size_t sprites;
     levelFile >> sprites;
     for (size_t i = 0; i < sprites; i++)
     {
@@ -113,7 +113,7 @@ void Window::DrawPerspective(const Game &game)
 
     // irányra merőleges vektor, azaz a kamera síkjával párhuzamos
     Vector2 plane = player.GetPlane();
-    for (size_t x = 0; x < width; x++)
+    for (int x = 0; x < width; x++)
     {
         // jelenlegi képernyőoszlop kamerához relatív aránya -1...1
         double camX = 2 * double(x) / width - 1;
@@ -143,7 +143,7 @@ void Window::DrawPerspective(const Game &game)
         int textureX = cast.WallX() * double(pSize.x);
 
         // bizonyos oldalak tükrözve jelennek meg, erre fix
-        if (cast.GetSide() == 0 && rayDir.x < 0 || cast.GetSide() == 1 && rayDir.y > 0)
+        if ((cast.GetSide() == 0 && rayDir.x < 0) || (cast.GetSide() == 1 && rayDir.y > 0))
             textureX = pSize.x - textureX - 1;
 
         // nyújtás mértéke
@@ -153,7 +153,7 @@ void Window::DrawPerspective(const Game &game)
         double textureY = (drawStart - height / 2 + lineHeight / 2) * scale;
 
         // méretre nyújtjuk/zsugorítjuk a textúrát
-        for (size_t y = drawStart; y < drawEnd; y++)
+        for (int y = drawStart; y < drawEnd; y++)
         {
             // textúra adott pixelét a képernyőre rajzoljuk9
             frameBuffer.SetPixel(x, y, pattern.GetPixel(textureX, textureY));
@@ -175,7 +175,7 @@ void Window::DrawSprites(const Game &game)
 {
     // aliases
     const Player &player = game.GetPlayer();
-    int entSize = game.GetEntities().Size();
+    size_t entSize = game.GetEntities().Size();
     if (entSize <= 0)
     {
         return;

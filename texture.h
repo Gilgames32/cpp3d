@@ -37,8 +37,8 @@ public:
 
     static Uint32 AlphaBlend(Uint32 base, Uint32 add);
 
-    Uint32 GetPixel(int x, int y) const;
-    void SetPixel(int x, int y, Uint32 set);
+    Uint32 GetPixel(size_t x, size_t y) const;
+    void SetPixel(size_t x, size_t y, Uint32 set);
     SDL_Texture *GetTexture();
     const SDL_Texture *GetTexture() const;
     const Duo<size_t> &GetSize() const;
@@ -66,8 +66,8 @@ public:
     void AddTexture(Texture *t, bool darken = false);
 
     // sdl limitációk miatt nem lehet konstans textúrával visszatérni
-    Texture &operator[](int index);
-    const Texture &operator[](int index) const;
+    Texture &operator[](size_t index);
+    const Texture &operator[](size_t index) const;
 };
 
 #endif // TEXTURE_H
