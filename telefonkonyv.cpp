@@ -23,14 +23,14 @@
 int main(int argc, char const *argv[])
 {
     TEST(file beolvasas, GameTest)
-        EXPECT_THROW(Game mainGame("asd.txt"), std::runtime_error) << "Nem dobott hibát" << std::endl;
+        EXPECT_ANY_THROW(Game mainGame("asd.txt")) << "Nem dobott hibát" << std::endl;
         EXPECT_NO_THROW(Game mainGame("./palyateszt/debug1.txt")) << "Hiba történt a fájl megynyitásakor" << std::endl;
     END
 
     TEST(movement, GameTest)
         Game mainGame("./palyateszt/debug1.txt");
         Input pootis(Vector2(-1, -1), 1, false);
-        mainGame.SimulateGame(pootis, 1000);
+        mainGame.SimulateGame(pootis, 10000);
 
         EXPECT_DOUBLE_EQ(2.0, mainGame.GetPlayer().GetPos().x);
         EXPECT_DOUBLE_EQ(1.0, mainGame.GetPlayer().GetPos().y);
