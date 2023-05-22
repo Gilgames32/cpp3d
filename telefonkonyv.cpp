@@ -49,66 +49,86 @@ int main(int argc, char const *argv[])
 
 int main(int argc, char const *argv[])
 {
-    // init
-    Window win(800, 600, "./ass/textures.txt");
-    Game mainGame("palya.txt");
-    WindowInput inp;
-
-    SDL_Event mainEvent;
-    bool quit = false;
-    Uint64 prev = SDL_GetPerformanceCounter(), curr = SDL_GetPerformanceCounter();
-    double deltaTime = 0;
-    while (!quit)
+    // :)
+    try
     {
-        // calc deltatime
-        prev = curr;
-        curr = SDL_GetPerformanceCounter();
-        deltaTime = double((curr - prev) * 1000 / double(SDL_GetPerformanceFrequency()));
-        // FPS
-        // std::cout << (1000 / deltaTime) << std::endl;
+        // init
+        Window win(800, 600, "./ass/textures.txt");
+        Game mainGame("palya.txt");
+        WindowInput inp;
 
-        // játék léptetése
-        quit = mainGame.SimulateGame(inp, deltaTime);
-
-        // grafika
-        win.Clear();
-        win.DrawPerspective(mainGame);
-        win.DrawSprites(mainGame);
-        win.DrawHUD(mainGame, 1000/deltaTime);
-        win.Render();
-
-        // input feldolgozás
-        while (SDL_PollEvent(&mainEvent))
+        SDL_Event mainEvent;
+        bool quit = false;
+        Uint64 prev = SDL_GetPerformanceCounter(), curr = SDL_GetPerformanceCounter();
+        double deltaTime = 0;
+        while (!quit)
         {
-            switch (mainEvent.type)
+            // calc deltatime
+            prev = curr;
+            curr = SDL_GetPerformanceCounter();
+            deltaTime = double((curr - prev) * 1000 / double(SDL_GetPerformanceFrequency()));
+            // FPS
+            // std::cout << (1000 / deltaTime) << std::endl;
+
+            // játék léptetése
+            quit = mainGame.SimulateGame(inp, deltaTime);
+
+            // grafika
+            win.Clear();
+            win.DrawPerspective(mainGame);
+            win.DrawSprites(mainGame);
+            win.DrawHUD(mainGame, 1000/deltaTime);
+            win.Render();
+
+            // input feldolgozás
+            while (SDL_PollEvent(&mainEvent))
             {
-            case SDL_QUIT:
-                quit = true;
-                break;
+                switch (mainEvent.type)
+                {
+                case SDL_QUIT:
+                    quit = true;
+                    break;
 
-            case SDL_KEYDOWN:
-            case SDL_KEYUP:
-                // ismétlődő input szűrés
-                if (!mainEvent.key.repeat)
-                    inp.UpdateKeys(mainEvent.key);
-                break;
+                case SDL_KEYDOWN:
+                case SDL_KEYUP:
+                    // ismétlődő input szűrés
+                    if (!mainEvent.key.repeat)
+                        inp.UpdateKeys(mainEvent.key);
+                    break;
 
-            case SDL_MOUSEMOTION:
-                inp.UpdateMouse(mainEvent.motion);
-                break;
+                case SDL_MOUSEMOTION:
+                    inp.UpdateMouse(mainEvent.motion);
+                    break;
 
-            case SDL_MOUSEBUTTONDOWN:
-                SDL_SetRelativeMouseMode(SDL_TRUE);
-                inp.SetShootTrigger();
-                break;
+                case SDL_MOUSEBUTTONDOWN:
+                    SDL_SetRelativeMouseMode(SDL_TRUE);
+                    inp.SetShootTrigger();
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+                }
+            }
+
+            if (quit)
+            {
+                if (mainGame.GetEntities().Size() == 0)
+                    std::cout << "GAME COMPLETED" << std::endl;
+                else
+                    std::cout << "GAME OVER" << std::endl;
             }
         }
-    }
 
-    return EXIT_SUCCESS;
+        return EXIT_SUCCESS;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        std::cout << "A program hibába ütközött." << std::endl;
+        return EXIT_FAILURE;
+    }
+    
+
 }
 
 #endif // CPORTA

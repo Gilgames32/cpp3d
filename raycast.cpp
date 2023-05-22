@@ -1,10 +1,10 @@
 #include "raycast.h"
 
 Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dirVector)
-    : space(spaceGrid), start(startVector), dir(dirVector)
+    : start(startVector), dir(dirVector)
 {
     // kiindulási cella
-    cell = Duo<int>(start.x, start.y);
+    Duo<int> cell(start.x, start.y);
 
     // egyik x vagy y oldalról a legközelebbi átellenes oldalig a távolság
     // 1 helyett átfogó kéne
@@ -15,6 +15,9 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
     stepDir.x = dir.x < 0 ? -1 : 1;
     stepDir.y = dir.y < 0 ? -1 : 1;
 
+    // rácsvonalanként léptetett pont
+    // starthoz relatív
+    Vector2 sideDist;
     // legközelebbi falig sugár
     // mert nem rácsponton állunk
     sideDist.x = (dir.x < 0 ? start.x - cell.x : cell.x + 1.0 - start.x) * deltaDist.x;
@@ -23,8 +26,8 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
     // ameddig tart a bor addig megyek
     // tbh lövésem sincs mit csinál ha out of bounds vagyunk lol
     // spicy oneliner :3
-    while ( !(cell.x < 0 || cell.y < 0 || cell.x >= spaceGrid.GetSize().x || cell.y >= spaceGrid.GetSize().y) && space[cell.x][cell.y] == 0)
-    {        
+    while (!(cell.x < 0 || cell.y < 0 || cell.x >= spaceGrid.GetSize().x || cell.y >= spaceGrid.GetSize().y) && spaceGrid[cell.x][cell.y] == 0)
+    {
         // DDA algoritmus
         if (sideDist.x < sideDist.y)
         {
@@ -50,10 +53,9 @@ Ray::Ray(const Matrix &spaceGrid, const Vector2 &startVector, const Vector2 &dir
 Ray::Ray(const Ray &ray) : start(ray.start),
                            end(ray.end),
                            dir(ray.dir),
-                           sideDist(ray.sideDist),
                            wallDist(ray.wallDist),
-                           side(ray.side),
-                           space(ray.space) {}
+                           side(ray.side)
+{}
 
 double Ray::WallX() const
 {
@@ -68,7 +70,7 @@ double Ray::WallX() const
 
 // trust me van értelme gettert írni mindenhez :|
 
-int Ray::CellValue() const { return space[cell.x][cell.y]; }
+int Ray::CellValue() const { return cellValue; }
 
 double Ray::GetWallDist() const { return wallDist; }
 

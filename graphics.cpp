@@ -36,9 +36,7 @@ Window::Window(int w, int h, const char *texturePath) : width(w), height(h), for
     // open
     std::ifstream levelFile(texturePath);
     if (!levelFile.is_open())
-    {
         throw std::runtime_error("Hiba a fájl megnyitásakor");
-    }
     // load floor and cieling
     levelFile >> floorColor;
     levelFile >> cielingColor;
@@ -96,11 +94,11 @@ void Window::Render()
 void Window::DrawHUD(const Game &game, int fps)
 {
     // crosshair
-    boxColor(renderer, width/2 -1, height/2 -1, width/2 +1, height/2 +1, 0xFFFFFFFF);
-    
+    boxColor(renderer, width / 2 - 1, height / 2 - 1, width / 2 + 1, height / 2 + 1, 0xFFFFFFFF);
+
     // igen így is lehet betűméretet állítani xd
-    SDL_RenderSetLogicalSize(renderer, width/2, height/2);
-    stringColor(renderer, 4, 4,  ("FPS - " + std::to_string(fps)).c_str(), 0xFFFFFFFF);
+    SDL_RenderSetLogicalSize(renderer, width / 2, height / 2);
+    stringColor(renderer, 4, 4, ("FPS - " + std::to_string(fps)).c_str(), 0xFFFFFFFF);
     stringColor(renderer, 4, 20, (" HP - " + std::to_string(game.GetPlayer().GetHP())).c_str(), 0xFFFFFFFF);
     SDL_RenderSetLogicalSize(renderer, width, height);
 }
@@ -138,7 +136,7 @@ void Window::DrawPerspective(const Game &game)
             drawEnd = height - 1;
 
         // adott textúra
-        const Texture &pattern = wallTextures[(cast.CellValue()-1)*2 + cast.GetSide()];
+        const Texture &pattern = wallTextures[(cast.CellValue() - 1) * 2 + cast.GetSide()];
         const Duo<size_t> &pSize = pattern.GetSize();
 
         // textúra X oszlopa
@@ -178,7 +176,10 @@ void Window::DrawSprites(const Game &game)
     // aliases
     const Player &player = game.GetPlayer();
     int entSize = game.GetEntities().Size();
-    if (entSize <= 0) { return; }
+    if (entSize <= 0)
+    {
+        return;
+    }
 
     // lezárjuk, mert rajzolni fogunk
     frameBuffer.Lock();
@@ -211,7 +212,7 @@ void Window::DrawSprites(const Game &game)
         const Entity &ent = *(sortedEnts[i].a);
         const Vector2 &dir = player.GetDir();
         const Vector2 plane = player.GetPlane();
-        Texture &spriteTex = spriteTextures[ent.GetID()-1];
+        Texture &spriteTex = spriteTextures[ent.GetID() - 1];
         const Duo<size_t> &spriteTexSize = spriteTex.GetSize();
 
         // játékoshoz relatív pozíciója
@@ -334,7 +335,4 @@ void WindowInput::UpdateMouse(const SDL_MouseMotionEvent &mouseEvent)
     turn += mouseEvent.xrel * sensitivity;
 }
 
-void WindowInput::SetShootTrigger()
-{
-    shootTrigger = true;
-}
+void WindowInput::SetShootTrigger() { shootTrigger = true; }

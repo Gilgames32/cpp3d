@@ -1,5 +1,5 @@
 #include "gamelogic.h"
-//#define CPORTA
+// #define CPORTA
 
 Entity::Entity(int id, const Vector2 &pos) : id(id), pos(pos) {}
 
@@ -10,6 +10,16 @@ const Vector2 &Entity::GetPos() const { return pos; }
 void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double speed)
 {
     // egységnyi hosszúságúra nyújtjuk
+    try
+    {
+        moveDir.normalize();
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+        return;
+    }
+
     moveDir = moveDir.normalize();
 
     // kívánt következő pozíció
@@ -45,21 +55,25 @@ void Entity::Move(const Matrix &grid, Vector2 moveDir, double deltaTime, double 
         // ha kell tovább csúsztatni
         if (slide != Vector2(0, 0))
         {
-            // ezt is raycastoljuk
-            Ray slidePath(grid, pos, slide.normalize());
-            double slideMax = slidePath.GetWallDist() - snap;
-            if (slideMax < 0)
-                slideMax = 0;
-            double slideDist = slide.abs();
-            if (slideDist > slideMax)
-                pos += slide.normalize() * slideMax;
-            // ezt már nincs értelme tovább slideolni mert merőleges
-            else
-                pos += slide;
+            try
+            {
+                // ezt is raycastoljuk
+                Ray slidePath(grid, pos, slide.normalize());
+                double slideMax = slidePath.GetWallDist() - snap;
+                if (slideMax < 0)
+                    slideMax = 0;
+                double slideDist = slide.abs();
+                if (slideDist > slideMax)
+                    pos += slide.normalize() * slideMax;
+                // ezt már nincs értelme tovább slideolni mert merőleges
+                else
+                    pos += slide;
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << e.what() << '\n';
+            }
         }
-        
-
-
     }
     else
     {
@@ -71,25 +85,13 @@ Player::Player(const Vector2 &position, const Vector2 &direction) : Entity(-1, p
 
 Player::Player(const Player &p) : Entity(-1, p.GetPos()), dir(p.dir) {}
 
-int Player::GetHP() const
-{
-    return health;
-}
+int Player::GetHP() const { return health; }
 
-const Vector2 &Player::GetDir() const
-{
-    return dir;
-}
+const Vector2 &Player::GetDir() const { return dir; }
 
-Vector2 Player::GetPlane() const
-{
-    return Vector2(-dir.y, dir.x) * 0.66; // fov
-}
+Vector2 Player::GetPlane() const { return Vector2(-dir.y, dir.x) * 0.66; } // szorzóval állítható az FOV
 
-void Player::Rotate(double turn)
-{
-    dir.rotate(turn);
-}
+void Player::Rotate(double turn) { dir.rotate(turn); }
 
 bool Player::Shoot(const Matrix &level, DinTomb<Entity> &entities)
 {
@@ -129,7 +131,16 @@ bool Player::Shoot(const Matrix &level, DinTomb<Entity> &entities)
         if (i->b < hits[mindex].b)
             mindex = i.Index();
 
-    entities.Delete(hits[mindex].a);
+    // just for good measures
+    try
+    {
+        entities.Delete(hits[mindex].a);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
     return true;
 }
 
@@ -224,7 +235,7 @@ Game::Game(const char *saveName)
         int tempid;
         double posx, posy;
         levelFile >> tempid >> posx >> posy;
-        entities.Append(Entity(tempid, Vector2(posx + .5, posy +.5)));
+        entities.Append(Entity(tempid, Vector2(posx + .5, posy + .5)));
     }
 
     // close
@@ -232,7 +243,9 @@ Game::Game(const char *saveName)
 }
 
 const Matrix &Game::GetLevel() const { return level; }
+
 const Player &Game::GetPlayer() const { return player; }
+
 const DinTomb<Entity> &Game::GetEntities() const { return entities; }
 
 bool Game::SimulateGame(Input &inp, double deltaTime)
@@ -250,15 +263,16 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
 
     // shooting
     if (inp.GetShootTrigger())
+    {
         player.Shoot(level, entities);
+    }
 
     // process entities
-    if (entities.Size() == 0)
+    if (entities.Size() <= 0)
     {
-        std::cout << "GAME COMPLETED" << std::endl;
         return true;
     }
-    
+
     for (auto i = entities.begin(); i != entities.end(); ++i)
     {
         // aliases
@@ -281,7 +295,6 @@ bool Game::SimulateGame(Input &inp, double deltaTime)
             {
                 if (player.DamagePlayer(10))
                 {
-                    std::cout << "GAME OVER" << std::endl;
                     return true;
                 }
             }

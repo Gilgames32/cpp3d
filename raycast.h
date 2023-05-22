@@ -17,10 +17,6 @@ class Ray
     // a sugár irányvektora
     const Vector2 dir;
 
-    // rácsvonalanként léptetett pont
-    // starthoz relatív
-    Vector2 sideDist;
-
     // halszemeffektusmentes távolság
     // azaz egy dir-re merőleges egyenestől való távolsága a becsapódásnak
     double wallDist;
@@ -28,11 +24,8 @@ class Ray
     // a becsapódási oldal
     bool side;
 
-    // a becsapódási cella koordinátája
-    Duo<int> cell;
-
-    // a pálya
-    const Matrix &space;
+    // a becsapódási cella értéke
+    int cellValue;
 
 public:
     Ray(const Matrix &sapceGrid, const Vector2 &startVector, const Vector2 &dirVector);
@@ -47,8 +40,6 @@ public:
     bool GetSide() const;
     const Vector2 &GetStart() const;
     const Vector2 &GetEnd() const;
-
-    //~Ray();
 };
 
 #endif // RAYCAST_H

@@ -4,15 +4,9 @@ Uint32 Texture::windowFormat = SDL_PIXELFORMAT_ABGR8888;
 
 SDL_Renderer *Texture::windowRenderer = nullptr;
 
-void Texture::SetRenderer(SDL_Renderer *renderer)
-{
-    windowRenderer = renderer;
-}
+void Texture::SetRenderer(SDL_Renderer *renderer) { windowRenderer = renderer; }
 
-void Texture::SetFormat(Uint32 format)
-{
-    windowFormat = format;
-}
+void Texture::SetFormat(Uint32 format) { windowFormat = format; }
 
 Texture::Texture() : texture(nullptr), size(Duo<size_t>(0, 0)), pixels(nullptr), pitch(0) {}
 
@@ -20,7 +14,7 @@ Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
 {
     SDL_Surface *image = IMG_Load(fileName);
     if (image == nullptr)
-        //throw "NEPTUNKOD"; ...
+        // throw "NEPTUNKOD"; ...
         throw std::runtime_error("Nem betölthető a kép");
 
     size.x = image->w;
@@ -99,7 +93,7 @@ Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
         return add;
     if (skip == 0x00)
         return base;
-    
+
     double addAlpha = double(skip) / 255;
 
     // https://en.wikipedia.org/wiki/Alpha_compositing
@@ -117,20 +111,11 @@ Uint32 Texture::AlphaBlend(Uint32 base, Uint32 add)
     return color;
 }
 
-const SDL_Texture *Texture::GetTexture() const
-{
-    return texture;
-}
+const SDL_Texture *Texture::GetTexture() const { return texture; }
 
-SDL_Texture *Texture::GetTexture()
-{
-    return texture;
-}
+SDL_Texture *Texture::GetTexture() { return texture; }
 
-const Duo<size_t> &Texture::GetSize() const
-{
-    return size;
-}
+const Duo<size_t> &Texture::GetSize() const { return size; }
 
 void Texture::Lock()
 {
@@ -204,7 +189,7 @@ void Palette::AddTexture(Texture *t, bool darken)
     // add the dark version after if needed
     if (darken)
     {
-        Texture* darkt = new Texture(*t);
+        Texture *darkt = new Texture(*t);
         Duo size = darkt->GetSize();
         for (size_t x = 0; x < size.x; x++)
         {
@@ -212,7 +197,7 @@ void Palette::AddTexture(Texture *t, bool darken)
             {
                 // todo: switch order of blending (?)
                 darkt->SetPixel(x, y, Texture::AlphaBlend(0xFF000000, darkt->GetPixel(x, y) & 0x77FFFFFF));
-            }   
+            }
         }
         // :nyakkendő:
         AddTexture(darkt, false);
@@ -233,7 +218,4 @@ Texture &Palette::operator[](int index)
         return *(textures[index]);
 }
 
-const Texture &Palette::operator[](int index) const
-{
-    return operator[](index);
-}
+const Texture &Palette::operator[](int index) const { return operator[](index); }

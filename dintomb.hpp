@@ -63,7 +63,7 @@ public:
     void Delete(int index)
     {
         if (index < 0 || index >= size)
-            throw std::out_of_range("alul vagy tul van idexelve halo");
+            throw std::out_of_range("Tartományon kívül eső index");
 
         T **temp = new T *[size - 1];
         for (size_t i = 0; i < size; i++)
@@ -82,7 +82,7 @@ public:
     T &operator[](int index)
     {
         if (index < 0 || index >= size)
-            throw std::out_of_range("alul vagy tul van idexelve halo");
+            throw std::out_of_range("Tartományon kívül eső index");
 
         return *(data[index]);
     }
@@ -90,7 +90,7 @@ public:
     const T &operator[](int index) const
     {
         if (index < 0 || index >= size)
-            throw std::out_of_range("alul vagy tul van idexelve halo");
+            throw std::out_of_range("Tartományon kívül eső index");
 
         return *(data[index]);
     }
@@ -135,7 +135,7 @@ public:
             if (idx != parent->size)
                 return *(parent->data[idx]);
             else
-                throw std::out_of_range("utolso elem lesz ez helo");
+                throw std::out_of_range("Utolsó utáni elem nem dereferálható");
         }
 
         T *operator->() const { return &operator*(); }

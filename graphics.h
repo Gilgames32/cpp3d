@@ -45,7 +45,6 @@ private:
 
 public:
     WindowInput();
-    //~Input();
     void UpdateKeys(const SDL_KeyboardEvent &keyEvent);
     void UpdateMouse(const SDL_MouseMotionEvent &mouseEvent);
     void SetShootTrigger();
