@@ -217,11 +217,3 @@ Texture &Palette::operator[](size_t index)
     else
         return *(textures[index]);
 }
-
-const Texture &Palette::operator[](size_t index) const
-{
-    if (index < 0 || index >= size)
-        return *placeholder;
-    else
-        return *(textures[index]);
-}

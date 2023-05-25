@@ -22,13 +22,15 @@
 </rant>
 */
 
-// kettős indirekcijó jajdejó
+/**
+ * kettős indirekcióval tárol dinamikusan foglalt memóriaterületen adott típusú változókat
+ */
 template <typename T>
 class DinTomb
 {
 private:
-    T **data;
-    size_t size;
+    T **data;    /**< adott típusú adatokra mutató pointerek tömbje */
+    size_t size; /**< tömb méreteF */
 
 public:
     class DTIterator;
