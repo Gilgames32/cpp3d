@@ -33,11 +33,18 @@ private:
     size_t size; /**< tömb méreteF */
 
 public:
-    class DTIterator;
-    class DTIteratorConst;
+    class DTIterator;      /**< iterátor osztály */
+    class DTIteratorConst; /**< konstans iterátor osztály */
 
+    /**
+     * alapértelmezett konstruktor
+     * @param s méret
+     */
     DinTomb(size_t s = 0) : size(s) { data = new T *[size]; }
 
+    /**
+     * destruktor
+     */
     ~DinTomb()
     {
         for (size_t i = 0; i < size; i++)
@@ -47,8 +54,17 @@ public:
         delete[] data;
     }
 
+    /**
+     * méret getter
+     * @return méret
+     */
     size_t Size() const { return size; }
 
+    /**
+     * hozzáfűzés
+     * a tömb méretét eggyel növeli, utolsó elem új lesz
+     * @param add hozzáfűzendő elem
+     */
     void Append(const T &add)
     {
         T **temp = new T *[size + 1];
@@ -62,6 +78,11 @@ public:
         data = temp;
     }
 
+    /**
+     * törlés
+     * adott indexű elemet felszabadít, eggyel csökken a méret
+     * @param index törölni kívánt index eleme
+     */
     void Delete(size_t index)
     {
         if (index < 0 || index >= size)
@@ -81,6 +102,10 @@ public:
         data = temp;
     }
 
+    /**
+     * indexelő operátor
+     * @param index index
+     */
     T &operator[](size_t index)
     {
         if (index < 0 || index >= size)
@@ -89,6 +114,10 @@ public:
         return *(data[index]);
     }
 
+    /**
+     * konstans indexelő operátor
+     * @param index index
+     */
     const T &operator[](size_t index) const
     {
         if (index < 0 || index >= size)
@@ -97,23 +126,47 @@ public:
         return *(data[index]);
     }
 
+    /**
+     * @return tömb első elemére mutató iterátor
+     */
     DTIterator begin() { return DTIterator(*this); }
 
+    /**
+     * @return tömb utolsó utáni elemére mutató iterátor
+     */
     DTIterator end() { return DTIterator(*this, size); }
 
+    /**
+     * @return tömb első elemére mutató konstans iterátor
+     */
     DTIteratorConst begin() const { return DTIteratorConst(*this); }
 
+    /**
+     * @return tömb utolsó utáni elemére mutató konstans iterátor
+     */
     DTIteratorConst end() const { return DTIteratorConst(*this, size); }
 
     class DTIterator
     {
-        DinTomb *parent;
-        size_t idx;
+        DinTomb *parent; /**< iterátorhoz tartozó tömb első eleme */
+        size_t idx;      /**< index */
 
     public:
+        /**
+         * alapértelmezett konstruktor
+         */
         DTIterator() : parent(0), idx(0) {}
+
+        /**
+         * konstrukotr
+         * @param t hozzá tartozó tömb
+         * @param offset kezdeti index
+         */
         DTIterator(DinTomb &t, size_t offset = 0) : parent(&t), idx(offset) {}
 
+        /**
+         * pre-inkrementáló operátor
+         */
         DTIterator &operator++()
         {
             if (idx != parent->size)
@@ -121,6 +174,9 @@ public:
             return *this;
         }
 
+        /**
+         * poszt-inkrementáló operátor
+         */
         DTIterator operator++(int)
         {
             DTIterator tmp = *this;
@@ -128,10 +184,19 @@ public:
             return tmp;
         }
 
+        /**
+         * hasonlító operátor (nem egyenlő)
+         */
         bool operator!=(const DTIterator &i) const { return (idx != i.idx); }
 
+        /**
+         * hasonlító operátor (egyenlő)
+         */
         bool operator==(const DTIterator &i) const { return !operator!=(i); }
 
+        /**
+         * dereferáló operátor
+         */
         T &operator*() const
         {
             if (idx != parent->size)
@@ -140,17 +205,40 @@ public:
                 throw std::out_of_range("Utolsó utáni elem nem dereferálható");
         }
 
+        /**
+         * nyíl operátor
+         */
         T *operator->() const { return &operator*(); }
 
+        /**
+         * @return index
+         */
         size_t Index() { return idx; }
     };
 
     class DTIteratorConst : public DTIterator
     {
     public:
+        /**
+         * alapértelmezett konstrukor
+         */
         DTIteratorConst() {}
+
+        /**
+         * konstruktor
+         * @param a hozzá tartozó tömb
+         * @param ix kezdeti index
+        */
         DTIteratorConst(const DinTomb &a, size_t ix = 0) : DTIterator(const_cast<DinTomb &>(a), ix) {}
+
+        /**
+         * dereferáló operátor konstans változata
+        */
         const T &operator*() const { return DTIterator::operator*(); }
+
+        /**
+         * nyíl operátor konstans változata
+         */
         const T *operator->() const { return &operator*(); }
     };
 };
