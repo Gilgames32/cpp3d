@@ -42,6 +42,7 @@ public:
      * indexelő operátor
      * @param index sor indexe
      * @return indexedik sor, int tömb
+     * @throw mátrixon kívül eső oszlopindex
      */
     int *operator[](size_t index) const;
 

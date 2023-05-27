@@ -31,6 +31,7 @@ public:
     /**
      * kép fájl alapján textúrát betöltő konstruktor
      * @param fileName kép fájlneve
+     * @throw hibás fájl(név)
      */
     Texture(const char *fileName);
 
@@ -87,6 +88,7 @@ public:
      * adott pixel színének settere
      * @param x pixel x koordinátája
      * @param y pixel y koordinátája
+     * @throw textúrán kívül eső pixel
      */
     void SetPixel(size_t x, size_t y, Uint32 set);
 

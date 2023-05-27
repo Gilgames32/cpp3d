@@ -24,6 +24,7 @@ Texture::Texture(const char *fileName) : pixels(nullptr), pitch(0)
     SDL_ConvertPixels(size.x, size.y, image->format->format, image->pixels, image->pitch, windowFormat, pixels, pitch);
     UnLock();
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_FreeSurface(image);
 }
 
 Texture::Texture(int w, int h) : size(Duo<size_t>(w, h)), pixels(nullptr), pitch(0)

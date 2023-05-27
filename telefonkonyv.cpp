@@ -41,11 +41,9 @@ int main(int argc, char const *argv[])
         Input pootis(Vector2(-1, -1), 0, true);
         EXPECT_TRUE(mainGame.SimulateGame(pootis, 10));
     END
-    
 }
 
 #else
-
 
 int main(int argc, char const *argv[])
 {
@@ -77,7 +75,7 @@ int main(int argc, char const *argv[])
             win.Clear();
             win.DrawPerspective(mainGame);
             win.DrawSprites(mainGame);
-            win.DrawHUD(mainGame, 1000/deltaTime);
+            win.DrawHUD(mainGame, 1000 / deltaTime);
             win.Render();
 
             // input feldolgozás
@@ -121,14 +119,12 @@ int main(int argc, char const *argv[])
 
         return EXIT_SUCCESS;
     }
-    catch(const std::exception& e)
+    catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
         std::cout << "A program hibába ütközött." << std::endl;
         return EXIT_FAILURE;
     }
-    
-
 }
 
 #endif // CPORTA

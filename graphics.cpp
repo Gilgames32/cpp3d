@@ -3,13 +3,19 @@
 Window::Window(int w, int h, const char *texturePath) : width(w), height(h), format(SDL_PIXELFORMAT_ABGR8888), frameBuffer(), wallTextures()
 {
     // sdl inicializálás
-    SDL_Init(SDL_INIT_EVERYTHING);
+    std::cout << SDL_Init(SDL_INIT_EVERYTHING) << "/n";
 
     // ablak és renderer
     // vices érted mert telefonkönyv oszt 3d xddddddd
     window = SDL_CreateWindow("Telefonkönyv3D", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, 0);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_SHOWN);
-    // SDL_RenderSetLogicalSize(renderer, width, height); // ha esetleg pixelesíteni szeretnénk még rajt
+    // SDL_RenderSetLogicalSize(renderer, width, height); // ha esetleg pixelesíteni szeretnénk még rajt (buffer miatt nem szerencsés)
+
+    // ikon beállítás
+    icon = IMG_Load("icon.png");
+    if (icon == nullptr)
+        throw std::runtime_error("Nem található az ikon (icon.png)");
+    SDL_SetWindowIcon(window, icon);
 
     // alapértelmezett renderer a textúrákhoz
     // elmagyarázhatnám, hogy miért kell de tldr: az sdl fos
@@ -67,6 +73,7 @@ Window::~Window()
     delete[] zBuffer;
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    SDL_FreeSurface(icon);
     SDL_Quit();
 }
 

@@ -82,6 +82,7 @@ public:
     /**
      * vektor normálisa
      * @return megegyező írányú, egységnyi hosszúságú vektor
+     * @throw nullvektort próbál normalizálni
      */
     Vector2 normalize() const;
 

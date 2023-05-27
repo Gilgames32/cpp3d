@@ -160,6 +160,7 @@ public:
     /**
      * konstruktor
      * @param saveName pálya fájljának neve
+     * @throw hibás fájl(név)
      */
     Game(const char *saveName);
 
