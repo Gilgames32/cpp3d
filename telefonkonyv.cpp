@@ -51,8 +51,8 @@ int main(int argc, char const *argv[])
     try
     {
         // init
-        Window win(800, 600, "./ass/textures.txt");
-        Game mainGame("palya.txt");
+        Window win(800, 600, "./textures.txt");
+        Game mainGame("./palya.txt");
         WindowInput inp;
 
         SDL_Event mainEvent;
