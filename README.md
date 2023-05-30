@@ -38,4 +38,4 @@ Függőleges szinkronizációt használ, az FPS ezért nem megy a képernyő ké
 Prog2 nagyházinak nem ajátnlott beadni, én már megtettem. :3
 
 ## Képek
-![:3](https://raw.githubusercontent.com/Gilgames32/cpp3d/main/ass/screenshot.png)
+![:3](https://raw.githubusercontent.com/Gilgames32/cpp3d/master/ass/screenshot.png)
