@@ -191,7 +191,7 @@ void Palette::AddTexture(Texture *t, bool darken)
     if (darken)
     {
         Texture *darkt = new Texture(*t);
-        Duo size = darkt->GetSize();
+        Duo<size_t> size = darkt->GetSize();
         for (size_t x = 0; x < size.x; x++)
         {
             for (size_t y = 0; y < size.y; y++)
